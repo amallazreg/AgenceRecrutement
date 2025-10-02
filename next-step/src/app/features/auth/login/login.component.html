@@ -1,12 +1,12 @@
 <div class="login-container">
   <!-- Section gauche avec illustration -->
   <div class="login-illustration">
-      <img src="/next-step/src/assets/nextstep.jpg" alt="NextStep AI Logo">  </div>
+      <img src="/assets/job.png" alt="NextStep AI Logo">  </div>
 
   <!-- Section droite avec formulaire -->
   <div class="login-form">
     <div class="logo">
-      <img src="assets/logo.png" alt="NextStep AI Logo">
+      <img src="assets/logo.jpeg" alt="NextStep AI Logo">
       <h2>NextStep <span>AI</span></h2>
     </div>
 
@@ -18,10 +18,24 @@
         <input type="email" id="email" placeholder="Email" required>
       </div>
 
-      <div class="input-group">
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" placeholder="Mot de passe" required>
-      </div>
+   <div class="input-group password-group">
+  <label for="password">Mot de passe</label>
+  <input 
+    [type]="showPassword ? 'text' : 'password'" 
+    id="password" 
+    placeholder="Mot de passe" 
+    required>
+  
+  <span class="toggle-password" (click)="togglePassword()" style="
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin-top: -31px;
+">
+    {{ showPassword ? '🙈' : '👁️' }}
+  </span>
+</div>
+
 
       <div class="remember">
         <input type="checkbox" id="remember">
