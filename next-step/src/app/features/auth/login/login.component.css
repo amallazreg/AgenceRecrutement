@@ -17,9 +17,13 @@
 }
 .login-illustration img {
   width: 70%;
-  max-width: 400px;
+  max-width: 500px;
 }
-
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
 /* Formulaire (droite) */
 .login-form {
   flex: 1;

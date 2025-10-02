@@ -1,9 +1,10 @@
 <div class="login-container">
-  <!-- Section gauche avec illustration -->
+  <!-- Section gauche -->
   <div class="login-illustration">
-      <img src="/assets/job.png" alt="NextStep AI Logo">  </div>
+    <img src="/assets/job22.png" alt="NextStep AI Logo">
+  </div>
 
-  <!-- Section droite avec formulaire -->
+  <!-- Section droite -->
   <div class="login-form">
     <div class="logo">
       <img src="assets/logo.jpeg" alt="NextStep AI Logo">
@@ -12,41 +13,66 @@
 
     <h3>Connexion</h3>
 
-    <form>
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+
+      <!-- Champ Email -->
       <div class="input-group">
         <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Email" required>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          placeholder="Email"
+          required
+          email
+          [(ngModel)]="formData.email"
+          #emailCtrl="ngModel">
+
+        <!-- Messages d'erreur email -->
+        <div class="error" *ngIf="emailCtrl.invalid && emailCtrl.touched">
+          <small *ngIf="emailCtrl.errors?.['required']">L'email est requis.</small>
+          <small *ngIf="emailCtrl.errors?.['email']">Format d'email invalide.</small>
+        </div>
       </div>
 
-   <div class="input-group password-group">
-  <label for="password">Mot de passe</label>
-  <input 
-    [type]="showPassword ? 'text' : 'password'" 
-    id="password" 
-    placeholder="Mot de passe" 
-    required>
-  
-  <span class="toggle-password" (click)="togglePassword()" style="
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    margin-top: -31px;
-">
-    {{ showPassword ? '🙈' : '👁️' }}
-  </span>
-</div>
+      <!-- Champ Mot de passe -->
+      <div class="input-group password-group">
+        <label for="password">Mot de passe</label>
+        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          id="password" 
+          name="password"
+          placeholder="Mot de passe"
+          required
+          minlength="6"
+          [(ngModel)]="formData.password"
+          #passwordCtrl="ngModel">
 
+        <span class="toggle-password" (click)="togglePassword()" 
+          style="display: flex; justify-content: flex-end; margin-top: -31px;">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </span>
 
+        <!-- Messages d'erreur password -->
+        <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched" style="margin-top: 14px;">
+          <small *ngIf="passwordCtrl.errors?.['required']">Le mot de passe est requis.</small>
+        </div>
+      </div>
+
+      <!-- Checkbox souvenir -->
       <div class="remember">
-        <input type="checkbox" id="remember">
+        <input type="checkbox" id="remember" name="remember" [(ngModel)]="formData.remember">
         <label for="remember">Se souvenir de moi</label>
       </div>
 
-      <button type="submit" class="btn">Se connecter</button>
+      <!-- Bouton connexion -->
+      <button type="submit" class="btn" [disabled]="!loginForm.valid">
+        Se connecter
+      </button>
     </form>
 
     <p class="signup-text">
-      Pas encore de compte ? <a href="#">Créer un compte</a>
+      Pas encore de compte ? <a routerLink="/auth/signup" routerLinkActive="router-link-active" >Créer un compte</a>
     </p>
 
     <footer>

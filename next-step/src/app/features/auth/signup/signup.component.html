@@ -1,1 +1,111 @@
-<p>signup works!</p>
+<div class="signup-container">
+  <!-- Illustration -->
+  <div class="signup-illustration">
+    <img src="/assets/job22.png" alt="Inscription Illustration">
+  </div>
+
+  <!-- Formulaire -->
+  <div class="signup-form">
+    <div class="logo">
+      <img src="assets/logo.jpeg" alt="NextStep AI Logo">
+      <h2>NextStep <span>AI</span></h2>
+    </div>
+
+    <h3>Créer un compte</h3>
+
+    <form #signupForm="ngForm" (ngSubmit)="onSubmit(signupForm)" novalidate>
+      
+      <!-- Nom complet -->
+      <div class="input-group">
+        <label for="name">Nom complet</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          placeholder="Votre nom complet"
+          required
+          [(ngModel)]="formData.name"
+          #nameCtrl="ngModel">
+        <div class="error" *ngIf="nameCtrl.invalid && nameCtrl.touched">
+          <small>Le nom est requis.</small>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="Email"
+          required
+          email
+          [(ngModel)]="formData.email"
+          #emailCtrl="ngModel">
+        <div class="error" *ngIf="emailCtrl.invalid && emailCtrl.touched">
+          <small *ngIf="emailCtrl.errors?.['required']">L'email est requis.</small>
+          <small *ngIf="emailCtrl.errors?.['email']">Format invalide.</small>
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="input-group password-group">
+        <label for="password">Mot de passe</label>
+        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          id="password" 
+          name="password"
+          placeholder="Mot de passe"
+          required
+          minlength="6"
+          [(ngModel)]="formData.password"
+          #passwordCtrl="ngModel">
+        <span class="toggle-password" (click)="togglePassword()">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </span>
+        <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
+          <small>Mot de passe requis (min 6 caractères).</small>
+        </div>
+      </div>
+
+      <!-- Confirmation -->
+      <div class="input-group password-group">
+        <label for="confirmPassword">Confirmer le mot de passe</label>
+        <input 
+          [type]="showConfirmPassword ? 'text' : 'password'" 
+          id="confirmPassword" 
+          name="confirmPassword"
+          placeholder="Confirmer le mot de passe"
+          required
+          [(ngModel)]="formData.confirmPassword"
+          #confirmCtrl="ngModel">
+        <span class="toggle-password" (click)="toggleConfirmPassword()">
+          {{ showConfirmPassword ? '🙈' : '👁️' }}
+        </span>
+        <div class="error" *ngIf="formData.password !== formData.confirmPassword && confirmCtrl.touched">
+          <small>Les mots de passe ne correspondent pas.</small>
+        </div>
+      </div>
+
+      <!-- Accepter conditions -->
+      <div class="remember">
+        <input type="checkbox" id="accept" name="accept" [(ngModel)]="formData.acceptTerms" required>
+        <label for="accept">J’accepte les conditions d’utilisation</label>
+      </div>
+
+      <!-- Bouton -->
+      <button type="submit" class="btn" [disabled]="!signupForm.valid || formData.password !== formData.confirmPassword">
+        Créer un compte
+      </button>
+    </form>
+
+    <p class="login-text">
+      Déjà un compte ? <a href="#">Se connecter</a>
+    </p>
+
+    <footer>
+      © 2025 NextStep – Tous droits réservés
+    </footer>
+  </div>
+</div>
