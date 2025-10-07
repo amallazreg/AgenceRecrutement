@@ -1,14 +1,17 @@
-/* Container principal */
-.login-container {
+/* ===============================
+   🌐 PAGE STRUCTURE
+=============================== */
+.login-page {
   display: flex;
-  height: 100vh;
   align-items: center;
   justify-content: center;
-  background: #f8faff;
-  font-family: Arial, sans-serif;
+  height: 96vh;
+  background: #f9fbff;
+  font-family: "Poppins", Arial, sans-serif;
+  overflow: hidden;
 }
 
-/* Illustration (gauche) */
+/* Illustration */
 .login-illustration {
   flex: 1;
   display: flex;
@@ -16,98 +19,153 @@
   align-items: center;
 }
 .login-illustration img {
-  width: 70%;
+  width: 75%;
   max-width: 500px;
+  animation: float 3s ease-in-out infinite;
 }
-.error {
-  color: red;
-  font-size: 12px;
-  margin-top: 4px;
-}
-/* Formulaire (droite) */
-.login-form {
-  flex: 1;
-  background: #fff;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  max-width: 400px;
-  margin-right: 100px;
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
 }
 
+/* ===============================
+   🧾 LOGIN CARD
+=============================== */
+.login-card {
+  flex: 1;
+  max-width: 400px;
+  background: #fff;
+  padding: 40px 35px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 20px;
+  animation: slideIn 0.6s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Logo */
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 15px;
 }
 .logo img {
   width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
-.logo h2 {
-  font-size: 20px;
-  margin: 0;
-  font-weight: bold;
+.logo h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
 }
 .logo span {
-  color: #4f46e5; /* Violet */
+  color: #4f46e5;
 }
 
-h3 {
-  margin: 20px 144px;
-  font-size: 22px;
-  color: #111;
+/* Title */
+h2 {
+  font-size: 20px;
+  margin: 10px 0 25px;
+  text-align: center;
+  color: #111827;
 }
 
-/* Inputs */
-.input-group {
-  margin-bottom: 15px;
+/* ===============================
+   ✏️ FORM INPUTS
+=============================== */
+.form-group {
+  margin-bottom: 16px;
 }
-.input-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-  color: #555;
-}
-.input-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+
+.input-icon {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
+  padding: 10px 12px;
+  background: #fafafa;
+  transition: border-color 0.3s ease;
+}
+.input-icon:focus-within {
+  border-color: #4f46e5;
+  background: #fff;
+}
+.input-icon i {
+  color: #6b7280;
+  font-size: 16px;
+  margin-right: 8px;
+}
+.input-icon input {
+  border: none;
+  outline: none;
+  flex: 1;
   font-size: 14px;
+  background: transparent;
 }
 
-/* Checkbox */
+.toggle-password {
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 8px;
+  color: #6b7280;
+}
+
+/* Errors */
+.error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Souvenir */
 .remember {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin: 12px 0 18px;
 }
 .remember label {
-  margin-left: 8px;
   font-size: 14px;
   color: #555;
+  margin-left: 6px;
 }
 
 /* Bouton */
 .btn {
   width: 100%;
   padding: 12px;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
   border: none;
-  background: #4f46e5;
   color: white;
-  font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
 .btn:hover {
-  background: #4338ca;
+  background: linear-gradient(90deg, #4338ca, #4f46e5);
+  transform: translateY(-2px);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* Texte inscription */
+/* Lien inscription */
 .signup-text {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 18px;
   font-size: 14px;
 }
 .signup-text a {
@@ -121,7 +179,29 @@ h3 {
 /* Footer */
 footer {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 25px;
   font-size: 12px;
-  color: #888;
+  color: #9ca3af;
+}
+
+/* ===============================
+   📱 RESPONSIVE
+=============================== */
+@media (max-width: 900px) {
+  .login-page {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 40px 20px;
+    height: auto;
+  }
+  .login-illustration {
+    margin-bottom: 20px;
+  }
+  .login-illustration img {
+    width: 60%;
+  }
+  .login-card {
+    max-width: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
 }

@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnimationOptions , LottieComponent} from 'ngx-lottie';
 import { FormsModule, NgForm } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule , FormsModule],
+  imports: [CommonModule , FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'] 
 })
