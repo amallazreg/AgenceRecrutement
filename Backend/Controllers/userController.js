@@ -4,64 +4,65 @@ require('dotenv').config();
 const secret = process.env.JWT_SECRET;
 
 
+
 const signupController = async (req, res) => {
-    try {
-        const { username, email, password, confirmPassword,phone, role } = req.body;
+  try {
+    const { username, email, password, confirmPassword, phone, role } = req.body;
 
-        console.log('Received signup request with:', { username, email,phone, role });
+    console.log('Received signup request with:', { username, email, phone, role });
 
-        if (!username || !email  || !password || !confirmPassword || !phone) {
-            console.log('Missing fields');
-            return res.status(400).json({ message: 'Ensure username, email, password, and confirmPassword are provided' });
-        }
-
-        // Vérifier que le mot de passe et la confirmation correspondent
-        if (password !== confirmPassword) {
-            console.log('Passwords do not match');
-            return res.status(400).json({ message: 'Password and confirmPassword must match' });
-        }
-
-        // Vérifier s'il existe déjà un utilisateur admin
-        const adminUser = await User.findOne({ role: 'admin' });
-
-        // Si un utilisateur admin existe déjà, empêcher un deuxième admin
-        if (adminUser && role === 'admin') {
-            console.log('An admin user already exists. Cannot create another one.');
-            return res.status(403).json({ message: 'An admin user already exists. Only users and agencies can be created now.' });
-        }
-
-        // Vérifier si l'email ou le username existe déjà
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            console.log('Username or email already exists');
-            return res.status(400).json({ message: 'Username or email already exists!' });
-        }
-
-        let userRole;
-        if (!adminUser) {
-            userRole = 'admin';
-        } else {
-            if (role === 'user') {
-                userRole = 'user';
-            } 
-            if (role === 'agence') {
-                userRole = 'agence';
-            } 
-        }
-
-        // Créer un nouvel utilisateur
-        const user = new User({ username, email, password,phone,role: userRole });
-
-        const savedUser = await user.save();
-        console.log('User saved:', savedUser);
-
-        res.status(201).json({ message: 'User created successfully', user: savedUser });
-
-    } catch (err) {
-        console.error('Error occurred:', err);
-        res.status(500).json({ message: 'An error occurred while creating the user' });
+    // Vérification des champs obligatoires
+    if (!username || !email || !password || !confirmPassword || !phone) {
+      console.log('Missing fields');
+      return res.status(400).json({ message: 'Ensure username, email, password, and confirmPassword are provided' });
     }
+
+    // Vérifier que le mot de passe et la confirmation correspondent
+    if (password !== confirmPassword) {
+      console.log('Passwords do not match');
+      return res.status(400).json({ message: 'Password and confirmPassword must match' });
+    }
+
+    // Vérifier s'il existe déjà un utilisateur admin
+    const adminUser = await User.findOne({ role: 'admin' });
+
+    // Si un utilisateur admin existe déjà, empêcher un deuxième admin
+    if (adminUser && role === 'admin') {
+      console.log('An admin user already exists. Cannot create another one.');
+      return res.status(403).json({ message: 'An admin user already exists. Only users and agencies can be created now.' });
+    }
+
+    // Vérifier si l'email ou le username existe déjà
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      console.log('Username or email already exists');
+      return res.status(400).json({ message: 'Username or email already exists!' });
+    }
+
+    // Définir le rôle automatiquement :
+    let userRole;
+    if (!adminUser) {
+      userRole = 'admin'; // ✅ le premier compte créé devient admin
+    } else {
+      userRole = role || 'user'; // ✅ tous les autres comptes sont user par défaut
+    }
+
+    // Créer un nouvel utilisateur
+    const user = new User({ username, email, password, phone, role: userRole });
+
+    const savedUser = await user.save();
+    console.log('User saved:', savedUser);
+
+    res.status(201).json({ message: 'User created successfully', user: savedUser });
+
+  } catch (err) {
+    console.error('Error occurred:', err);
+    res.status(500).json({ message: 'An error occurred while creating the user' });
+  }
 };
+
+module.exports = { signupController };
+
 
 
 const signinController = async (req, res) => {
