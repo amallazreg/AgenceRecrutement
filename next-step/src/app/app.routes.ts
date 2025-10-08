@@ -6,7 +6,8 @@ import { UserDashboardComponent } from './user-dashboard/user-dashboard.componen
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/signup', component: SignupComponent },
+  { path: 'userDashboard', component: UserDashboardComponent },
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'auth/login' },
-  {path: 'userDashboard', component:UserDashboardComponent},
-];
+  { path: '**', redirectTo: 'auth/login' }
+
+]
