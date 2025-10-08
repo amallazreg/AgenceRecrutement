@@ -20,7 +20,7 @@ export class SignupComponent {
   constructor(private authService : AuthServiceService,private router: Router){}
 
   formData = {
-    username: '',
+    name: '',
     email: '',
     phone: '',
     password: '',
@@ -39,7 +39,7 @@ export class SignupComponent {
   onSubmit(form: NgForm) {
     if (form.valid && this.formData.password === this.formData.confirmPassword) {
       const user = {
-        username: this.formData.username,
+        name: this.formData.name,
         email: this.formData.email,
         phone: this.formData.phone,
         password: this.formData.password,

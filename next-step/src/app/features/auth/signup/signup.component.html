@@ -19,14 +19,14 @@
       
       <!-- Nom complet -->
       <div class="input-group">
-        <label for="username">Username</label>
+        <label for="name">Name</label>
         <input 
           type="text" 
-          id="username"
-          name="username" 
+          id="name"
+          name="name" 
           placeholder="your full name"
           required
-          [(ngModel)]="formData.username"
+          [(ngModel)]="formData.name"
           #nameCtrl="ngModel">
         <div class="error" *ngIf="nameCtrl.invalid && nameCtrl.touched">
           <small>Name is required.</small>

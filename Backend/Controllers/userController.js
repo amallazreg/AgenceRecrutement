@@ -1,5 +1,7 @@
 const User = require('../Models/userModel');
+const Company = require('../Models/companyModel') ;
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 const secret = process.env.JWT_SECRET;
 
@@ -7,14 +9,14 @@ const secret = process.env.JWT_SECRET;
 
 const signupController = async (req, res) => {
   try {
-    const { username, email, password, confirmPassword, phone, role } = req.body;
+    const { name, email, password, confirmPassword, phone, role } = req.body;
 
-    console.log('Received signup request with:', { username, email, phone, role });
+    console.log('Received signup request with:', { name, email, phone, role });
 
     // Vérification des champs obligatoires
-    if (!username || !email || !password || !confirmPassword || !phone) {
+    if (!name || !email || !password || !confirmPassword || !phone) {
       console.log('Missing fields');
-      return res.status(400).json({ message: 'Ensure username, email, password, and confirmPassword are provided' });
+      return res.status(400).json({ message: 'Ensure name, email, password, and confirmPassword are provided' });
     }
 
     // Vérifier que le mot de passe et la confirmation correspondent
@@ -32,11 +34,11 @@ const signupController = async (req, res) => {
       return res.status(403).json({ message: 'An admin user already exists. Only users and agencies can be created now.' });
     }
 
-    // Vérifier si l'email ou le username existe déjà
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    // Vérifier si l'email ou le name existe déjà
+    const existingUser = await User.findOne({ $or: [{ name }, { email }] });
     if (existingUser) {
-      console.log('Username or email already exists');
-      return res.status(400).json({ message: 'Username or email already exists!' });
+      console.log('name or email already exists');
+      return res.status(400).json({ message: 'name or email already exists!' });
     }
 
     // Définir le rôle automatiquement :
@@ -48,7 +50,7 @@ const signupController = async (req, res) => {
     }
 
     // Créer un nouvel utilisateur
-    const user = new User({ username, email, password, phone, role: userRole });
+    const user = new User({ name, email, password, phone, role: userRole });
 
     const savedUser = await user.save();
     console.log('User saved:', savedUser);
@@ -61,55 +63,81 @@ const signupController = async (req, res) => {
   }
 };
 
-module.exports = { signupController };
-
 
 
 const signinController = async (req, res) => {
-    try {
-        const { username, password } = req.body;
+  try {
+    const { name, password } = req.body;
 
-        // Vérifier si l'utilisateur existe
-        const user = await User.findOne({ username }).select('email username password role _id').exec();
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Could not authenticate user' });
-        }
-
-        // Vérifier le mot de passe avec bcrypt
-        const validPassword = await user.comparePassword(password);
-        if (!validPassword) {
-            return res.status(401).json({ success: false, message: 'Could not authenticate password' });
-        }
-
-        // Récupérer le secret depuis les variables d'environnement
-        const secret = process.env.SECRET_KEY;
-        if (!secret) {
-            throw new Error("Le secret JWT n'est pas défini dans les variables d'environnement");
-        }
-
-        // Générer le token avec l'ID de l'utilisateur
-        const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role },
-            secret,
-            { expiresIn: '24h' }
-        );
-
-        // Réponse en fonction du rôle
-        if (user.role === 'admin') {
-            return res.json({ success: true, message: 'Admin authenticated', token, role: 'admin' });
-        } else if (user.role === 'agence') {
-            return res.json({ success: true, message: 'Agence authenticated', token, role: 'agence' });
-        } else {
-            return res.json({ success: true, message: 'User authenticated', token,username, role: 'user',userId:user._id });
-        }
-
-    } catch (err) {
-        console.error('Error in signinController:', err);
-        res.status(500).send(`An error occurred while authenticating the user: ${err.message}`);
+    if (!name || !password) {
+      return res.status(400).json({ success: false, message: "Nom et mot de passe requis" });
     }
+
+    // =============================
+    // 1️⃣ Rechercher dans la collection User
+    // =============================
+    let account = await User.findOne({ name }).select("email name password role _id").exec();
+    let accountType = "user";
+
+    // Si pas trouvé, rechercher dans Company
+    if (!account) {
+      account = await Company.findOne({ name }).select("name password role _id").exec();
+      accountType = "company";
+    }
+
+    // Si toujours pas trouvé → erreur
+    if (!account) {
+      return res.status(401).json({ success: false, message: "Utilisateur ou entreprise non trouvé(e)" });
+    }
+
+    // =============================
+    // 2️⃣ Vérifier le mot de passe
+    // =============================
+    const validPassword =
+      accountType === "user"
+        ? await account.comparePassword(password)
+        : await bcrypt.compare(password, account.password);
+
+    if (!validPassword) {
+      return res.status(401).json({ success: false, message: "Mot de passe incorrect" });
+    }
+
+    // =============================
+    // 3️⃣ Générer le token JWT
+    // =============================
+    const secret = process.env.JWT_SECRET || process.env.SECRET_KEY;
+    if (!secret) {
+      throw new Error("Le secret JWT n'est pas défini dans les variables d'environnement");
+    }
+
+    const token = jwt.sign(
+      { id: account._id, name: account.name, role: account.role },
+      secret,
+      { expiresIn: "24h" }
+    );
+
+    // =============================
+    // 4️⃣ Réponse selon le rôle
+    // =============================
+    if (account.role === "admin") {
+      return res.json({ success: true, message: "Admin authentifié", token, role: "admin" });
+    } else if (accountType === "company" || account.role === "company") {
+      return res.json({ success: true, message: "Company authentifiée", token, role: "company" });
+    } else {
+      return res.json({
+        success: true,
+        message: "User authentifié",
+        token,
+        role: "user",
+        userId: account._id,
+        name: account.name,
+      });
+    }
+  } catch (err) {
+    console.error("Erreur dans signinController fusionné:", err);
+    res.status(500).send(`Erreur lors de l'authentification : ${err.message}`);
+  }
 };
-
-
 
 
 module.exports = {

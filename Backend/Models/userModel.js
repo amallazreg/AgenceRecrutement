@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 // Définition du schéma de l'utilisateur
 const UserSchema = new Schema({
-    username: { type: String, required: true },
+    name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phone:{ type: String},

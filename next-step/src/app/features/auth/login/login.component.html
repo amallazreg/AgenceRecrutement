@@ -14,21 +14,21 @@
     <h2>Login</h2>
 
 <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)" novalidate>
-      <!-- Username -->
+      <!-- Name -->
       <div class="form-group">
         <div class="input-icon">
           <i class="fa fa-envelope"></i>
           <div class="input-group">
         <input 
           type="text" 
-          id="username"
-          name="username" 
-          placeholder="Username"
+          id="name"
+          name="name" 
+          placeholder="Name"
           required
-          [(ngModel)]="formData.username"
+          [(ngModel)]="formData.name"
           #nameCtrl="ngModel">
         <div class="error" *ngIf="nameCtrl.invalid && nameCtrl.touched">
-          <small>Username required.</small>
+          <small>name required.</small>
         </div>
       </div>
       </div>
@@ -43,7 +43,7 @@
             [type]="showPassword ? 'text' : 'password'"
             id="password"
             name="password"
-            placeholder="Mot de passe"
+            placeholder="Password"
             required
             minlength="6"
             [(ngModel)]="formData.password"

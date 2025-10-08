@@ -22,7 +22,7 @@ export class LoginComponent {
 
   // Données du formulaire
   formData = {
-    username: '',
+    name: '',
     password: '',
     remember: false
   };
@@ -37,12 +37,18 @@ onSubmit(form: NgForm, event: Event) {
   event.preventDefault(); // Empêche le reload
   if (form.valid) {
     this.authService.signin({
-      username: this.formData.username,
+      name: this.formData.name,
       password: this.formData.password
     }).subscribe({
       next: (res) => {
         console.log('Connexion réussie ✅', res);
-        this.router.navigate(['/userDashboard']);
+          if (res.role === 'admin') {
+            this.router.navigate(['/adminDashboard']);
+          } else if (res.role === 'user') {
+            this.router.navigate(['/userDashboard']);
+          }else if(res.role =='company'){
+            this.router.navigate(['/companyDashboard']);
+          }
       },
       error: (err) => {
         console.error('Erreur connexion ❌', err);

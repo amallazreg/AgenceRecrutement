@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 // Définition du schéma de l'utilisateur
 const CompanySchema = new Schema({
-    companyName: { type: String, required: true, unique: true, validate: {
+    name: { type: String, required: true, unique: true, validate: {
         validator: function(v) {
             return v != null && v.trim() !== '';
         },

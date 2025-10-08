@@ -9,9 +9,9 @@ const secret = process.env.JWT_SECRET;
 
 const signupController = async (req, res) => {
     try {
-        const { companyName, sector, companyDescription, fullAddress, phoneNumber, email, website, hrManage, managerEmail, password, confirmPassword } = req.body;
+        const { name, sector, companyDescription, fullAddress, phoneNumber, email, website, hrManage, managerEmail, password, confirmPassword } = req.body;
 
-        if (!companyName || !sector || !companyDescription || !fullAddress || !phoneNumber || !website || !email || !hrManage || !managerEmail || !password || !confirmPassword) {
+        if (!name || !sector || !companyDescription || !fullAddress || !phoneNumber || !website || !email || !hrManage || !managerEmail || !password || !confirmPassword) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -20,16 +20,16 @@ const signupController = async (req, res) => {
         }
 
         // Assurez-vous que les champs uniques ne sont pas vides
-        if (!companyName.trim() || !email.trim() || !website.trim()) {
-            return res.status(400).json({ message: 'companyName, Email et website ne peuvent pas être vides' });
+        if (!name.trim() || !email.trim() || !website.trim()) {
+            return res.status(400).json({ message: 'name, Email et website ne peuvent pas être vides' });
         }
 
-        const existingCompany = await Company.findOne({ $or: [{ companyName }, { email }, { website }] });
+        const existingCompany = await Company.findOne({ $or: [{ name }, { email }, { website }] });
         if (existingCompany) {
             return res.status(400).json({ message: 'Company with the same name, email, or website already exists' });
         }
 
-        const company = new Company({ companyName, sector, companyDescription, fullAddress, phoneNumber, email, website, hrManage, managerEmail, password, confirmPassword, role: 'company' });
+        const company = new Company({ name, sector, companyDescription, fullAddress, phoneNumber, email, website, hrManage, managerEmail, password, confirmPassword, role: 'company' });
 
         const savedCompany = await company.save();
         res.status(201).json({ message: 'Company created successfully', company: savedCompany });
@@ -43,10 +43,10 @@ const signupController = async (req, res) => {
 
 const signinController = async (req, res) => {
     try {
-        const { companyName, password } = req.body;
+        const { name, password } = req.body;
 
         // Vérifier si l'agence existe
-        const company = await Company.findOne({ companyName }).select('companyName password role _id').exec();
+        const company = await Company.findOne({ name }).select('name password role _id').exec();
         if (!company) {
             return res.status(401).json({ success: false, message: "Company non trouvée" });
         }
@@ -65,7 +65,7 @@ const signinController = async (req, res) => {
 
         // Générer le token avec l'ID de l'agence
         const token = jwt.sign(
-            { id: company._id, companyName: company.companyName, role: company.role },
+            { id: company._id, name: company.name, role: company.role },
             secret,
             { expiresIn: "24h" }
         );

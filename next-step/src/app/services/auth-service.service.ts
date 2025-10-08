@@ -17,7 +17,7 @@ export class AuthServiceService {
     return this.http.post(`${this.apiUrl}/user/signup`, userData);
   }
 
-   signin(credentials: { username: string, password: string }): Observable<AuthResponse> {
+   signin(credentials: { name: string, password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/user/signin`, credentials).pipe(
       tap((res: any) => {
         if (res.token) {
