@@ -11,28 +11,29 @@
       <h1>NextStep <span>AI</span></h1>
     </div>
 
-    <h2>Connexion</h2>
+    <h2>Login</h2>
 
-    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
-      <!-- Email -->
+<form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)" novalidate>
+      <!-- Username -->
       <div class="form-group">
         <div class="input-icon">
           <i class="fa fa-envelope"></i>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Email"
-            required
-            [(ngModel)]="formData.email"
-            #emailCtrl="ngModel"
-          />
-        </div>
-        <div class="error" *ngIf="emailCtrl.invalid && emailCtrl.touched">
-          <small *ngIf="emailCtrl.errors?.['required']">Email requis</small>
-          <small *ngIf="emailCtrl.errors?.['email']">Format invalide</small>
+          <div class="input-group">
+        <input 
+          type="text" 
+          id="username"
+          name="username" 
+          placeholder="Username"
+          required
+          [(ngModel)]="formData.username"
+          #nameCtrl="ngModel">
+        <div class="error" *ngIf="nameCtrl.invalid && nameCtrl.touched">
+          <small>Username required.</small>
         </div>
       </div>
+      </div>
+      </div>
+      
 
       <!-- Mot de passe -->
       <div class="form-group">
@@ -53,24 +54,24 @@
           </span>
         </div>
         <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
-          <small *ngIf="passwordCtrl.errors?.['required']">Mot de passe requis</small>
+          <small *ngIf="passwordCtrl.errors?.['required']">Password required</small>
         </div>
       </div>
 
       <!-- Souvenir -->
       <div class="remember">
         <input type="checkbox" id="remember" [(ngModel)]="formData.remember" name="remember" />
-        <label for="remember">Se souvenir de moi</label>
+        <label for="remember">Remember me</label>
       </div>
 
       <!-- Bouton -->
-      <button type="submit" class="btn" [disabled]="!loginForm.valid">Se connecter</button>
+      <button type="submit" class="btn" [disabled]="!loginForm.valid">Log in</button>
     </form>
 
     <p class="signup-text">
-      Pas encore de compte ? <a routerLink="/auth/signup">Créer un compte</a>
+      No account yet? <a routerLink="/auth/signup">Create an account</a>
     </p>
 
-    <footer>© 2025 NextStep AI — Tous droits réservés</footer>
+    <footer>© 2025 NextStep AI — All rights reserved</footer>
   </div>
 </div>

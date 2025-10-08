@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnimationOptions , LottieComponent} from 'ngx-lottie';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthServiceService } from '../../../services/auth-service.service';
 
 @Component({
   selector: 'app-login',
@@ -12,11 +13,16 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./login.component.css'] 
 })
 export class LoginComponent {  
+
+  constructor(private authService: AuthServiceService, private router: Router) {}
+
   showPassword: boolean = false;   // pour afficher/masquer le mot de passe
+    errorMessage: string = '';
+
 
   // Données du formulaire
   formData = {
-    email: '',
+    username: '',
     password: '',
     remember: false
   };
@@ -27,18 +33,26 @@ export class LoginComponent {
   }
 
   // Soumission du formulaire
-  onSubmit(form: NgForm) {
-    if (form.valid) {
-      console.log('Formulaire valide ✅');
-      console.log('Email:', this.formData.email);
-      console.log('Mot de passe:', this.formData.password);
-      console.log('Se souvenir de moi:', this.formData.remember);
-
-      // 👉 Ici tu peux appeler ton service d’authentification
-      // this.authService.login(this.formData).subscribe(...)
-
-    } else {
-      console.log('Formulaire invalide ❌');
-    }
+onSubmit(form: NgForm, event: Event) {
+  event.preventDefault(); // Empêche le reload
+  if (form.valid) {
+    this.authService.signin({
+      username: this.formData.username,
+      password: this.formData.password
+    }).subscribe({
+      next: (res) => {
+        console.log('Connexion réussie ✅', res);
+        this.router.navigate(['/userDashboard']);
+      },
+      error: (err) => {
+        console.error('Erreur connexion ❌', err);
+        this.errorMessage = err.error?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
+      }
+    });
+  } else {
+    console.log('Formulaire invalide ❌');
+    this.errorMessage = 'Veuillez remplir tous les champs correctement.';
   }
+}
+
 }
