@@ -17,6 +17,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "lottie-web": "^5.13.0",
     "lucide-angular": "^0.545.0",
     "ngx-lottie": "^13.0.0",

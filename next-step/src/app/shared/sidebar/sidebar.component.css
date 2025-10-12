@@ -1,48 +1,65 @@
-.sidebar {
-  width: 240px;
-  height: 100vh;
-  background: linear-gradient(180deg, #3b82f6, #60a5fa);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem 0;
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9fbfc;
 }
 
-.sidebar-header {
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: linear-gradient(to bottom, #4a90e2, #67b3f3);
+  border-top-right-radius: 20px;
   display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  padding: 20px 0;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
 .logo {
-  width: 40px;
-  height: 40px;
-}
-
-.sidebar-menu {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
-.menu-item {
+.logo i {
+  font-size: 24px;
+  color: white;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  color: #4a90e2;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
+  color: #dceeff;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 14px;
+}
+
+.menu li i {
+  margin-right: 12px;
+  font-size: 16px;
+  width: 20px;
+}
+
+.menu li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.menu li.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   color: white;
-  text-decoration: none;
-  font-weight: 500;
-  border-left: 4px solid transparent;
-  transition: all 0.2s;
-}
-
-.menu-item:hover,
-.menu-item.active {
-  background: rgba(255, 255, 255, 0.15);
-  border-left: 4px solid white;
-}
-
-.material-icons {
-  font-size: 20px;
 }

@@ -1,15 +1,25 @@
-<div class="sidebar">
-  <div class="sidebar-header">
-    <img src="assets/logo.jpeg" alt="Logo" class="logo">
+
+  <div class="sidebar">
+    <div class="logo">
+      <img src="assets/motivation.png" alt="Logo NextStep AI" style="width: 50px;" />
+    </div>
+    <ul class="menu">
+      <li class="active">
+        <i class="fa-solid fa-house"></i>
+        <span>Tableau de bord</span>
+      </li>
+      <li>
+        <i class="fa-solid fa-clipboard-check"></i>
+        <span>Offres d’emploi</span>
+      </li>
+      <li>
+        <i class="fa-solid fa-book"></i>
+        <span>Mes candidatures</span>
+      </li>
+      <li>
+        <i class="fa-solid fa-user"></i>
+        <span>Mon profil</span>
+      </li>
+    </ul>
   </div>
 
-  <nav class="sidebar-menu">
-    <a *ngFor="let item of menuItems"
-       [routerLink]="item.link"
-       routerLinkActive="active"
-       class="menu-item">
-      <i class="material-icons">{{ item.icon }}</i>
-      <span>{{ item.label }}</span>
-    </a>
-  </nav>
-</div>

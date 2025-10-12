@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true, 
-  imports: [CommonModule],
+  imports: [CommonModule , SidebarComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })

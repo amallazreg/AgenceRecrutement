@@ -1,8 +1,9 @@
-.layout {
+.dashboard-layout {
   display: flex;
 }
-.content {
-  flex: 1;
+
+.dashboard-content {
+  margin-left: 240px; /* largeur de la sidebar */
   padding: 2rem;
-  background: #f9fafb;
+  width: calc(100% - 240px);
 }
