@@ -13,15 +13,18 @@
 
 /* Illustration */
 .login-illustration {
-  flex: 1;
+  /*flex: 1;*/
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: 10%;
+    width: 43%
 }
 .login-illustration img {
-  width: 75%;
+  width: 80%;
   max-width: 500px;
   animation: float 3s ease-in-out infinite;
+  margin-right: 28%;
 }
 @keyframes float {
   0% { transform: translateY(0); }

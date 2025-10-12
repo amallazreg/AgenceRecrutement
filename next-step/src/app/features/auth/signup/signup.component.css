@@ -15,17 +15,21 @@
 
 /* ===== Illustration ===== */
 .signup-illustration {
-  flex: 1;
+  /*flex: 1;*/
   display: flex;
   justify-content: center;
   align-items: center;
   animation: fadeInLeft 1s ease;
+      margin-left: 10%;
+    width: 43%;
+    
 }
 
 .signup-illustration img {
   width: 80%;
   max-width: 500px;
   animation: float 4s ease-in-out infinite;
+  margin-right: 40%;
 }
 
 @keyframes float {
@@ -41,12 +45,12 @@
 .signup-form {
   flex: 1;
   background: #ffffff;
-  padding: 45px 60px;
+  padding: 16px 60px;
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  max-width: 430px;
+  max-width: 391px;
   animation: fadeInRight 1s ease;
-  max-height: 591px;
+  max-height: 662px;
 }
 
 /* ===== Logo ===== */
@@ -76,8 +80,8 @@
 /* ===== Titre ===== */
 h3 {
   text-align: center;
-  margin: 20px 0 25px 0;
-  font-size: 22px;
+  margin: 9px 0 9px 0;
+  font-size: 20px;
   color: #111827;
 }
 
@@ -94,8 +98,8 @@ h3 {
 }
 
 .input-group input {
-  width: 100%;
-  padding: 12px 14px;
+  width: 93%;
+  padding: 8px 14px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 15px;
@@ -115,7 +119,7 @@ h3 {
 .toggle-password {
   position: absolute;
   right: 12px;
-  top: 35px;
+  top: 28px;
   cursor: pointer;
   font-size: 18px;
   user-select: none;
@@ -164,7 +168,7 @@ h3 {
 /* ===== Texte de connexion ===== */
 .login-text {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
   color: #6b7280;
   font-size: 14px;
 }
