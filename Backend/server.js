@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const userRoute = require('./Routes/userRoute');
 const companyRoute = require('./Routes/companyRoute');
-
+const adminRoute = require('./Routes/adminRoute'); 
 
 
 // Création de l'application Express
@@ -37,6 +37,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', userRoute); 
 app.use('',companyRoute);
+app.use('/admin',adminRoute) ;
 
 
 // Démarrage du serveur
