@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', userRoute); 
-app.use('',companyRoute);
+app.use('/company',companyRoute);
 app.use('/admin',adminRoute) ;
 
 
