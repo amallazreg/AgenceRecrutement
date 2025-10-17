@@ -1,4 +1,240 @@
-<app-sidebar></app-sidebar>
-<div class="content">
- 
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+  <main class="main-content">
+    <!-- Tableau de Bord Admin -->
+    <div class="dashboard-container">
+      <!-- Header du dashboard -->
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Tableau de Bord Admin</h1>
+        <div class="header-actions">
+          <button class="btn-primary">
+            <span class="material-icons">add</span>
+            Nouvelle Société
+          </button>
+          <div class="date-filter">
+            <span class="material-icons">calendar_today</span>
+            Ce mois-ci
+          </div>
+        </div>
+      </div>
+
+      <!-- Cartes de statistiques -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">
+            <span class="material-icons">people</span>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-number">1,248</h3>
+            <p class="stat-label">Candidats inscrits</p>
+            <div class="stat-trend positive">
+              <span class="material-icons">trending_up</span>
+              +12% ce mois
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon success">
+            <span class="material-icons">business</span>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-number">156</h3>
+            <p class="stat-label">Sociétés actives</p>
+            <div class="stat-trend positive">
+              <span class="material-icons">trending_up</span>
+              +5% ce mois
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon warning">
+            <span class="material-icons">work</span>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-number">342</h3>
+            <p class="stat-label">Offres publiées</p>
+            <div class="stat-trend positive">
+              <span class="material-icons">trending_up</span>
+              +8% ce mois
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon danger">
+            <span class="material-icons">assignment</span>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-number">2,847</h3>
+            <p class="stat-label">Candidatures</p>
+            <div class="stat-trend negative">
+              <span class="material-icons">trending_down</span>
+              -3% ce mois
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphiques et données détaillées -->
+      <div class="charts-grid">
+        <!-- Graphique des candidatures -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Évolution des candidatures</h3>
+            <select class="chart-filter">
+              <option>30 derniers jours</option>
+              <option>3 derniers mois</option>
+              <option>Cette année</option>
+            </select>
+          </div>
+          <div class="chart-container">
+            <!-- Le graphique sera inséré ici via Chart.js -->
+            <div class="chart-placeholder">
+              <span class="material-icons">bar_chart</span>
+              <p>Graphique des candidatures</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Répartition par domaine -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Offres par domaine</h3>
+            <span class="material-icons">more_vert</span>
+          </div>
+          <div class="chart-container">
+            <!-- Le graphique sera inséré ici via Chart.js -->
+            <div class="chart-placeholder">
+              <span class="material-icons">pie_chart</span>
+              <p>Répartition par domaine</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dernières activités et statistiques rapides -->
+      <div class="activities-grid">
+        <!-- Dernières sociétés inscrites -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <h3>Dernières sociétés</h3>
+            <button class="btn-text">Voir tout</button>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-avatar">
+                <span class="material-icons">business</span>
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">Tech Solutions SARL</p>
+                <span class="activity-subtitle">Technologie</span>
+              </div>
+              <div class="activity-meta">
+                <span class="activity-time">Il y a 2h</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar">
+                <span class="material-icons">business</span>
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">Marketing Pro</p>
+                <span class="activity-subtitle">Marketing</span>
+              </div>
+              <div class="activity-meta">
+                <span class="activity-time">Il y a 5h</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar">
+                <span class="material-icons">business</span>
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">Finance Group</p>
+                <span class="activity-subtitle">Finance</span>
+              </div>
+              <div class="activity-meta">
+                <span class="activity-time">Il y a 1j</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar">
+                <span class="material-icons">business</span>
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">Health Care Plus</p>
+                <span class="activity-subtitle">Santé</span>
+              </div>
+              <div class="activity-meta">
+                <span class="activity-time">Il y a 2j</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques d'utilisation -->
+        <div class="stats-quick">
+          <div class="quick-stat">
+            <div class="quick-icon">
+              <span class="material-icons">check_circle</span>
+            </div>
+            <div class="quick-content">
+              <h4>85%</h4>
+              <p>Taux d'activation</p>
+            </div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-icon">
+              <span class="material-icons">schedule</span>
+            </div>
+            <div class="quick-content">
+              <h4>24h</h4>
+              <p>Temps moyen de réponse</p>
+            </div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-icon">
+              <span class="material-icons">star</span>
+            </div>
+            <div class="quick-content">
+              <h4>4.8/5</h4>
+              <p>Satisfaction utilisateurs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau des alertes -->
+      <div class="alerts-section">
+        <div class="section-header">
+          <h3>Alertes et notifications</h3>
+          <span class="badge">3 nouvelles</span>
+        </div>
+        <div class="alerts-grid">
+          <div class="alert-card warning">
+            <div class="alert-icon">
+              <span class="material-icons">warning</span>
+            </div>
+            <div class="alert-content">
+              <h4>CV en attente de validation</h4>
+              <p>15 CV nécessitent votre approbation</p>
+            </div>
+            <button class="btn-outline">Vérifier</button>
+          </div>
+          <div class="alert-card info">
+            <div class="alert-icon">
+              <span class="material-icons">info</span>
+            </div>
+            <div class="alert-content">
+              <h4>Nouvelle société en attente</h4>
+              <p>2 sociétés demandent l'accès</p>
+            </div>
+            <button class="btn-outline">Approuver</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>

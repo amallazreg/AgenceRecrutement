@@ -1,25 +1,42 @@
-
-  <div class="sidebar">
-    <div class="logo">
-      <img src="assets/motivation.png" alt="Logo NextStep AI" style="width: 50px;" />
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Header de la sidebar -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <div class="logo" (click)="expandSidebar()">
+        <img src="assets/logo-removebg.png" alt="Logo NextStep AI" style="display: flex; align-items: center; gap: 10px;width: 25px;" />
+        <span class="platform-name" *ngIf="!isCollapsed">{{ platformName }}</span>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()" *ngIf="!isCollapsed">
+        <span class="material-icons">chevron_left</span>
+      </button>
     </div>
-    <ul class="menu">
-      <li class="active">
-        <i class="fa-solid fa-house"></i>
-        <span>Tableau de bord</span>
-      </li>
-      <li>
-        <i class="fa-solid fa-clipboard-check"></i>
-        <span>Offres d’emploi</span>
-      </li>
-      <li>
-        <i class="fa-solid fa-book"></i>
-        <span>Mes candidatures</span>
-      </li>
-      <li>
-        <i class="fa-solid fa-user"></i>
-        <span>Mon profil</span>
-      </li>
-    </ul>
   </div>
 
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of menuItems" 
+          class="nav-item" 
+          [class.active]="item.isActive"
+          (click)="setActiveItem(item)">
+        <a class="nav-link" [routerLink]="item.route" routerLinkActive="active">
+          <span class="material-icons nav-icon">{{ item.icon }}</span>
+          <span class="nav-text" *ngIf="!isCollapsed">{{ item.name }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Footer de la sidebar -->
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <div class="user-info">
+      <div class="user-avatar">
+        <span class="material-icons">person</span>
+      </div>
+      <div class="user-details">
+        <span class="user-name">Admin</span>
+        <span class="user-role">Administrateur</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -4,6 +4,7 @@ import { SignupComponent } from './features/auth/signup/signup.component';
 import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
 import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
 import { CompanyDashboardComponent } from './dashboards/company-dashboard/company-dashboard.component';
+import { CompaniesComponent } from './companies/companies/companies.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   {path : 'adminDashboard' , component:AdminDashboardComponent},
   {path : 'companyDashboard', component:CompanyDashboardComponent},
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: 'companies', component: CompaniesComponent },
   { path: '**', redirectTo: 'auth/login' }
 
 ]
