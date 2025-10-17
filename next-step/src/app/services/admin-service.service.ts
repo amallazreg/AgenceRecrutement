@@ -16,8 +16,13 @@ private apiUrl = 'http://localhost:3000';
   }
 
   getCompanyCount(): Observable<any> {
-  return this.http.get<any>(`${this.apiUrl}/admin/getCompanyCount`);
-}
+     return this.http.get<any>(`${this.apiUrl}/admin/getCompanyCount`);
+  }
+
+  getAllCompanies(): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}/admin/getAllCompany`);
+  }
+
 
 
 }

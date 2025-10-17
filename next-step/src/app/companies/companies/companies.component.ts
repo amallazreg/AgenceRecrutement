@@ -10,11 +10,11 @@ interface Company {
   sector: string;
   description: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   phonePrefix: string;
   website: string;
   fullAddress: string;
-  hrManager: string;
+  hrManage: string;
   managerEmail: string;
   status: 'active' | 'pending';
 }
@@ -31,62 +31,30 @@ export class CompaniesComponent implements OnInit {
   filteredCompanies: Company[] = [];
   searchTerm: string = '';
   showAddModal: boolean = false;
+    errorMessage = '';
+
 
   constructor(private adminService : AdminServiceService) {}
 
   ngOnInit() {
-    this.loadSampleData();
     this.filterCompanies();
+    this.loadCompanies();
     this.loadCompanyCount()
   }
 
-  loadSampleData() {
-    this.companies = [
-      {
-        id: 1,
-        name: 'Tech Solutions SARL',
-        sector: 'Technologie',
-        description: 'Entreprise spécialisée dans les solutions IT',
-        email: 'contact@techsolutions.com',
-        phone: '1 23 45 67 89',
-        phonePrefix: '+33',
-        website: 'https://techsolutions.com',
-        fullAddress: '123 Rue de la Tech, 75001 Paris',
-        hrManager: 'Marie Dubois',
-        managerEmail: 'marie.dubois@techsolutions.com',
-        status: 'active'
+  loadCompanies() {
+    this.adminService.getAllCompanies().subscribe({
+      next: (res) => {
+        this.companies = res;
+        this.filteredCompanies = [...this.companies]; // copie pour le filtrage/sorting
       },
-      {
-        id: 2,
-        name: 'Marketing Pro',
-        sector: 'Marketing',
-        description: 'Agence de marketing digital',
-        email: 'info@marketingpro.com',
-        phone: '1 98 76 54 32',
-        phonePrefix: '+33',
-        website: 'https://marketingpro.com',
-        fullAddress: '456 Avenue Marketing, 69002 Lyon',
-        hrManager: 'Pierre Martin',
-        managerEmail: 'pierre.martin@marketingpro.com',
-        status: 'pending'
-      },
-      {
-        id: 3,
-        name: 'Finance Group',
-        sector: 'Finance',
-        description: 'Conseil en gestion financière',
-        email: 'contact@financegroup.com',
-        phone: '1 45 67 89 01',
-        phonePrefix: '+33',
-        website: 'https://financegroup.com',
-        fullAddress: '789 Boulevard Finance, 13008 Marseille',
-        hrManager: 'Sophie Laurent',
-        managerEmail: 'sophie.laurent@financegroup.com',
-        status: 'active'
+      error: (err) => {
+        console.error('Erreur lors du chargement des sociétés:', err);
+        this.errorMessage = 'Erreur lors du chargement des sociétés.';
       }
-    ];
-    this.filteredCompanies = [...this.companies];
+    });
   }
+
   totalCompany: number = 0;
 
   loadCompanyCount() {
@@ -108,7 +76,7 @@ export class CompaniesComponent implements OnInit {
         company.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         company.sector.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         company.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        company.hrManager.toLowerCase().includes(this.searchTerm.toLowerCase())
+        company.hrManage.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
   }
@@ -176,6 +144,6 @@ export class CompaniesComponent implements OnInit {
   }
 
   refreshData() {
-    this.loadSampleData();
+        this.loadCompanies();
   }
 }
