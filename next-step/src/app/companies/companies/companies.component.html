@@ -5,17 +5,17 @@
       <!-- Header -->
       <div class="companies-header">
         <div class="header-left">
-          <h1 class="page-title">Gestion des Sociétés</h1>
-          <p class="page-subtitle">Gérez toutes les sociétés partenaires de la plateforme</p>
+          <h1 class="page-title">Company Management</h1>
+          <p class="page-subtitle">Manage all partner companies on the platform</p>
         </div>
         <div class="header-actions">
           <button class="btn-primary" (click)="openAddCompanyModal()">
             <span class="material-icons">add</span>
-            Nouvelle Société
+            New Company
           </button>
           <div class="search-box">
             <span class="material-icons">search</span>
-            <input type="text" placeholder="Rechercher une société..." [(ngModel)]="searchTerm" (input)="filterCompanies()">
+            <input type="text" placeholder="Search for a company..." [(ngModel)]="searchTerm" (input)="filterCompanies()">
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ companies.length }}</h3>
-            <p>Sociétés totales</p>
+            <p>Total companies</p>
           </div>
         </div>
         <div class="quick-stat-card">
@@ -37,7 +37,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ getActiveCompanies() }}</h3>
-            <p>Sociétés actives</p>
+            <p>Active companies</p>
           </div>
         </div>
         <div class="quick-stat-card">
@@ -46,7 +46,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ getPendingCompanies() }}</h3>
-            <p>En attente</p>
+            <p>On hold</p>
           </div>
         </div>
       </div>
@@ -54,15 +54,15 @@
       <!-- Tableau des sociétés -->
       <div class="companies-table-container">
         <div class="table-header">
-          <h3>Toutes les sociétés</h3>
+          <h3>All companies</h3>
           <div class="table-actions">
             <button class="btn-outline" (click)="exportData()">
               <span class="material-icons">download</span>
-              Exporter
+              Export
             </button>
             <button class="btn-outline" (click)="refreshData()">
               <span class="material-icons">refresh</span>
-              Actualiser
+              Refresh
             </button>
           </div>
         </div>
@@ -73,13 +73,13 @@
               <tr>
                 <th>
                   <div class="table-header-cell">
-                    <span>Nom de la société</span>
+                    <span>Company Name</span>
                     <span class="material-icons sort-icon" (click)="sortBy('name')">unfold_more</span>
                   </div>
                 </th>
-                <th>Secteur</th>
-                <th>Email</th>
-                <th>Téléphone</th>
+                <th>Sector</th>
+                <th>E-mail</th>
+                <th>Phone</th>
                 <th>Manager HR</th>
                 <th>Statut</th>
                 <th>Actions</th>
@@ -135,11 +135,11 @@
           <!-- Message si aucune société -->
           <div *ngIf="filteredCompanies.length === 0" class="empty-state">
             <span class="material-icons">business</span>
-            <h3>Aucune société trouvée</h3>
-            <p>Commencez par ajouter votre première société</p>
+            <h3>No company found</h3>
+            <p>Start by adding your first company</p>
             <button class="btn-primary" (click)="openAddCompanyModal()">
               <span class="material-icons">add</span>
-              Ajouter une société
+              Add a company
             </button>
           </div>
         </div>
@@ -150,7 +150,7 @@
     <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddCompanyModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Nouvelle Société</h2>
+          <h2>New Company</h2>
           <button class="btn-close" (click)="closeAddCompanyModal()">
             <span class="material-icons">close</span>
           </button>
