@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
 import { FormCompanyComponent } from '../form-company/form-company.component';
+import { AdminServiceService } from '../../services/admin-service.service';
 interface Company {
   id: number;
   name: string;
@@ -31,11 +32,12 @@ export class CompaniesComponent implements OnInit {
   searchTerm: string = '';
   showAddModal: boolean = false;
 
-  constructor() {}
+  constructor(private adminService : AdminServiceService) {}
 
   ngOnInit() {
     this.loadSampleData();
     this.filterCompanies();
+    this.loadCompanyCount()
   }
 
   loadSampleData() {
@@ -84,6 +86,18 @@ export class CompaniesComponent implements OnInit {
       }
     ];
     this.filteredCompanies = [...this.companies];
+  }
+  totalCompany: number = 0;
+
+  loadCompanyCount() {
+    this.adminService.getCompanyCount().subscribe({
+      next: (res) => {
+        this.totalCompany = res.totalCompany;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement du nombre de sociétés:', err);
+      }
+    });
   }
 
   filterCompanies() {

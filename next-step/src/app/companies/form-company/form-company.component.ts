@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AdminServiceService } from '../../services/admin-service.service';
+
 @Component({
   selector: 'app-form-company',
   standalone: true , 
@@ -14,8 +16,10 @@ export class FormCompanyComponent {
   @Input() companyData: any = null;
 
   companyForm: FormGroup;
+  successMessage = '';
+  errorMessage = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private adminService :AdminServiceService ) {
     this.companyForm = this.createCompanyForm();
   }
 
@@ -25,17 +29,19 @@ export class FormCompanyComponent {
     }
   }
 
-  createCompanyForm(): FormGroup {
+  
+
+createCompanyForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required]],
       sector: ['', [Validators.required]],
-      description: [''],
+      companyDescription: [''],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required]],
+      phoneNumber: ['', [Validators.required]],
       phonePrefix: ['+33'],
       website: [''],
       fullAddress: [''],
-      hrManager: ['', [Validators.required]],
+      hrManage: ['', [Validators.required]],
       managerEmail: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
@@ -51,7 +57,43 @@ export class FormCompanyComponent {
 
   onSubmit() {
     if (this.companyForm.valid) {
-      this.formSubmit.emit(this.companyForm.value);
+      // correspondance avec les champs backend
+      const formValue = this.companyForm.value;
+
+      const companyData = {
+        name: formValue.name,
+        sector: formValue.sector,
+        companyDescription: formValue.companyDescription,
+        fullAddress: formValue.fullAddress,
+        phoneNumber: formValue.phonePrefix + formValue.phoneNumber,
+        email: formValue.email,
+        website: formValue.website,
+        hrManage: formValue.hrManage,
+        managerEmail: formValue.managerEmail,
+        password: formValue.password,
+        confirmPassword: formValue.confirmPassword
+      };
+
+      this.adminService.signupCompany(companyData).subscribe({
+        next: (res) => {
+              this.successMessage = 'Company created successfully ✅';
+              this.errorMessage = '';
+              this.formSubmit.emit(res);
+              this.companyForm.reset();
+
+              // ✅ Cache le message après 3 secondes
+              setTimeout(() => {
+                this.successMessage = '';
+              }, 3000);
+        },
+        error: (err) => {
+          this.errorMessage = err.error?.message || 'An error occurred ❌';
+          this.successMessage = '';
+          console.error('Signup error:', err);
+        }
+      });
+    } else {
+      this.companyForm.markAllAsTouched();
     }
   }
 

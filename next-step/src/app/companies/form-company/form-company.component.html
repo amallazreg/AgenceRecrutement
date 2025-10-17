@@ -28,7 +28,7 @@
       </div>
       <div class="form-group">
         <label>Description</label>
-        <textarea formControlName="description" placeholder="Description de la société" rows="3"></textarea>
+        <textarea formControlName="companyDescription" placeholder="Company Description" rows="3"></textarea>
       </div>
     </div>
 
@@ -52,9 +52,9 @@
               <option value="+41">+41</option>
               <option value="+49">+49</option>
             </select>
-            <input type="tel" formControlName="phone" placeholder="1 23 45 67 89">
+            <input type="tel" formControlName="phoneNumber" placeholder="1 23 45 67 89">
           </div>
-          <div class="error-message" *ngIf="companyForm.get('phone')?.invalid && companyForm.get('phone')?.touched">
+          <div class="error-message" *ngIf="companyForm.get('phoneNumber')?.invalid && companyForm.get('phoneNumber')?.touched">
             Phone is required
           </div>
         </div>
@@ -74,8 +74,8 @@
       <h3>Manager RH</h3>
       <div class="form-group">
         <label>Manager's name *</label>
-        <input type="text" formControlName="hrManager" placeholder="Nom complet du manager">
-        <div class="error-message" *ngIf="companyForm.get('hrManager')?.invalid && companyForm.get('hrManager')?.touched">
+        <input type="text" formControlName="hrManage" placeholder="Nom complet du manager">
+        <div class="error-message" *ngIf="companyForm.get('hrManage')?.invalid && companyForm.get('hrManage')?.touched">
           Manager name is required
         </div>
       </div>
@@ -116,3 +116,13 @@
     </button>
   </div>
 </form>
+
+<!-- ✅ Message de succès ou d'erreur -->
+<div class="alert-container" *ngIf="successMessage || errorMessage">
+  <div class="alert success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+  <div class="alert error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>
