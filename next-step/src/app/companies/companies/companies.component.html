@@ -31,23 +31,23 @@
             <p>Total companies</p>
           </div>
         </div>
-        <div class="quick-stat-card">
-          <div class="stat-icon active">
+        <div >
+        <!--  <div class="stat-icon active">
             <span class="material-icons">check_circle</span>
           </div>
           <div class="stat-info">
             <h3>{{ getActiveCompanies() }}</h3>
             <p>Active companies</p>
-          </div>
+          </div>-->
         </div>
-        <div class="quick-stat-card">
-          <div class="stat-icon pending">
+        <div >
+          <!--<div class="stat-icon pending">
             <span class="material-icons">schedule</span>
           </div>
           <div class="stat-info">
             <h3>{{ getPendingCompanies() }}</h3>
             <p>On hold</p>
-          </div>
+          </div>-->
         </div>
       </div>
 
@@ -81,7 +81,7 @@
                 <th>E-mail</th>
                 <th>Phone</th>
                 <th>Manager HR</th>
-                <th>Statut</th>
+                <th>Website</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -110,16 +110,13 @@
                   </div>
                 </td>
                 <td>
-                  <span class="status-badge" [class.active]="company.status === 'active'" 
-                        [class.pending]="company.status === 'pending'">
-                    {{ company.status === 'active' ? 'Actif' : 'En attente' }}
-                  </span>
+                  {{ company.website }}
                 </td>
                 <td>
                   <div class="action-buttons">
-                    <button class="btn-icon" (click)="editCompany(company)" title="Modifier">
+                  <!-- <button class="btn-icon" (click)="editCompany(company)" title="Modifier">
                       <span class="material-icons">edit</span>
-                    </button>
+                    </button> --> 
                     <button class="btn-icon" (click)="viewCompany(company)" title="Voir détails">
                       <span class="material-icons">visibility</span>
                     </button>

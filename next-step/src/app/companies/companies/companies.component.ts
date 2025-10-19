@@ -5,7 +5,7 @@ import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
 import { FormCompanyComponent } from '../form-company/form-company.component';
 import { AdminServiceService } from '../../services/admin-service.service';
 interface Company {
-  id: number;
+  _id: string;
   name: string;
   sector: string;
   description: string;
@@ -128,11 +128,20 @@ export class CompaniesComponent implements OnInit {
   }
 
   deleteCompany(company: Company) {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer ${company.name} ?`)) {
-      this.companies = this.companies.filter(c => c.id !== company.id);
-      this.filterCompanies();
+    if (confirm(`Are you sure you want to delete ${company.name} ?`)) {
+       this.adminService.deleteAgency(company._id).subscribe({
+        next: () => {
+          this.loadCompanies(); 
+          this.loadCompanyCount()
+        },
+        error: (err) => {
+          console.error('Erreur lors de la suppression', err);
+        }
+      });
     }
   }
+
+  
 
   sortBy(field: string) {
     // Implémentez le tri

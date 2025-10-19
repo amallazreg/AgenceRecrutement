@@ -2,6 +2,20 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AdminServiceService } from '../../services/admin-service.service';
+interface Company {
+  _id: string;
+  name: string;
+  sector: string;
+  description: string;
+  email: string;
+  phoneNumber: string;
+  phonePrefix: string;
+  website: string;
+  fullAddress: string;
+  hrManage: string;
+  managerEmail: string;
+  status: 'active' | 'pending';
+}
 
 @Component({
   selector: 'app-form-company',
@@ -10,6 +24,8 @@ import { AdminServiceService } from '../../services/admin-service.service';
   templateUrl: './form-company.component.html',
   styleUrl: './form-company.component.css'
 })
+
+
 export class FormCompanyComponent {
  @Output() formSubmit = new EventEmitter<any>();
   @Output() formCancel = new EventEmitter<void>();
@@ -18,7 +34,8 @@ export class FormCompanyComponent {
   companyForm: FormGroup;
   successMessage = '';
   errorMessage = '';
-
+  companies: Company[] = [];
+  filteredCompanies: Company[] = [];
   constructor(private fb: FormBuilder, private adminService :AdminServiceService ) {
     this.companyForm = this.createCompanyForm();
   }
@@ -80,10 +97,12 @@ createCompanyForm(): FormGroup {
               this.errorMessage = '';
               this.formSubmit.emit(res);
               this.companyForm.reset();
+              this.loadCompanies() ;
 
               // ✅ Cache le message après 3 secondes
               setTimeout(() => {
                 this.successMessage = '';
+                window.location.reload();
               }, 3000);
         },
         error: (err) => {
@@ -96,6 +115,22 @@ createCompanyForm(): FormGroup {
       this.companyForm.markAllAsTouched();
     }
   }
+
+    loadCompanies() {
+    this.adminService.getAllCompanies().subscribe({
+      next: (res) => {
+        this.companies = res;
+        this.filteredCompanies = [...this.companies]; // copie pour le filtrage/sorting
+        window.location.reload();
+
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des sociétés:', err);
+        this.errorMessage = 'Erreur lors du chargement des sociétés.';
+      }
+    });
+  }
+  
 
   onCancel() {
     this.formCancel.emit();

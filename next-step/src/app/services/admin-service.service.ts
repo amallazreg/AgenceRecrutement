@@ -23,6 +23,13 @@ private apiUrl = 'http://localhost:3000';
       return this.http.get<any[]>(`${this.apiUrl}/admin/getAllCompany`);
   }
 
+ 
+  deleteAgency(id: string): Observable<any> {
+      return this.http.delete(`${this.apiUrl}/admin/deleteCompany/${id}`);
+  }
+
+
+
 
 
 }
