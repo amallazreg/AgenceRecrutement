@@ -462,9 +462,9 @@
   padding: 60px 20px;
 
   .material-icons {
-    font-size: 64px;
+    font-size: 34px;
     color: #cbd5e1;
-    margin-bottom: 16px;
+    margin-bottom: 0px;
   }
 
   h3 {

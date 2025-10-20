@@ -1,0 +1,145 @@
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+  <main class="main-content">
+    <div class="candidates-container">
+      <!-- Header -->
+      <div class="candidates-header">
+        <div class="header-left">
+          <h1 class="page-title">Candidates Management</h1>
+          <p class="page-subtitle">Manage all candidates registered on the platform</p>
+        </div>
+        <div class="header-actions">
+          <div class="search-box">
+            <span class="material-icons">search</span>
+            <input type="text" placeholder="Search for a candidate..." [(ngModel)]="searchTerm" (input)="filterCandidates()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="quick-stat-card">
+          <div class="stat-icon">
+            <span class="material-icons">people</span>
+          </div>
+          <div class="stat-info">
+            <h3>{{ getTotalCandidates() }}</h3>
+            <p>Total Candidates</p>
+          </div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="stat-icon active">
+            <span class="material-icons">check_circle</span>
+          </div>
+          <div class="stat-info">
+            <h3>{{ getActiveCandidates() }}</h3>
+            <p>Active Candidates</p>
+          </div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="stat-icon warning">
+            <span class="material-icons">work</span>
+          </div>
+          <div class="stat-info">
+            <h3>87%</h3>
+            <p>Matching Rate</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Candidates Table -->
+      <div class="candidates-table-container">
+        <div class="table-header">
+          <h3>All Candidates</h3>
+          <div class="table-actions">
+            <button class="btn-outline" (click)="exportData()">
+              <span class="material-icons">download</span>
+              Export
+            </button>
+            <button class="btn-outline" (click)="refreshData()">
+              <span class="material-icons">refresh</span>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="candidates-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Specialty</th>
+                <th>Skills</th>
+                <th>CV</th>
+                <!--<th>Status</th>--> 
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let candidate of filteredCandidates" class="table-row">
+                <td>
+                  <div class="candidate-info">
+                    <div class="candidate-avatar">
+                      <span class="material-icons">person</span>
+                    </div>
+                    <div class="candidate-details">
+                      <strong>{{ candidate.firstName }} {{ candidate.lastName }}</strong>
+                      <span class="candidate-date">Registered on {{ candidate.registrationDate }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ candidate.email }}</td>
+                <td>{{ candidate.phone }}</td>
+                <td>
+                  <span class="specialty-badge">{{ candidate.specialty }}</span>
+                </td>
+                <td>
+                  <div class="skills-container">
+                    <span *ngFor="let skill of candidate.skills.slice(0, 2)" class="skill-tag">
+                      {{ skill }}
+                    </span>
+                    <span *ngIf="candidate.skills.length > 2" class="skill-more">
+                      +{{ candidate.skills.length - 2 }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <button class="btn-cv" (click)="downloadCV(candidate)" title="Download CV">
+                    <span class="material-icons">description</span>
+                    CV
+                  </button>
+                </td>
+               <!--<td>
+                  <span class="status-badge" [class.active]="candidate.status === 'active'" 
+                        [class.inactive]="candidate.status === 'inactive'">
+                    {{ candidate.status === 'active' ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>--> 
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-icon" (click)="viewCandidate(candidate)" title="View profile">
+                      <span class="material-icons">visibility</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty state message -->
+          <div *ngIf="filteredCandidates.length === 0" class="empty-state">
+            <span class="material-icons">person_search</span>
+            <h3>No candidates found</h3>
+            <p>No candidates match your search criteria</p>
+            <button class="btn-primary" (click)="searchTerm = ''; filterCandidates()">
+              <span class="material-icons">clear</span>
+              Clear search
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

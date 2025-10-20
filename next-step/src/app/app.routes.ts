@@ -5,6 +5,7 @@ import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboa
 import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
 import { CompanyDashboardComponent } from './dashboards/company-dashboard/company-dashboard.component';
 import { CompaniesComponent } from './companies/companies/companies.component';
+import { CondidateComponent } from './companies/condidate/condidate.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
@@ -14,6 +15,9 @@ export const routes: Routes = [
   {path : 'companyDashboard', component:CompanyDashboardComponent},
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'companies', component: CompaniesComponent },
-  { path: '**', redirectTo: 'auth/login' }
+  {path :'candidates',component : CondidateComponent
+  },
+  { path: '**', redirectTo: 'auth/login' }, 
+
 
 ]
