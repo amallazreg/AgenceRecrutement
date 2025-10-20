@@ -6,6 +6,8 @@ const cors = require('cors');
 const userRoute = require('./Routes/userRoute');
 const companyRoute = require('./Routes/companyRoute');
 const adminRoute = require('./Routes/adminRoute'); 
+const offreRoute = require('./Routes/offreRoute'); 
+
 
 
 // Création de l'application Express
@@ -38,6 +40,7 @@ app.get('/', (req, res) => {
 app.use('/user', userRoute); 
 app.use('/company',companyRoute);
 app.use('/admin',adminRoute) ;
+app.use('/company',offreRoute) ;
 
 
 // Démarrage du serveur
