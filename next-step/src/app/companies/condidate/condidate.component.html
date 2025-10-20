@@ -71,7 +71,7 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Specialty</th>
-                <th>Skills</th>
+                <!--<th>Skills</th>-->
                 <th>CV</th>
                 <!--<th>Status</th>--> 
                 <th>Actions</th>
@@ -85,7 +85,7 @@
                       <span class="material-icons">person</span>
                     </div>
                     <div class="candidate-details">
-                      <strong>{{ candidate.firstName }} {{ candidate.lastName }}</strong>
+                      <strong>{{ candidate.name }} </strong>
                       <span class="candidate-date">Registered on {{ candidate.registrationDate }}</span>
                     </div>
                   </div>
@@ -95,7 +95,7 @@
                 <td>
                   <span class="specialty-badge">{{ candidate.specialty }}</span>
                 </td>
-                <td>
+             <!--  <td>
                   <div class="skills-container">
                     <span *ngFor="let skill of candidate.skills.slice(0, 2)" class="skill-tag">
                       {{ skill }}
@@ -104,7 +104,7 @@
                       +{{ candidate.skills.length - 2 }}
                     </span>
                   </div>
-                </td>
+                </td> --> 
                 <td>
                   <button class="btn-cv" (click)="downloadCV(candidate)" title="Download CV">
                     <span class="material-icons">description</span>
