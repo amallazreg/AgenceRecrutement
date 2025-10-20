@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
+import { AdminServiceService } from '../../services/admin-service.service';
 
 interface Candidate {
   id: number;
@@ -26,10 +27,16 @@ export class CondidateComponent implements OnInit {
   candidates: Candidate[] = [];
   filteredCandidates: Candidate[] = [];
   searchTerm: string = '';
+  totalUser: number = 0;
+
+  constructor(private adminService : AdminServiceService) {
+
+  }
 
   ngOnInit() {
     this.loadSampleData();
     this.filterCandidates();
+    this.getTotalCandidates() ;
   }
 
   loadSampleData() {
@@ -116,8 +123,15 @@ export class CondidateComponent implements OnInit {
     return this.candidates.filter(candidate => candidate.status === 'active').length;
   }
 
-  getTotalCandidates(): number {
-    return this.candidates.length;
+  getTotalCandidates()  {
+    this.adminService.getUserCount().subscribe({
+      next: (res) => {
+        this.totalUser = res.totalUser;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement du nombre de users:', err);
+      }
+    });
   }
 
   downloadCV(candidate: Candidate) {

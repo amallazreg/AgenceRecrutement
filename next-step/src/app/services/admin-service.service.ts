@@ -28,6 +28,15 @@ private apiUrl = 'http://localhost:3000';
       return this.http.delete(`${this.apiUrl}/admin/deleteCompany/${id}`);
   }
 
+   getAllUsers(): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}/admin/getAllUser`);
+  }
+
+   getUserCount(): Observable<any> {
+     return this.http.get<any>(`${this.apiUrl}/admin/getUserCount`);
+  }
+
+
 
 
 
