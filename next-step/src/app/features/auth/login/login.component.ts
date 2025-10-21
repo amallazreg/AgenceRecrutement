@@ -32,9 +32,9 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  // Soumission du formulaire
 onSubmit(form: NgForm, event: Event) {
   event.preventDefault(); // Empêche le reload
+
   if (form.valid) {
     this.authService.signin({
       name: this.formData.name,
@@ -42,13 +42,21 @@ onSubmit(form: NgForm, event: Event) {
     }).subscribe({
       next: (res) => {
         console.log('Connexion réussie ✅', res);
-          if (res.role === 'admin') {
-            this.router.navigate(['/adminDashboard']);
-          } else if (res.role === 'user') {
-            this.router.navigate(['/userDashboard']);
-          }else if(res.role =='company'){
-            this.router.navigate(['/companyDashboard']);
-          }
+
+        // ✅ Enregistre le token et le rôle dans le localStorage
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('role', res.role);
+
+        // ✅ Redirige vers le bon dashboard selon le rôle
+        if (res.role === 'admin') {
+          this.router.navigate(['/adminDashboard']);
+        } else if (res.role === 'company') {
+          this.router.navigate(['/companyDashboard']);
+        } else if (res.role === 'user') {
+          this.router.navigate(['/userDashboard']);
+        } else {
+          this.router.navigate(['/login']); // par sécurité
+        }
       },
       error: (err) => {
         console.error('Erreur connexion ❌', err);
@@ -60,5 +68,7 @@ onSubmit(form: NgForm, event: Event) {
     this.errorMessage = 'Veuillez remplir tous les champs correctement.';
   }
 }
+
+
 
 }

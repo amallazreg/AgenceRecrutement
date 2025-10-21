@@ -20,12 +20,10 @@ interface MenuItem {
 export class SidebarComponent implements OnInit {
   platformName = 'Next Step';
   isCollapsed = false;
-  
-  currentUserRole: string = 'admin'; // admin, company, user
+  currentUserRole: string = ''; // <- par défaut vide
 
-  // Tous les items de menu CORRIGÉS
   allMenuItems: MenuItem[] = [
-    // Admin items
+    // ----------------- ADMIN -----------------
     {
       name: 'Tableau de bord',
       icon: 'dashboard',
@@ -55,7 +53,7 @@ export class SidebarComponent implements OnInit {
       roles: ['admin']
     },
 
-    // Company items (recruteur)
+    // ----------------- COMPANY -----------------
     {
       name: 'Tableau de bord',
       icon: 'dashboard',
@@ -85,7 +83,7 @@ export class SidebarComponent implements OnInit {
       roles: ['company']
     },
 
-    // User items (candidat)
+    // ----------------- USER -----------------
     {
       name: 'Tableau de bord',
       icon: 'dashboard',
@@ -126,10 +124,10 @@ export class SidebarComponent implements OnInit {
     this.setActiveItemByRoute();
   }
 
+  // 🔹 Récupère le rôle depuis le localStorage (défini après le login)
   getCurrentUserRole(): void {
-    // À remplacer par votre vraie logique d'authentification
-    // Pour tester, changez cette valeur :
-    this.currentUserRole = 'admin'; // 'company' ou 'user'
+    const role = localStorage.getItem('role');
+    this.currentUserRole = role ? role : 'user'; // valeur par défaut
   }
 
   filterMenuItems(): void {
@@ -165,11 +163,7 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleSidebar(): void {
-    this.isCollapsed = true;
-  }
-
-  expandSidebar(): void {
-    this.isCollapsed = false;
+    this.isCollapsed = !this.isCollapsed;
   }
 
   setActiveItem(selectedItem: MenuItem): void {
@@ -187,14 +181,13 @@ export class SidebarComponent implements OnInit {
   }
 
 
-  navigateToRoute(route: string): void {
-    this.router.navigate([route]);
-  }
-
-  logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('role');
-  this.router.navigate(['/login']);
+expandSidebar(): void {
+  this.isCollapsed = false;
 }
 
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    this.router.navigate(['/login']);
+  }
 }
