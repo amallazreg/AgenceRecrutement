@@ -185,4 +185,16 @@ export class SidebarComponent implements OnInit {
       item.isActive = currentRoute === item.route || currentRoute.startsWith(item.route + '/');
     });
   }
+
+
+  navigateToRoute(route: string): void {
+    this.router.navigate([route]);
+  }
+
+  logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  this.router.navigate(['/login']);
+}
+
 }

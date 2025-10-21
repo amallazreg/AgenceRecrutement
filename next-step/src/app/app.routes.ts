@@ -7,6 +7,9 @@ import { CompanyDashboardComponent } from './dashboards/company-dashboard/compan
 import { CompaniesComponent } from './companies/companies/companies.component';
 import { CondidateComponent } from './AdminInterfaces/condidate/condidate.component';
 
+
+import { AcceuilComponent } from './dashboards/acceuil/acceuil.component';
+
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/signup', component: SignupComponent },
@@ -15,8 +18,8 @@ export const routes: Routes = [
   {path : 'companyDashboard', component:CompanyDashboardComponent},
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'companies', component: CompaniesComponent },
-  {path :'candidates',component : CondidateComponent
-  },
+  {path :'candidates',component : CondidateComponent},
+  {path : 'acceuil', component : AcceuilComponent},
   { path: '**', redirectTo: 'auth/login' }, 
 
 

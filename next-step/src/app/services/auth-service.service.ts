@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { AuthResponse } from '../interface/auth-response';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class AuthServiceService {
 
   private apiUrl = 'http://localhost:3000'
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,) {}
 
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/user/signup`, userData);
@@ -40,4 +41,12 @@ export class AuthServiceService {
     const decodedPayload = atob(payload); // Décoder en base64
     return JSON.parse(decodedPayload); // Retourner l'objet JSON
   }
+
+  logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
 }
+
+}
+
+
