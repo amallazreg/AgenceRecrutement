@@ -1,54 +1,167 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+
 interface MenuItem {
   name: string;
   icon: string;
   route: string;
   isActive: boolean;
+  roles: string[];
 }
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule ,RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   platformName = 'Next Step';
   isCollapsed = false;
+  
+  currentUserRole: string = 'admin'; // admin, company, user
 
-  menuItems: MenuItem[] = [
+  // Tous les items de menu CORRIGÉS
+  allMenuItems: MenuItem[] = [
+    // Admin items
     {
       name: 'Tableau de bord',
       icon: 'dashboard',
       route: '/adminDashboard',
-      isActive: false
+      isActive: false,
+      roles: ['admin']
     },
     {
       name: 'Offres d\'emploi',
       icon: 'work',
       route: '/jobs',
-      isActive: false
+      isActive: false,
+      roles: ['admin']
     },
     {
       name: 'Companies',
       icon: 'business',
       route: '/companies',
-      isActive: false
+      isActive: false,
+      roles: ['admin']
     },
     {
       name: 'Candidats',
       icon: 'people',
       route: '/candidates',
-      isActive: false
+      isActive: false,
+      roles: ['admin']
+    },
+
+    // Company items (recruteur)
+    {
+      name: 'Tableau de bord',
+      icon: 'dashboard',
+      route: '/companyDashboard',
+      isActive: false,
+      roles: ['company']
+    },
+    {
+      name: 'Mes Offres',
+      icon: 'work',
+      route: '/company/jobs',
+      isActive: false,
+      roles: ['company']
+    },
+    {
+      name: 'Candidats',
+      icon: 'people',
+      route: '/company/candidates',
+      isActive: false,
+      roles: ['company']
+    },
+    {
+      name: 'Entretiens',
+      icon: 'calendar_today',
+      route: '/company/interviews',
+      isActive: false,
+      roles: ['company']
+    },
+
+    // User items (candidat)
+    {
+      name: 'Tableau de bord',
+      icon: 'dashboard',
+      route: '/userDashboard',
+      isActive: false,
+      roles: ['user']
+    },
+    {
+      name: 'Offres',
+      icon: 'search',
+      route: '/user/jobs',
+      isActive: false,
+      roles: ['user']
+    },
+    {
+      name: 'Mes Candidatures',
+      icon: 'description',
+      route: '/user/applications',
+      isActive: false,
+      roles: ['user']
+    },
+    {
+      name: 'Mon Profil',
+      icon: 'person',
+      route: '/user/profile',
+      isActive: false,
+      roles: ['user']
     }
   ];
 
-  constructor(private router: Router) {
-    // Activer l'élément correspondant à la route actuelle
+  menuItems: MenuItem[] = [];
+
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    this.getCurrentUserRole();
+    this.filterMenuItems();
     this.setActiveItemByRoute();
+  }
+
+  getCurrentUserRole(): void {
+    // À remplacer par votre vraie logique d'authentification
+    // Pour tester, changez cette valeur :
+    this.currentUserRole = 'admin'; // 'company' ou 'user'
+  }
+
+  filterMenuItems(): void {
+    this.menuItems = this.allMenuItems.filter(item => 
+      item.roles.includes(this.currentUserRole)
+    );
+  }
+
+  getUserDisplayInfo(): { name: string; role: string } {
+    switch(this.currentUserRole) {
+      case 'admin':
+        return { name: 'Admin', role: 'Administrateur' };
+      case 'company':
+        return { name: 'Entreprise', role: 'Recruteur' };
+      case 'user':
+        return { name: 'Candidat', role: 'Chercheur d\'emploi' };
+      default:
+        return { name: 'Utilisateur', role: 'Membre' };
+    }
+  }
+
+  getUserAvatarIcon(): string {
+    switch(this.currentUserRole) {
+      case 'admin':
+        return 'admin_panel_settings';
+      case 'company':
+        return 'business';
+      case 'user':
+        return 'person';
+      default:
+        return 'person';
+    }
   }
 
   toggleSidebar(): void {
@@ -63,8 +176,6 @@ export class SidebarComponent {
     this.menuItems.forEach(item => {
       item.isActive = item.name === selectedItem.name;
     });
-    
-    // Navigation vers la route
     this.router.navigate([selectedItem.route]);
   }
 
@@ -73,9 +184,5 @@ export class SidebarComponent {
     this.menuItems.forEach(item => {
       item.isActive = currentRoute === item.route || currentRoute.startsWith(item.route + '/');
     });
-  }
-
-  navigateToRoute(route: string): void {
-    this.router.navigate([route]);
   }
 }

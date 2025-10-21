@@ -30,13 +30,26 @@
   <!-- Footer de la sidebar -->
   <div class="sidebar-footer" *ngIf="!isCollapsed">
     <div class="user-info">
-      <div class="user-avatar">
-        <span class="material-icons">person</span>
+      <div class="user-avatar" [class]="currentUserRole">
+        <span class="material-icons">{{ getUserAvatarIcon() }}</span>
       </div>
       <div class="user-details">
-        <span class="user-name">Admin</span>
-        <span class="user-role">Administrateur</span>
+        <span class="user-name">{{ getUserDisplayInfo().name }}</span>
+        <span class="user-role">{{ getUserDisplayInfo().role }}</span>
       </div>
     </div>
+    
+    <!-- Bouton Logout -->
+    <button class="logout-btn"  title="Déconnexion">
+      <span class="material-icons">logout</span>
+      <span class="logout-text">Logout</span>
+    </button>
+  </div>
+
+  <!-- Footer version collapsed (quand la sidebar est réduite) -->
+  <div class="sidebar-footer-collapsed" *ngIf="isCollapsed">
+    <button class="logout-btn-collapsed"  title="Déconnexion">
+      <span class="material-icons">logout</span>
+    </button>
   </div>
 </div>

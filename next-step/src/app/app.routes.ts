@@ -5,7 +5,7 @@ import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboa
 import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
 import { CompanyDashboardComponent } from './dashboards/company-dashboard/company-dashboard.component';
 import { CompaniesComponent } from './companies/companies/companies.component';
-import { CondidateComponent } from './companies/condidate/condidate.component';
+import { CondidateComponent } from './AdminInterfaces/condidate/condidate.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },

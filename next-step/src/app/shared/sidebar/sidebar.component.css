@@ -3,7 +3,35 @@
 :host {
   display: block;
 }
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
 
+.user-avatar.admin {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.user-avatar.recruiter, 
+.user-avatar.company {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.user-avatar.candidate, 
+.user-avatar.user {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.user-avatar .material-icons {
+  font-size: 20px;
+  color: white;
+}
 .sidebar {
   width: 280px;
   height: 100vh;
@@ -271,4 +299,78 @@
     rgba(102, 126, 234, 0.95) 0%, 
     rgba(118, 75, 162, 0.95) 100%);
   backdrop-filter: blur(20px);
+}
+/* Styles pour le bouton logout */
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.logout-btn .material-icons {
+  font-size: 18px;
+}
+
+.logout-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Version collapsed du logout */
+.sidebar-footer-collapsed {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.logout-btn-collapsed {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.logout-btn-collapsed:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: scale(1.1);
+}
+
+/* Ajustement du footer pour accommoder le logout */
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }

@@ -1,1 +1,260 @@
-<p>company-dashboard works!</p>
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+  <main class="main-content">
+    <div class="recruiter-dashboard">
+      <!-- Header -->
+      <div class="dashboard-header">
+        <div class="header-left">
+          <h1 class="page-title">Recruitment Dashboard</h1>
+          <p class="page-subtitle">Manage your hiring process and track candidate pipeline</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-primary">
+            <span class="material-icons">add</span>
+            Post New Job
+          </button>
+          <div class="date-filter">
+            <span class="material-icons">calendar_today</span>
+            Last 30 days
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="metrics-grid">
+        <div *ngFor="let metric of metrics" class="metric-card" [class]="metric.color">
+          <div class="metric-icon">
+            <span class="material-icons">{{ metric.icon }}</span>
+          </div>
+          <div class="metric-content">
+            <h3>{{ metric.value }}</h3>
+            <p>{{ metric.title }}</p>
+            <div class="metric-trend" [class]="metric.trend">
+              <span class="material-icons">{{ metric.trend === 'up' ? 'trending_up' : 'trending_down' }}</span>
+              {{ metric.change }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-section">
+        <h3>Quick Actions</h3>
+        <div class="actions-grid">
+          <button *ngFor="let action of quickActions" 
+                  class="action-card" 
+                  (click)="performAction(action.action)">
+            <div class="action-icon">
+              <span class="material-icons">{{ action.icon }}</span>
+            </div>
+            <span class="action-label">{{ action.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="dashboard-grid">
+        <!-- Active Jobs -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>Active Job Positions</h3>
+            <button class="btn-text">View All</button>
+          </div>
+          <div class="card-content">
+            <div *ngFor="let job of activeJobs" class="job-item">
+              <div class="job-info">
+                <h4>{{ job.title }}</h4>
+                <div class="job-meta">
+                  <span class="department">{{ job.department }}</span>
+                  <span class="applications">{{ job.applications }} applications</span>
+                </div>
+              </div>
+              <div class="job-stats">
+                <div class="stat">
+                  <span class="material-icons">visibility</span>
+                  {{ job.views }} views
+                </div>
+                <span class="status-badge" [class]="getStatusClass(job.status)">
+                  {{ getStatusText(job.status) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Candidates -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>Recent Candidates</h3>
+            <button class="btn-text">View All</button>
+          </div>
+          <div class="card-content">
+            <div *ngFor="let candidate of recentCandidates" class="candidate-item">
+              <div class="candidate-avatar">
+                <span class="material-icons">person</span>
+              </div>
+              <div class="candidate-info">
+                <h4>{{ candidate.name }}</h4>
+                <p>{{ candidate.position }}</p>
+                <div class="candidate-meta">
+                  <span class="application-date">{{ candidate.applicationDate }}</span>
+                  <span class="score">Score: {{ candidate.score }}%</span>
+                </div>
+              </div>
+              <div class="candidate-status">
+                <span class="status-badge" [class]="getStatusClass(candidate.status)">
+                  {{ getStatusText(candidate.status) }}
+                </span>
+                <button class="btn-icon" (click)="viewCandidate(candidate)">
+                  <span class="material-icons">visibility</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hiring Pipeline -->
+        <div class="dashboard-card pipeline-card">
+          <div class="card-header">
+            <h3>Hiring Pipeline</h3>
+            <button class="btn-text">Detailed View</button>
+          </div>
+          <div class="pipeline-stages">
+            <div class="pipeline-stage">
+              <div class="stage-header">
+                <span class="stage-title">Applied</span>
+                <span class="stage-count">45</span>
+              </div>
+              <div class="stage-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-stage">
+              <div class="stage-header">
+                <span class="stage-title">Screening</span>
+                <span class="stage-count">28</span>
+              </div>
+              <div class="stage-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 62%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-stage">
+              <div class="stage-header">
+                <span class="stage-title">Interview</span>
+                <span class="stage-count">14</span>
+              </div>
+              <div class="stage-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 31%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-stage">
+              <div class="stage-header">
+                <span class="stage-title">Offer</span>
+                <span class="stage-count">5</span>
+              </div>
+              <div class="stage-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 11%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-stage">
+              <div class="stage-header">
+                <span class="stage-title">Hired</span>
+                <span class="stage-count">3</span>
+              </div>
+              <div class="stage-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 7%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Interviews -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>Upcoming Interviews</h3>
+            <button class="btn-text">Schedule</button>
+          </div>
+          <div class="card-content">
+            <div class="interview-item">
+              <div class="interview-time">
+                <span class="time">10:00 AM</span>
+                <span class="date">Today</span>
+              </div>
+              <div class="interview-details">
+                <h4>Technical Interview</h4>
+                <p>Sarah Johnson - Senior Frontend Developer</p>
+                <span class="interview-type">Video Call</span>
+              </div>
+              <button class="btn-icon">
+                <span class="material-icons">video_call</span>
+              </button>
+            </div>
+            <div class="interview-item">
+              <div class="interview-time">
+                <span class="time">02:30 PM</span>
+                <span class="date">Today</span>
+              </div>
+              <div class="interview-details">
+                <h4>Culture Fit</h4>
+                <p>David Brown - DevOps Engineer</p>
+                <span class="interview-type">In-Person</span>
+              </div>
+              <button class="btn-icon">
+                <span class="material-icons">location_on</span>
+              </button>
+            </div>
+            <div class="interview-item">
+              <div class="interview-time">
+                <span class="time">11:00 AM</span>
+                <span class="date">Tomorrow</span>
+              </div>
+              <div class="interview-details">
+                <h4>Technical Screening</h4>
+                <p>Mike Chen - Product Manager</p>
+                <span class="interview-type">Phone Call</span>
+              </div>
+              <button class="btn-icon">
+                <span class="material-icons">phone</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Summary -->
+      <div class="performance-summary">
+        <div class="summary-card">
+          <h3>Recruitment Performance</h3>
+          <div class="summary-stats">
+            <div class="summary-stat">
+              <span class="stat-value">{{ getTotalApplications() }}</span>
+              <span class="stat-label">Total Applications</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-value">{{ getAverageScore() }}%</span>
+              <span class="stat-label">Avg. Candidate Score</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-value">24 days</span>
+              <span class="stat-label">Avg. Time to Hire</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-value">68%</span>
+              <span class="stat-label">Offer Acceptance Rate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
