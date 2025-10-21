@@ -78,4 +78,11 @@ export class SidebarComponent {
   navigateToRoute(route: string): void {
     this.router.navigate([route]);
   }
+
+  logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  this.router.navigate(['/login']);
+}
+
 }
