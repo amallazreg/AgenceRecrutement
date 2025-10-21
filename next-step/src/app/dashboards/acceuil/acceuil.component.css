@@ -1,0 +1,416 @@
+   * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            color: #1e3a8a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #dbeafe;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-highlight {
+            color: white;
+            display: inline-block;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0 1rem;
+            border-radius: 8px;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-white {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1e3a8a;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 2px solid #e5e7eb;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.15);
+            border-color: #3b82f6;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .icon-blue {
+            background: linear-gradient(135deg, #dbeafe, #93c5fd);
+            color: #1e3a8a;
+        }
+
+        .icon-dark {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            color: white;
+        }
+
+        .icon-light {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #1e3a8a;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            line-height: 1.8;
+        }
+
+        /* Roles Section */
+        .roles {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+
+        .roles-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .role-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .role-card:hover {
+            transform: scale(1.05);
+            border-color: #3b82f6;
+        }
+
+        .role-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .role-admin {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+        }
+
+        .role-company {
+            background: linear-gradient(135deg, #60a5fa, #93c5fd);
+            color: white;
+        }
+
+        .role-candidate {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            color: white;
+        }
+
+        .role-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .role-card ul {
+            list-style: none;
+            text-align: left;
+            margin-top: 1.5rem;
+        }
+
+        .role-card li {
+            padding: 0.7rem 0;
+            color: #6b7280;
+            position: relative;
+            padding-left: 1.8rem;
+        }
+
+        .role-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: #111827;
+            color: white;
+            padding: 3rem 2rem 1.5rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #93c5fd;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            padding: 0.3rem 0;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #3b82f6;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
