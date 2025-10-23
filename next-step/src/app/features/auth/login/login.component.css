@@ -702,3 +702,11 @@ footer {
     font-size: 28px;  /* si tu veux que le span suive le h1 */
     color: #4f46e5;
 }
+.btn:hover {
+  background: linear-gradient(90deg, #4338ca, #4f46e5);
+  transform: translateY(-2px);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

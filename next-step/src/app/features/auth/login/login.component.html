@@ -122,12 +122,28 @@
 
                 <h2 class="login-title">Login</h2>
 
-                <form id="loginForm">
+                <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)" novalidate>
+
                     <div class="input-group">
                         <div class="input-wrapper">
                             <span class="input-icon">👤</span>
-                            <input type="text" placeholder="Name" required>
-                        </div>
+ <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+            minlength="6"
+            [(ngModel)]="formData.password"
+            #passwordCtrl="ngModel"
+          />
+          <span class="toggle-password" (click)="togglePassword()">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </span>
+        </div>
+        <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
+          <small *ngIf="passwordCtrl.errors?.['required']">Password required</small>
+                                </div>
                     </div>
 
                     <div class="input-group">
@@ -145,10 +161,10 @@
                         </label>
                     </div>
 
-                    <button type="submit" class="btn-login">Log in</button>
+                  <button type="submit" class="btn-login" [disabled]="!loginForm.valid">Log in</button>
 
                     <div class="footer-text">
-                        No account yet? <a href="#" id="registerLink">Create an account</a>
+                        No account yet? <a href="/auth/signup" id="registerLink">Create an account</a>
                     </div>
 
                     <div class="copyright">
