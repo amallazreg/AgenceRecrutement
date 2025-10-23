@@ -1,11 +1,9 @@
 
-<div class="login-page">
-  <!-- Illustration gauche -->
+<!--<div class="login-page">
   <div class="login-illustration">
     <img src="/assets/job22.png" alt="Illustration de connexion" />
   </div>
 
-  <!-- Formulaire droit -->
   <div class="login-card">
     <div class="logo">
       <img src="assets/logo.jpeg" alt="Logo NextStep AI" />
@@ -15,8 +13,8 @@
     <h2>Login</h2>
 
 <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)" novalidate>
-      <!-- Name -->
-      <div class="form-group">
+
+  <div class="form-group">
         <div class="input-icon">
           <i class="fa-solid fa-user"></i>
           <div class="input-group">
@@ -37,7 +35,6 @@
       </div>
       
 
-      <!-- Mot de passe -->
       <div class="form-group">
         <div class="input-icon">
           <i class="fa fa-lock"></i>
@@ -60,13 +57,11 @@
         </div>
       </div>
 
-      <!-- Souvenir -->
       <div class="remember">
         <input type="checkbox" id="remember" [(ngModel)]="formData.remember" name="remember" />
         <label for="remember">Remember me</label>
       </div>
 
-      <!-- Bouton -->
       <button type="submit" class="btn" [disabled]="!loginForm.valid">Log in</button>
     </form>
 
@@ -77,3 +72,122 @@
     <footer>© 2025 NextStep AI — All rights reserved</footer>
   </div>
 </div>
+-->
+
+<div class="app-container">
+<app-sidebar-acceuil></app-sidebar-acceuil>
+<div class="login-container">
+        <!-- Section Gauche - Illustration -->
+        <div class="left-section">
+            <div class="animated-bg">
+                <div class="grid-pattern"></div>
+                <div class="floating-shapes">
+                    <div class="shape shape1"></div>
+                    <div class="shape shape2"></div>
+                    <div class="shape shape3"></div>
+                </div>
+            </div>
+            
+            <div class="left-content">
+                <div class="illustration">
+                    <div class="card-stack">
+                        <div class="card card1">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-text">Smart CV Matching</div>
+                        </div>
+                        <div class="card card2">
+                            <div class="card-icon">🤖</div>
+                            <div class="card-text">AI-Powered Selection</div>
+                        </div>
+                        <div class="card card3">
+                            <div class="card-icon">📄</div>
+                            <div class="card-text">Smart CV Matching</div>
+                        </div>
+                    </div>
+                </div>
+                <h1>NextStep AI</h1>
+                <p>Revolutionize your recruitment with artificial intelligence</p>
+            </div>
+        </div>
+
+        <!-- Section Droite - Formulaire -->
+        <div class="right-section">
+            <div class="login-card">
+              <!--  <div class="logo-section">
+                    <div class="logo">
+                        <img src="assets/logo.jpeg" alt="Logo NextStep AI" />
+                     </div>
+                    <div class="logo-text">NextStep</div>
+                </div> -->
+
+                <h2 class="login-title">Login</h2>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" placeholder="Name" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" placeholder="Password" required>
+                            <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                        </div>
+                    </div>
+
+                    <div class="remember-row">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="remember">
+                            <span class="remember-label">Remember me</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-login">Log in</button>
+
+                    <div class="footer-text">
+                        No account yet? <a href="#" id="registerLink">Create an account</a>
+                    </div>
+
+                    <div class="copyright">
+                        © 2025 NextStep AI — All rights reserved
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+
+        const form = document.getElementById('loginForm');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = e.target[0].value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            console.log('Login attempt:', { username, password, remember });
+            
+            alert(`Connexion réussie!\nUtilisateur: ${username}`);
+        });
+
+        document.getElementById('registerLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Redirection vers la page d\'inscription');
+        });
+    </script>
