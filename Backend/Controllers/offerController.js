@@ -75,43 +75,61 @@ const getOfferById = async (req, res) => {
 };
 
 // Update offer (only company owner)
+// controllers/offerController.js
+const { cleanOfferDataForUpdate } = require('../utils/offerUtils');
+
 const updateOffer = async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id);
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
-    if (String(offer.companyId) !== req.user.id) return res.status(403).json({ message: 'Not allowed' });
 
-    // Update seulement les champs attendus (ne pas remplacer tout req.body)
-    const updatable = [
-      'title','description','requiredSkills','experienceLevel','contractType',
-      'location','salaryRange','startDate','applicationDeadline','workingHours','remoteOption',
-      'programmingLanguages','frameworks','databaseKnowledge','tools','methodology',
-      'requiredDiploma','medicalSpecialty','workSchedule','status'
-    ];
-    updatable.forEach(field => {
-      if (field in req.body) offer[field] = req.body[field];
+    // Vérification que c’est la société qui possède l’offre
+    if (String(offer.companyId) !== String(req.company._id)) {
+      return res.status(403).json({ message: 'Not allowed' });
+    }
+
+    // Filtrer seulement les champs autorisés pour ce secteur
+    const cleanedData = cleanOfferDataForUpdate(offer, req.body);
+
+    // Appliquer dynamiquement la mise à jour
+    Object.entries(cleanedData).forEach(([key, value]) => {
+      offer[key] = value;
     });
 
     await offer.save();
-    return res.json(offer);
+
+    res.json({
+      success: true,
+      message: "Offre mise à jour avec succès",
+      offer
+    });
+
   } catch (err) {
-    return res.status(500).json({ message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// Delete offer
+
+
 const deleteOffer = async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id);
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
-    if (String(offer.companyId) !== req.user.id) return res.status(403).json({ message: 'Not allowed' });
 
-    await offer.remove();
+    // Vérifier que c'est bien la société qui a créé l'offre
+    if (String(offer.companyId) !== String(req.company._id)) {
+      return res.status(403).json({ message: 'Not allowed' });
+    }
+
+    await offer.deleteOne(); // supprime l'offre
     return res.json({ message: 'Offer deleted' });
   } catch (err) {
+    console.error('Delete offer error:', err.message);
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 module.exports ={
     createOffer,

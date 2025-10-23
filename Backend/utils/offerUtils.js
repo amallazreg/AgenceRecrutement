@@ -26,4 +26,58 @@ function cleanOfferData(offerData) {
 
   return cleanedData;
 }
-module.exports = { cleanOfferData };
+
+// utils/offerUtils.js
+
+function cleanOfferDataForUpdate(offer, updateData) {
+  const fieldsBySector = {
+    Technologie: [
+      'programmingLanguages', 'frameworks', 'databaseKnowledge',
+      'tools', 'projectType', 'methodology'
+    ],
+    Marketing: [
+      'marketingChannels', 'campaignTools', 'targetAudience', 'kpiFocus'
+    ],
+    Finance: [
+      'financialTools', 'areaOfExpertise', 'certifications', 'reportingFrequency'
+    ],
+    Santé: [
+      'requiredDiploma', 'medicalSpecialty', 'workSchedule', 'licenseNumber'
+    ],
+    Éducation: [
+      'teachingLevel', 'subjectTaught', 'requiredDegree', 'classSize'
+    ],
+    Commerce: [
+      'salesType', 'productType', 'salesTarget', 'customerManagementTools', 'mobilityRequired'
+    ],
+    Industrie: [
+      'machineOperation', 'safetyCertifications', 'shiftType',
+      'productionEnvironment', 'qualityControl'
+    ]
+  };
+
+  // Champs généraux qu'on garde toujours
+  const generalFields = [
+    'title', 'description', 'requiredSkills', 'experienceLevel', 'contractType',
+    'location', 'salaryRange', 'startDate', 'applicationDeadline',
+    'workingHours', 'remoteOption', 'status'
+  ];
+
+  // Les champs autorisés sont ceux du secteur de l’offre + les champs généraux
+  const allowedFields = [...generalFields, ...(fieldsBySector[offer.sector] || [])];
+
+  const cleanedData = {};
+  Object.keys(updateData).forEach(key => {
+    if (allowedFields.includes(key)) {
+      cleanedData[key] = updateData[key];
+    }
+  });
+
+  return cleanedData;
+}
+
+
+module.exports = { 
+    cleanOfferData,
+    cleanOfferDataForUpdate
+ };
