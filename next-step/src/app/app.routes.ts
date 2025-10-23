@@ -9,6 +9,7 @@ import { CondidateComponent } from './AdminInterfaces/condidate/condidate.compon
 
 
 import { AcceuilComponent } from './dashboards/acceuil/acceuil.component';
+import { CompanyOffersComponent } from './CompanyInterfaces/company-offers/company-offers.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'companies', component: CompaniesComponent },
   {path :'candidates',component : CondidateComponent},
   {path : 'acceuil', component : AcceuilComponent},
+  {path:'offers', component: CompanyOffersComponent}, 
   { path: '**', redirectTo: 'auth/login' }, 
 
 

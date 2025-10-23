@@ -64,7 +64,7 @@ export class SidebarComponent implements OnInit {
     {
       name: 'Mes Offres',
       icon: 'work',
-      route: '/company/jobs',
+      route: '/offers',
       isActive: false,
       roles: ['company']
     },
