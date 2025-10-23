@@ -2,85 +2,45 @@
 const Offer = require('../Models/offreModel');
 const Company = require('../Models/companyModel');
 
+const { cleanOfferData } = require('../utils/offerUtils');
+
 // Create Offer
 const createOffer = async (req, res) => {
   try {
-    const companyId = req.company._id; // fourni par verifyToken
+    const companyId = req.company._id; // ✅ fourni par middleware
     const company = await Company.findById(companyId);
     if (!company) return res.status(404).json({ message: 'Company not found' });
 
-    // Construire l'objet en prenant req.body (ne pas faire confiance aveuglément au client)
-    const data = {
-      companyId,
-      sector: company.sector,
-      title: req.body.title,
-      description: req.body.description,
-      requiredSkills: req.body.requiredSkills || [],
-      experienceLevel: req.body.experienceLevel,
-      contractType: req.body.contractType,
-      location: req.body.location,
-      salaryRange: req.body.salaryRange,
-      startDate: req.body.startDate,
-      applicationDeadline: req.body.applicationDeadline,
-      workingHours: req.body.workingHours,
-      remoteOption: req.body.remoteOption,
-
-      // Informatique
-      programmingLanguages: req.body.programmingLanguages || [],
-      frameworks: req.body.frameworks || [],
-      databaseKnowledge: req.body.databaseKnowledge || [],
-      tools: req.body.tools || [],
-      projectType : req.body.projectType || [],
-      methodology: req.body.methodology || [],
-
-      // Marketing
-      marketingChannels: req.body.marketingChannels || [],
-      campaignTools: req.body.campaignTools ||[],
-      targetAudience: req.body.targetAudience || [],
-      kpiFocus: req.body.kpiFocus || [],
-
-      // Finance
-      financialTools: req.body.financialTools || [],
-      areaOfExpertise: req.body.areaOfExpertise || [],
-      certifications: req.body.certifications||[],
-      reportingFrequency: req.body.reportingFrequency || [],
-
-      // Santé
-      requiredDiploma: req.body.requiredDiploma || [],
-      medicalSpecialty: req.body.medicalSpecialty || [],
-      workSchedule: req.body.workSchedule || [],
-      licenseNumber : req.body.licenseNumber || [],
-
-      // Education
-      teachingLevel:  req.body.teachingLevel || [],
-      subjectTaught: req.body.subjectTaught || [],
-      requiredDegree:req.body.requiredDegree || [],
-      classSize: req.body.classSize || [],
-
-      // Commerce
-      salesType: req.body.salesType || [],
-      productType: req.body.productType || [],
-      salesTarget: req.body.salesTarget || [],
-      customerManagementTools: req.body.customerManagementTools || [],
-      mobilityRequired: req.body.mobilityRequired || [],
-
-      //Industry
-      machineOperation: req.body.machineOperation || [],
-      safetyCertifications: req.body.safetyCertifications || [],
-      shiftType: req.body.shiftType || [],
-      productionEnvironment: req.body.productionEnvironment || [],
-      qualityControl: req.body.qualityControl  || [],
+    // 1️⃣ Ajouter d’abord les infos de la société
+    let offerData = {
+      ...req.body,
+      companyId: company._id,
+      sector: company.sector
     };
 
-    const offer = new Offer(data);
-    await offer.save();
+    // 2️⃣ Ensuite seulement, nettoyer selon le secteur
+    offerData = cleanOfferData(offerData);
 
-    return res.status(201).json(offer);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    // 3️⃣ Créer et sauvegarder
+    // Créer dynamiquement le document sans remplir les champs absents
+    const newOffer = new Offer(offerData);
+    await newOffer.save();
+
+    await newOffer.save();
+
+
+    res.status(201).json({
+      success: true,
+      message: "Offre créée avec succès",
+      offer: newOffer
+    });
+
+  } catch (error) {
+    console.error("Erreur lors de la création de l’offre :", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // Get offers of a company
 const getOffersByCompany = async (req, res) => {

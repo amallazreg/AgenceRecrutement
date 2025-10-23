@@ -1,21 +1,29 @@
 const jwt = require('jsonwebtoken');
+const Company = require('../Models/companyModel');
 
-const authenticateCompany = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).json({ message: "Accès refusé, token manquant" });
-  }
-
+const authenticateCompany = async (req, res, next) => {
   try {
-    // Vérifie et décode le token
+    // Récupération du token dans l'en-tête Authorization
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ message: "Accès refusé, token manquant" });
+    }
+
+    // Vérification et décodage du token
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-    // Attache l'ID de l'agence à la requête
-    req.comapnyId = decoded._id;
-    
-    next(); // Passe au middleware suivant ou à la route
+    // Récupération de la société associée au token
+    const company = await Company.findById(decoded.id);
+    if (!company) {
+      return res.status(404).json({ message: "Société non trouvée" });
+    }
+
+    // ✅ Attacher la société entière à la requête (corrige ton erreur)
+    req.company = company;
+
+    next(); // Passe au contrôleur suivant
   } catch (err) {
+    console.error("Erreur d'authentification :", err.message);
     return res.status(401).json({ message: "Token invalide" });
   }
 };

@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 // Company actions (auth required)
 router.post('/createOffre', authMiddleware, createOffer);
-router.get('/my-offers', authMiddleware, getOffersByCompany);
+router.get('/getOffersByCompany', authMiddleware, getOffersByCompany);
 router.put('/updateOffre/:id', authMiddleware, updateOffer);
 router.delete('/deleteOffre/:id', authMiddleware, deleteOffer);
 
