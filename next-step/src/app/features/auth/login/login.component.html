@@ -76,8 +76,8 @@
 
 <div class="app-container">
 <app-sidebar-acceuil></app-sidebar-acceuil>
-<div class="login-container">
-        <!-- Section Gauche - Illustration -->
+  <div class="login-container">
+        <!-- Section Gauche -->
         <div class="left-section">
             <div class="animated-bg">
                 <div class="grid-pattern"></div>
@@ -101,7 +101,7 @@
                         </div>
                         <div class="card card3">
                             <div class="card-icon">📄</div>
-                            <div class="card-text">Smart CV Matching</div>
+                            <div class="card-text">Intelligent Analysis</div>
                         </div>
                     </div>
                 </div>
@@ -110,20 +110,19 @@
             </div>
         </div>
 
-        <!-- Section Droite - Formulaire -->
+        <!-- Section Droite -->
         <div class="right-section">
             <div class="login-card">
-            
-
                 <h2 class="login-title">Login</h2>
 
-                <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)" novalidate>
+                  <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)" novalidate>
 
+                
                     <div class="input-group">
                         <div class="input-wrapper">
                             <span class="input-icon">👤</span>
                             <input 
-                                  type="text" 
+                                         type="text" 
                                   id="name"
                                   name="name" 
                                   placeholder="Name"
@@ -139,7 +138,7 @@
                     <div class="input-group">
                         <div class="input-wrapper">
                             <span class="input-icon">🔒</span>
-                              <input
+                                          <input
                                   [type]="showPassword ? 'text' : 'password'"
                                   id="password"
                                   name="password"
@@ -153,20 +152,20 @@
                                   {{ showPassword ? '🙈' : '👁️' }}
                                 </span>
                         </div>
-                         <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
-                         <small *ngIf="passwordCtrl.errors?.['required']">Password required</small>
-        </div>
+                        <div class="error" id="passwordError" style="display: none;">
+                            <small>Password is required (min. 6 characters).</small>
+                        </div>
                     </div>
 
                     <div class="remember">
-                         <input type="checkbox" id="accept" name="accept" [(ngModel)]="formData.acceptTerms" required>
+                       <input type="checkbox" id="accept" name="accept" [(ngModel)]="formData.acceptTerms" required>
                         <label for="accept">Remember me</label>
-                   </div>
+                    </div>
 
-                   <button type="submit" class="btn" [disabled]="!loginForm.valid">Log in</button>
+                    <button type="submit" class="btn" [disabled]="!loginForm.valid">Log in</button>
 
                     <div class="footer-text">
-                        No account yet? <a href="/auth/signup" id="registerLink">Create an account</a>
+                      No account yet? <a href="/auth/signup" id="registerLink">Create an account</a>
                     </div>
 
                     <div class="copyright">
@@ -176,6 +175,7 @@
             </div>
         </div>
     </div>
+
     <script>
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -191,17 +191,39 @@
         }
 
         const form = document.getElementById('loginForm');
+        const nameInput = document.getElementById('name');
+        const passwordInput = document.getElementById('password');
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const username = e.target[0].value;
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
-
-            console.log('Login attempt:', { username, password, remember });
+            let valid = true;
             
-            alert(`Connexion réussie!\nUtilisateur: ${username}`);
+            // Validation du nom
+            if (!nameInput.value.trim()) {
+                document.getElementById('nameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+            }
+            
+            // Validation du mot de passe
+            if (!passwordInput.value || passwordInput.value.length < 6) {
+                document.getElementById('passwordError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('passwordError').style.display = 'none';
+            }
+            
+            if (valid) {
+                const remember = document.getElementById('remember').checked;
+                console.log('Login successful:', { 
+                    name: nameInput.value, 
+                    password: passwordInput.value,
+                    remember 
+                });
+                alert(`Connexion réussie!\nUtilisateur: ${nameInput.value}`);
+            }
         });
 
         document.getElementById('registerLink').addEventListener('click', (e) => {

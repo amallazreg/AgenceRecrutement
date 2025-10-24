@@ -1,22 +1,25 @@
 .app-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* Empêche tout le layout de scroller */
+}
+
+app-sidebar {
+  flex-shrink: 0; /* Sidebar reste fixe */
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: 100vh; /* Pleine hauteur */
+  z-index: 1000;
 }
 
 .main-content {
   flex: 1;
-  background: #f8fafc;
+  overflow-y: auto; /* Seul le contenu principal défile */
+  height: 100vh;
+  background-color: #f8fafc;
   padding: 24px;
-}
-.app-container {
-  display: flex;
-  min-height: 100vh;
-}
-
-.main-content {
-  flex: 1;
-  background: #f8fafc;
-  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* Styles du Dashboard */

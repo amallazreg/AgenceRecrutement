@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
 import { FormCompanyComponent } from '../form-company/form-company.component';
 import { AdminServiceService } from '../../services/admin-service.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
 
 interface Company {
   _id: string;

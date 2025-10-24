@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SidebarAcceuilComponent } from "../../sidebar-acceuil/sidebar-acceuil.component";
+import { SidebarAcceuilComponent } from '../../shared/sidebar-acceuil/sidebar-acceuil.component';
 
 @Component({
   selector: 'app-acceuil',

@@ -4,7 +4,7 @@ import { AnimationOptions , LottieComponent} from 'ngx-lottie';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthServiceService } from '../../../services/auth-service.service';
-import { SidebarAcceuilComponent } from "../../../sidebar-acceuil/sidebar-acceuil.component";
+import { SidebarAcceuilComponent } from '../../../shared/sidebar-acceuil/sidebar-acceuil.component';
 
 @Component({
   selector: 'app-login',
