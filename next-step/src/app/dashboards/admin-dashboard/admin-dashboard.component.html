@@ -7,10 +7,7 @@
       <div class="dashboard-header">
         <h1 class="dashboard-title">Tableau de Bord Admin</h1>
         <div class="header-actions">
-          <button class="btn-primary">
-            <span class="material-icons">add</span>
-            Nouvelle Société
-          </button>
+          
           <div class="date-filter">
             <span class="material-icons">calendar_today</span>
             Ce mois-ci
@@ -25,11 +22,10 @@
             <span class="material-icons">people</span>
           </div>
           <div class="stat-content">
-            <h3 class="stat-number">1,248</h3>
-            <p class="stat-label">Candidats inscrits</p>
+            <h3 class="stat-number">{{totalUser}}</h3>
+            <p class="stat-label">Candidates </p>
             <div class="stat-trend positive">
-              <span class="material-icons">trending_up</span>
-              +12% ce mois
+             
             </div>
           </div>
         </div>
@@ -39,11 +35,10 @@
             <span class="material-icons">business</span>
           </div>
           <div class="stat-content">
-            <h3 class="stat-number">156</h3>
-            <p class="stat-label">Sociétés actives</p>
+            <h3 class="stat-number">{{totalCompany}}</h3>
+            <p class="stat-label">Active companies</p>
             <div class="stat-trend positive">
-              <span class="material-icons">trending_up</span>
-              +5% ce mois
+             
             </div>
           </div>
         </div>
@@ -53,28 +48,15 @@
             <span class="material-icons">work</span>
           </div>
           <div class="stat-content">
-            <h3 class="stat-number">342</h3>
+            <h3 class="stat-number">{{totalOffers}}</h3>
             <p class="stat-label">Offres publiées</p>
             <div class="stat-trend positive">
-              <span class="material-icons">trending_up</span>
-              +8% ce mois
+            
             </div>
           </div>
         </div>
 
-        <div class="stat-card">
-          <div class="stat-icon danger">
-            <span class="material-icons">assignment</span>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-number">2,847</h3>
-            <p class="stat-label">Candidatures</p>
-            <div class="stat-trend negative">
-              <span class="material-icons">trending_down</span>
-              -3% ce mois
-            </div>
-          </div>
-        </div>
+      
       </div>
 
       <!-- Graphiques et données détaillées -->

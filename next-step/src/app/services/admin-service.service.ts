@@ -40,6 +40,10 @@ private apiUrl = 'http://localhost:3000';
      return this.http.get<any>(`${this.apiUrl}/admin/getUserCount`);
   }
 
+  getOffreCount() :   Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/company/getOffreCount`);
+  }
+
 
 
 
