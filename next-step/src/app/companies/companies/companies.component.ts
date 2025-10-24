@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
 import { FormCompanyComponent } from '../form-company/form-company.component';
 import { AdminServiceService } from '../../services/admin-service.service';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 interface Company {
   _id: string;
   name: string;
@@ -163,9 +166,92 @@ viewCompany(company: any) {
     console.log('Trier par:', field);
   }
 
-  exportData() {
-    console.log('Exporter les données');
+
+exportData() {
+  try {
+    const data = this.filteredCompanies && this.filteredCompanies.length ? this.filteredCompanies : this.companies;
+
+    if (!data || data.length === 0) {
+      alert('No companies to export.');
+      return;
+    }
+
+    const doc: any = new jsPDF('landscape', 'pt', 'a4'); // cast to any to avoid TS type issues
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // header
+    const title = 'Companies List';
+    const dateStr = new Date().toLocaleString();
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title, 40, 40);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Exported: ${dateStr}`, pageWidth - 160, 44, { align: 'right' });
+
+    const head = [[
+      'Company Name',
+      'Sector',
+      'E-mail',
+      'Phone',
+      'Manager HR',
+      'Manager Email',
+      'Website',
+      'Address',
+      'Status'
+    ]];
+
+    const body = data.map((c: any) => [
+      c.name ?? '',
+      c.sector ?? '',
+      c.email ?? '',
+      (c.phonePrefix ? c.phonePrefix + ' ' : '') + (c.phoneNumber ?? ''),
+      c.hrManage ?? '',
+      c.managerEmail ?? '',
+      c.website ?? '',
+      c.fullAddress ?? '',
+      c.status ?? ''
+    ]);
+
+    autoTable(doc, {
+      startY: 70,
+      head,
+      body,
+      styles: { fontSize: 9, cellPadding: 6 },
+      headStyles: { fillColor: [60, 141, 188], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      margin: { left: 20, right: 20, top: 20, bottom: 30 },
+      didDrawPage: (dataArg: any) => {
+        // pageNumber fourni par autoTable ; pageCount via doc.internal (casted)
+        const pageNumber = dataArg.pageNumber; // numéro de la page courante
+        const pageCount = (doc as any).internal.getNumberOfPages(); // total pages
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const pageWidthLocal = doc.internal.pageSize.getWidth();
+
+        // ligne séparatrice (optionnelle)
+        doc.setDrawColor(200);
+        doc.setLineWidth(0.5);
+        doc.line(20, 60, pageWidthLocal - 20, 60);
+
+        // footer : "Page X of Y"
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        const footerText = `Page ${pageNumber} of ${pageCount}`;
+        doc.text(footerText, pageWidthLocal / 2, pageHeight - 10, { align: 'center' });
+      },
+      showHead: 'everyPage'
+    });
+
+    const fileName = `companies_export_${ (new Date()).toISOString().slice(0,10) }.pdf`;
+    doc.save(fileName);
+
+  } catch (err) {
+    console.error('Export PDF error:', err);
+    alert('Erreur lors de la génération du PDF.');
   }
+}
+
+
 
   refreshData() {
         this.loadCompanies();
