@@ -25,7 +25,8 @@ export class LoginComponent {
   formData = {
     name: '',
     password: '',
-    remember: false
+    acceptTerms: false
+
   };
 
   // Méthode pour toggle mot de passe

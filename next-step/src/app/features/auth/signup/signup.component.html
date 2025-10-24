@@ -1,12 +1,10 @@
 
-
+<!--
 <div class="signup-container">
-  <!-- Illustration -->
   <div class="signup-illustration">
     <img src="/assets/job22.png" alt="Inscription Illustration">
   </div>
 
-  <!-- Formulaire -->
   <div class="signup-form">
     <div class="logo">
       <img src="assets/logo.jpeg" alt="NextStep AI Logo">
@@ -17,7 +15,6 @@
 
     <form #signupForm="ngForm" (ngSubmit)="onSubmit(signupForm)" novalidate>
       
-      <!-- Nom complet -->
       <div class="input-group">
         <label for="name">Name</label>
         <input 
@@ -33,7 +30,6 @@
         </div>
       </div>
 
-      <!-- Email -->
       <div class="input-group">
         <label for="email">E-mail</label>
         <input 
@@ -50,7 +46,6 @@
           <small *ngIf="emailCtrl.errors?.['email']">Invalid format.</small>
         </div>
       </div>
-       <!-- phone -->
       <div class="input-group">
         <label for="phone">Phone number</label>
         <input 
@@ -66,7 +61,6 @@
         </div>
       </div>
 
-      <!-- Mot de passe -->
       <div class="input-group password-group">
         <label for="password">Password</label>
         <input 
@@ -86,7 +80,6 @@
         </div>
       </div>
 
-      <!-- Confirmation -->
       <div class="input-group password-group">
         <label for="confirmPassword">Confirm password</label>
         <input 
@@ -105,13 +98,11 @@
         </div>
       </div>
 
-      <!-- Accepter conditions -->
       <div class="remember">
         <input type="checkbox" id="accept" name="accept" [(ngModel)]="formData.acceptTerms" required>
         <label for="accept">I accept the terms of use</label>
       </div>
 
-      <!-- Bouton -->
       <button type="submit" class="btn" [disabled]="!signupForm.valid || formData.password !== formData.confirmPassword">
         Create an account
       </button>
@@ -126,3 +117,275 @@
     </footer>
   </div>
 </div>
+-->
+<div class="app-container">
+<app-sidebar-acceuil></app-sidebar-acceuil>
+<div class="signup-container">
+        <!-- Section Gauche -->
+        <div class="left-section">
+            <div class="animated-bg">
+                <div class="grid-pattern"></div>
+                <div class="floating-shapes">
+                    <div class="shape shape1"></div>
+                    <div class="shape shape2"></div>
+                    <div class="shape shape3"></div>
+                </div>
+            </div>
+            
+            <div class="left-content">
+                <div class="illustration">
+                    <div class="card-stack">
+                        <div class="card card1">
+                            <div class="card-icon">📄</div>
+                            <div class="card-text">Instantt Results</div>
+                        </div>
+                        <div class="card card2">
+                            <div class="card-icon">🤖</div>
+                            <div class="card-text">AI-Powered Selection</div>
+                        </div>
+                        <div class="card card3">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-text">Smart CV Matching</div>
+                        </div>
+                    </div>
+                </div>
+                <h1>NextStep AI</h1>
+                <p>Révolutionnez votre recrutement avec l'intelligence artificielle</p>
+            </div>
+        </div>
+
+        <!-- Section Droite - Formulaire -->
+        <div class="right-section">
+            <div class="signup-card">
+              
+
+                <h2 class="signup-title">Sign Up</h2>
+
+         <form #signupForm="ngForm" (ngSubmit)="onSubmit(signupForm)" novalidate>
+                    <!-- Nom complet -->
+                    <div class="input-group">
+                        <label for="name">Name</label>
+                         <input 
+                            type="text" 
+                            id="name"
+                            name="name" 
+                            placeholder="your full name"
+                            required
+                            [(ngModel)]="formData.name"
+                            #nameCtrl="ngModel">
+                          <div class="error" *ngIf="nameCtrl.invalid && nameCtrl.touched">
+                            <small>Name is required.</small>
+                          </div>
+                     </div>
+
+                    <!-- Email -->
+                    <div class="input-group">
+                        <label for="email">E-mail</label>
+                       <input 
+                          type="email" 
+                          id="email" 
+                          name="email" 
+                          placeholder="Email"
+                          required
+                          email
+                          [(ngModel)]="formData.email"
+                          #emailCtrl="ngModel">
+                        <div class="error" *ngIf="emailCtrl.invalid && emailCtrl.touched">
+                          <small *ngIf="emailCtrl.errors?.['required']">Email is required</small>
+                          <small *ngIf="emailCtrl.errors?.['email']">Invalid format.</small>
+                        </div>
+                    </div>
+
+                    <!-- Téléphone -->
+                    <div class="input-group">
+                        <label for="phone">Phone number</label>
+                        <input 
+                              type="text" 
+                              id="phone"
+                              name="phone" 
+                              placeholder="your phone number"
+                              required
+                              [(ngModel)]="formData.phone"
+                              #phoneCtrl="ngModel">
+                    <div class="error" *ngIf="phoneCtrl.invalid && phoneCtrl.touched">
+                      <small>Phone number is required.</small>
+                    </div>
+                    </div>
+
+                    <!-- Mot de passe -->
+                    <div class="input-group password-group">
+                        <label for="password">Password</label>
+                       <input 
+                          [type]="showPassword ? 'text' : 'password'" 
+                          id="password" 
+                          name="password"
+                          placeholder="password"
+                          required
+                          minlength="6"
+                          [(ngModel)]="formData.password"
+                          #passwordCtrl="ngModel">
+                        <span class="toggle-password" (click)="togglePassword()">
+                          {{ showPassword ? '🙈' : '👁️' }}
+                        </span>
+                        <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
+                          <small>Password required (min 6 characters).</small>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation mot de passe -->
+                    <div class="input-group password-group">
+                        <label for="confirmPassword">Confirm password</label>
+                        <input 
+                          [type]="showConfirmPassword ? 'text' : 'password'" 
+                          id="confirmPassword" 
+                          name="confirmPassword"
+                          placeholder="Confirm your password"
+                          required
+                          [(ngModel)]="formData.confirmPassword"
+                          #confirmCtrl="ngModel">
+                        <span class="toggle-password" (click)="toggleConfirmPassword()">
+                          {{ showConfirmPassword ? '🙈' : '👁️' }}
+                        </span>
+                        <div class="error" *ngIf="formData.password !== formData.confirmPassword && confirmCtrl.touched">
+                          <small>The passwords do not match.</small>
+                        </div>
+                    </div>
+
+                    <!-- Accepter conditions -->
+                   <div class="remember">
+                         <input type="checkbox" id="accept" name="accept" [(ngModel)]="formData.acceptTerms" required>
+                        <label for="accept">I accept the terms of use</label>
+                   </div>
+
+                  <button type="submit" class="btn" [disabled]="!signupForm.valid || formData.password !== formData.confirmPassword">
+                        Create an account
+                  </button>
+                    <div class="footer-text">
+                        Already have an account? 
+                        <a href="#" id="loginLink">Login</a>
+                    </div>
+                </form>
+                <!-- ✅ Alerte centrée -->
+                <div class="custom-alert" *ngIf="showAlertBox" [ngClass]="alertType">
+                  <p>{{ alertMessage }}</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        const form = document.getElementById('signupForm');
+        const inputs = {
+            name: document.getElementById('name'),
+            email: document.getElementById('email'),
+            phone: document.getElementById('phone'),
+            password: document.getElementById('password'),
+            confirmPassword: document.getElementById('confirmPassword'),
+            accept: document.getElementById('accept')
+        };
+
+        // Validation en temps réel
+        inputs.name.addEventListener('blur', function() {
+            validateField('name', this.value.trim() !== '', 'Name is required.');
+        });
+
+        inputs.email.addEventListener('blur', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            validateField('email', emailRegex.test(this.value), 'Invalid email format.');
+        });
+
+        inputs.phone.addEventListener('blur', function() {
+            validateField('phone', this.value.trim() !== '', 'Phone number is required.');
+        });
+
+        inputs.password.addEventListener('blur', function() {
+            validateField('password', this.value.length >= 6, 'Password required (min 6 characters).');
+        });
+
+        inputs.confirmPassword.addEventListener('blur', function() {
+            validateField('confirm', this.value === inputs.password.value, 'The passwords do not match.');
+        });
+
+        function validateField(field, isValid, message) {
+            const errorDiv = document.getElementById(field + 'Error');
+            const inputField = document.getElementById(field === 'confirm' ? 'confirmPassword' : field);
+            
+            if (!isValid) {
+                errorDiv.style.display = 'block';
+                errorDiv.querySelector('small').textContent = message;
+                inputField.classList.add('invalid');
+            } else {
+                errorDiv.style.display = 'none';
+                inputField.classList.remove('invalid');
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validation complète
+            let isValid = true;
+
+            if (inputs.name.value.trim() === '') {
+                validateField('name', false, 'Name is required.');
+                isValid = false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(inputs.email.value)) {
+                validateField('email', false, 'Invalid email format.');
+                isValid = false;
+            }
+
+            if (inputs.phone.value.trim() === '') {
+                validateField('phone', false, 'Phone number is required.');
+                isValid = false;
+            }
+
+            if (inputs.password.value.length < 6) {
+                validateField('password', false, 'Password required (min 6 characters).');
+                isValid = false;
+            }
+
+            if (inputs.password.value !== inputs.confirmPassword.value) {
+                validateField('confirm', false, 'The passwords do not match.');
+                isValid = false;
+            }
+
+            if (!inputs.accept.checked) {
+                alert('You must accept the terms of use.');
+                isValid = false;
+            }
+
+            if (isValid) {
+                const formData = {
+                    name: inputs.name.value,
+                    email: inputs.email.value,
+                    phone: inputs.phone.value,
+                    password: inputs.password.value
+                };
+
+                console.log('Form submitted:', formData);
+                alert('Account created successfully!\nName: ' + formData.name + '\nEmail: ' + formData.email);
+            }
+        });
+
+        document.getElementById('loginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Redirection vers la page de connexion');
+        });
+    </script>
