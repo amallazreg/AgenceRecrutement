@@ -29,6 +29,22 @@ const getAllCompany = async (req, res) => {
     }
 };
 
+const getCompanyById = async (req, res) => {
+  try {
+    const company = await Company.findById(req.params.id);
+
+    if (!company) {
+      return res.status(404).json({ message: "Société non trouvée" });
+    }
+
+    res.status(200).json(company);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur lors de la récupération de la société" });
+  }
+};
+
+
 
 const deleteCompany = async (req, res) => {
     try {
@@ -78,5 +94,6 @@ const getUserCount = async (req, res) => {
     deleteCompany,
     deleteUser,
     getUserCount,
-    getCompanyCount
+    getCompanyCount,
+    getCompanyById
   }

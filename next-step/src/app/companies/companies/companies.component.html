@@ -1,5 +1,6 @@
 <div class="app-container">
   <app-sidebar></app-sidebar>
+
   <main class="main-content">
     <div class="companies-container">
       <!-- Header -->
@@ -8,19 +9,25 @@
           <h1 class="page-title">Company Management</h1>
           <p class="page-subtitle">Manage all partner companies on the platform</p>
         </div>
+
         <div class="header-actions">
           <button class="btn-primary" (click)="openAddCompanyModal()">
             <span class="material-icons">add</span>
             New Company
           </button>
+
           <div class="search-box">
             <span class="material-icons">search</span>
-            <input type="text" placeholder="Search for a company..." [(ngModel)]="searchTerm" (input)="filterCompanies()">
+            <input
+              type="text"
+              placeholder="Search for a company..."
+              [(ngModel)]="searchTerm"
+              (input)="filterCompanies()" />
           </div>
         </div>
       </div>
 
-      <!-- Statistiques rapides -->
+      <!-- Quick stats -->
       <div class="quick-stats">
         <div class="quick-stat-card">
           <div class="stat-icon">
@@ -31,27 +38,9 @@
             <p>Total companies</p>
           </div>
         </div>
-        <div >
-        <!--  <div class="stat-icon active">
-            <span class="material-icons">check_circle</span>
-          </div>
-          <div class="stat-info">
-            <h3>{{ getActiveCompanies() }}</h3>
-            <p>Active companies</p>
-          </div>-->
-        </div>
-        <div >
-          <!--<div class="stat-icon pending">
-            <span class="material-icons">schedule</span>
-          </div>
-          <div class="stat-info">
-            <h3>{{ getPendingCompanies() }}</h3>
-            <p>On hold</p>
-          </div>-->
-        </div>
       </div>
 
-      <!-- Tableau des sociétés -->
+      <!-- Companies table -->
       <div class="companies-table-container">
         <div class="table-header">
           <h3>All companies</h3>
@@ -85,6 +74,7 @@
                 <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               <tr *ngFor="let company of filteredCompanies" class="table-row">
                 <td>
@@ -98,28 +88,27 @@
                     </div>
                   </div>
                 </td>
-                <td>
-                  <span class="sector-badge">{{ company.sector }}</span>
-                </td>
+
+                <td><span class="sector-badge">{{ company.sector }}</span></td>
                 <td>{{ company.email }}</td>
                 <td>{{ company.phonePrefix }} {{ company.phoneNumber }}</td>
+
                 <td>
                   <div class="manager-info">
                     <strong>{{ company.hrManage }}</strong>
                     <span>{{ company.managerEmail }}</span>
                   </div>
                 </td>
-                <td>
-                  {{ company.website }}
-                </td>
+
+                <td>{{ company.website }}</td>
+
                 <td>
                   <div class="action-buttons">
-                  <!-- <button class="btn-icon" (click)="editCompany(company)" title="Modifier">
-                      <span class="material-icons">edit</span>
-                    </button> --> 
+                    <!-- réutilisation du modal : view -> passe la company en selected et active isViewMode -->
                     <button class="btn-icon" (click)="viewCompany(company)" title="Voir détails">
                       <span class="material-icons">visibility</span>
                     </button>
+
                     <button class="btn-icon danger" (click)="deleteCompany(company)" title="Supprimer">
                       <span class="material-icons">delete</span>
                     </button>
@@ -129,7 +118,7 @@
             </tbody>
           </table>
 
-          <!-- Message si aucune société -->
+          <!-- Empty state -->
           <div *ngIf="filteredCompanies.length === 0" class="empty-state">
             <span class="material-icons">business</span>
             <h3>No company found</h3>
@@ -143,18 +132,23 @@
       </div>
     </div>
 
-    <!-- Modal pour ajouter une société -->
+    <!-- === Modal réutilisable (Add + View) === -->
     <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddCompanyModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>New Company</h2>
+          <!-- Titre dynamique selon le mode -->
+          <h2 *ngIf="!isViewMode">New Company</h2>
+          <h2 *ngIf="isViewMode">Company Details</h2>
+
           <button class="btn-close" (click)="closeAddCompanyModal()">
             <span class="material-icons">close</span>
           </button>
         </div>
-        
-        <!-- Utilisation du composant formulaire séparé -->
+
+        <!-- On passe selectedCompany et isViewMode au composant de formulaire -->
         <app-form-company
+          [companyData]="selectedCompany"
+          [isViewMode]="isViewMode"
           (formSubmit)="handleFormSubmit($event)"
           (formCancel)="handleFormCancel()">
         </app-form-company>

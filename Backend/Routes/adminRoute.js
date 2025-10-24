@@ -1,10 +1,11 @@
 
 const express = require('express');
 const router = express.Router();
-const { getAllUser,getAllCompany, deleteCompany, deleteUser,getUserCount, getCompanyCount} = require('../Controllers/adminController');
+const { getAllUser,getCompanyById,getAllCompany, deleteCompany, deleteUser,getUserCount, getCompanyCount} = require('../Controllers/adminController');
 
 
 router.get('/getAllCompany',getAllCompany);
+router.get('/getCompanyById/:id',getCompanyById);
 router.get('/getAllUser',getAllUser);
 router.delete('/deleteCompany/:_id', deleteCompany);
 router.delete('/deleteUser/:_id', deleteUser);

@@ -22,6 +22,10 @@ private apiUrl = 'http://localhost:3000';
   getAllCompanies(): Observable<any[]> {
       return this.http.get<any[]>(`${this.apiUrl}/admin/getAllCompany`);
   }
+  
+  getCompanyById(id: string): Observable<any> {
+      return this.http.get<any[]>(`${this.apiUrl}/admin/getCompanyById/${id}`);
+  }
 
  
   deleteAgency(id: string): Observable<any> {

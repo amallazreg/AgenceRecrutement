@@ -32,7 +32,10 @@ export class CompaniesComponent implements OnInit {
   searchTerm: string = '';
   showAddModal: boolean = false;
     errorMessage = '';
+isViewMode: boolean = false;
 
+
+ selectedCompany: Company | null = null; 
 
   constructor(private adminService : AdminServiceService) {}
 
@@ -89,9 +92,12 @@ export class CompaniesComponent implements OnInit {
     return this.companies.filter(company => company.status === 'pending').length;
   }
 
-  openAddCompanyModal() {
-    this.showAddModal = true;
-  }
+openAddCompanyModal() {
+  this.selectedCompany = null;
+  this.isViewMode = false; // ✅ formulaire en mode édition
+  this.showAddModal = true;
+}
+
 
   closeAddCompanyModal() {
     this.showAddModal = false;
@@ -122,10 +128,19 @@ export class CompaniesComponent implements OnInit {
     // Implémentez la logique d'édition
   }
 
-  viewCompany(company: Company) {
-    console.log('Voir société:', company);
-    // Implémentez la logique de visualisation
-  }
+viewCompany(company: any) {
+  this.adminService.getCompanyById(company._id).subscribe({
+    next: (res) => {
+      this.selectedCompany = res;
+      this.isViewMode = true; // ✅ mode lecture seule activé
+      this.showAddModal = true;
+    },
+    error: (err) => {
+      console.error('Erreur récupération société', err);
+    }
+  });
+}
+
 
   deleteCompany(company: Company) {
     if (confirm(`Are you sure you want to delete ${company.name} ?`)) {
