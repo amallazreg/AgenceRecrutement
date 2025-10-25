@@ -9,7 +9,7 @@ import { CondidateComponent } from './AdminInterfaces/condidate/condidate.compon
 
 
 import { AcceuilComponent } from './dashboards/acceuil/acceuil.component';
-import { CompanyOffersComponent } from './CompanyInterfaces/company-offers/company-offers.component';
+import { CompanyOffersComponent } from './CompanyInterfaces/offers/company-offers/company-offers.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },

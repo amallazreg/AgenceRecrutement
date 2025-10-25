@@ -1,0 +1,817 @@
+<div class="create-offer-container">
+  <!-- Header -->
+  <div class="form-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="page-title">{{ isEditMode ? 'Modifier l\'offre' : 'Créer une nouvelle offre' }}</h1>
+        <p class="page-subtitle">Remplissez les informations de votre offre d'emploi</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="saveDraft()">
+        <span class="material-icons">save</span>
+        Enregistrer brouillon
+      </button>
+      <button class="btn-primary" (click)="publishOffer()" [disabled]="!offerForm.valid">
+        <span class="material-icons">publish</span>
+        Publier l'offre
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="offerForm" class="offer-form">
+    
+    <!-- Section 1: Informations Générales -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="material-icons">info</span>
+        <h2>Informations Générales</h2>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Secteur -->
+        <div class="form-group full-width">
+          <label for="sector">Secteur d'activité *</label>
+          <select id="sector" formControlName="sector" class="form-control" (change)="onSectorChange()">
+            <option value="">Sélectionnez un secteur</option>
+            <option value="Informatique">Informatique</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Finance">Finance</option>
+            <option value="Santé">Santé</option>
+            <option value="Éducation">Éducation</option>
+            <option value="Commerce">Commerce</option>
+            <option value="Industrie">Industrie</option>
+          </select>
+          <span class="error-message" *ngIf="offerForm.get('sector')?.invalid && offerForm.get('sector')?.touched">
+            Le secteur est requis
+          </span>
+        </div>
+
+        <!-- Titre -->
+        <div class="form-group full-width">
+          <label for="title">Titre du poste *</label>
+          <input 
+            type="text" 
+            id="title" 
+            formControlName="title" 
+            class="form-control"
+            placeholder="Ex: Développeur Full Stack Senior">
+          <span class="error-message" *ngIf="offerForm.get('title')?.invalid && offerForm.get('title')?.touched">
+            Le titre est requis
+          </span>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full-width">
+          <label for="description">Description du poste *</label>
+          <textarea 
+            id="description" 
+            formControlName="description" 
+            class="form-control textarea"
+            rows="6"
+            placeholder="Décrivez les missions, responsabilités et l'environnement de travail..."></textarea>
+          <span class="error-message" *ngIf="offerForm.get('description')?.invalid && offerForm.get('description')?.touched">
+            La description est requise
+          </span>
+        </div>
+
+        <!-- Compétences requises -->
+        <div class="form-group full-width">
+          <label for="requiredSkills">Compétences requises</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let skill of requiredSkills; let i = index">
+                {{ skill }}
+                <button type="button" class="remove-tag" (click)="removeSkill(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #skillInput
+              class="tag-input"
+              placeholder="Tapez une compétence et appuyez sur Entrée"
+              (keydown.enter)="addSkill($event, skillInput)">
+          </div>
+        </div>
+
+        <!-- Niveau d'expérience -->
+        <div class="form-group">
+          <label for="experienceLevel">Niveau d'expérience *</label>
+          <select id="experienceLevel" formControlName="experienceLevel" class="form-control">
+            <option value="Junior">Junior</option>
+            <option value="Intermediate">Intermédiaire</option>
+            <option value="Senior">Senior</option>
+          </select>
+        </div>
+
+        <!-- Type de contrat -->
+        <div class="form-group">
+          <label for="contractType">Type de contrat *</label>
+          <select id="contractType" formControlName="contractType" class="form-control">
+            <option value="CDI">CDI</option>
+            <option value="CDD">CDD</option>
+            <option value="Stage">Stage</option>
+            <option value="Freelance">Freelance</option>
+            <option value="Alternance">Alternance</option>
+          </select>
+        </div>
+
+        <!-- Localisation -->
+        <div class="form-group">
+          <label for="location">Localisation</label>
+          <input 
+            type="text" 
+            id="location" 
+            formControlName="location" 
+            class="form-control"
+            placeholder="Ex: Paris, France">
+        </div>
+
+        <!-- Fourchette salariale -->
+        <div class="form-group">
+          <label for="salaryRange">Fourchette salariale</label>
+          <input 
+            type="text" 
+            id="salaryRange" 
+            formControlName="salaryRange" 
+            class="form-control"
+            placeholder="Ex: 45K - 60K €">
+        </div>
+
+        <!-- Date de début -->
+        <div class="form-group">
+          <label for="startDate">Date de début souhaitée</label>
+          <input 
+            type="date" 
+            id="startDate" 
+            formControlName="startDate" 
+            class="form-control">
+        </div>
+
+        <!-- Date limite de candidature -->
+        <div class="form-group">
+          <label for="applicationDeadline">Date limite de candidature</label>
+          <input 
+            type="date" 
+            id="applicationDeadline" 
+            formControlName="applicationDeadline" 
+            class="form-control">
+        </div>
+
+        <!-- Horaires de travail -->
+        <div class="form-group">
+          <label for="workingHours">Horaires de travail</label>
+          <input 
+            type="text" 
+            id="workingHours" 
+            formControlName="workingHours" 
+            class="form-control"
+            placeholder="Ex: 35h/semaine">
+        </div>
+
+        <!-- Option télétravail -->
+        <div class="form-group">
+          <label for="remoteOption">Télétravail *</label>
+          <select id="remoteOption" formControlName="remoteOption" class="form-control">
+            <option value="Non">Non</option>
+            <option value="Oui">Oui</option>
+            <option value="Hybride">Hybride</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Champs spécifiques au secteur -->
+    <div class="form-section" *ngIf="selectedSector">
+      <div class="section-header">
+        <span class="material-icons">{{ getSectorIcon(selectedSector) }}</span>
+        <h2>Informations spécifiques - {{ selectedSector }}</h2>
+      </div>
+
+      <!-- Informatique -->
+      <div class="form-grid" *ngIf="selectedSector === 'Informatique'">
+        <div class="form-group full-width">
+          <label>Langages de programmation</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let lang of programmingLanguages; let i = index">
+                {{ lang }}
+                <button type="button" class="remove-tag" (click)="removeProgrammingLanguage(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #langInput
+              class="tag-input"
+              placeholder="Ex: JavaScript, Python..."
+              (keydown.enter)="addProgrammingLanguage($event, langInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Frameworks</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let fw of frameworks; let i = index">
+                {{ fw }}
+                <button type="button" class="remove-tag" (click)="removeFramework(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #frameworkInput
+              class="tag-input"
+              placeholder="Ex: React, Angular..."
+              (keydown.enter)="addFramework($event, frameworkInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Bases de données</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let db of databaseKnowledge; let i = index">
+                {{ db }}
+                <button type="button" class="remove-tag" (click)="removeDatabase(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #dbInput
+              class="tag-input"
+              placeholder="Ex: MongoDB, PostgreSQL..."
+              (keydown.enter)="addDatabase($event, dbInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Outils</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let tool of tools; let i = index">
+                {{ tool }}
+                <button type="button" class="remove-tag" (click)="removeTool(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #toolInput
+              class="tag-input"
+              placeholder="Ex: Git, Docker..."
+              (keydown.enter)="addTool($event, toolInput)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="projectType">Type de projet</label>
+          <input 
+            type="text" 
+            id="projectType" 
+            formControlName="projectType" 
+            class="form-control"
+            placeholder="Ex: Application web, Mobile...">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Méthodologies</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let method of methodology; let i = index">
+                {{ method }}
+                <button type="button" class="remove-tag" (click)="removeMethodology(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #methodInput
+              class="tag-input"
+              placeholder="Ex: Agile, Scrum..."
+              (keydown.enter)="addMethodology($event, methodInput)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Marketing -->
+      <div class="form-grid" *ngIf="selectedSector === 'Marketing'">
+        <div class="form-group full-width">
+          <label>Canaux marketing</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let channel of marketingChannels; let i = index">
+                {{ channel }}
+                <button type="button" class="remove-tag" (click)="removeMarketingChannel(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #channelInput
+              class="tag-input"
+              placeholder="Ex: SEO, Social Media..."
+              (keydown.enter)="addMarketingChannel($event, channelInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Outils de campagne</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let tool of campaignTools; let i = index">
+                {{ tool }}
+                <button type="button" class="remove-tag" (click)="removeCampaignTool(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #campaignInput
+              class="tag-input"
+              placeholder="Ex: Google Ads, Mailchimp..."
+              (keydown.enter)="addCampaignTool($event, campaignInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Public cible</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let audience of targetAudience; let i = index">
+                {{ audience }}
+                <button type="button" class="remove-tag" (click)="removeTargetAudience(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #audienceInput
+              class="tag-input"
+              placeholder="Ex: B2B, B2C..."
+              (keydown.enter)="addTargetAudience($event, audienceInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>KPIs</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let kpi of kpiFocus; let i = index">
+                {{ kpi }}
+                <button type="button" class="remove-tag" (click)="removeKPI(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #kpiInput
+              class="tag-input"
+              placeholder="Ex: ROI, Conversion..."
+              (keydown.enter)="addKPI($event, kpiInput)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Finance -->
+      <div class="form-grid" *ngIf="selectedSector === 'Finance'">
+        <div class="form-group full-width">
+          <label>Outils financiers</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let tool of financialTools; let i = index">
+                {{ tool }}
+                <button type="button" class="remove-tag" (click)="removeFinancialTool(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #finToolInput
+              class="tag-input"
+              placeholder="Ex: SAP, Excel..."
+              (keydown.enter)="addFinancialTool($event, finToolInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Domaines d'expertise</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let area of areaOfExpertise; let i = index">
+                {{ area }}
+                <button type="button" class="remove-tag" (click)="removeAreaOfExpertise(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #areaInput
+              class="tag-input"
+              placeholder="Ex: Audit, Comptabilité..."
+              (keydown.enter)="addAreaOfExpertise($event, areaInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Certifications</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let cert of certifications; let i = index">
+                {{ cert }}
+                <button type="button" class="remove-tag" (click)="removeCertification(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #certInput
+              class="tag-input"
+              placeholder="Ex: CFA, CPA..."
+              (keydown.enter)="addCertification($event, certInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Fréquence de reporting</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let freq of reportingFrequency; let i = index">
+                {{ freq }}
+                <button type="button" class="remove-tag" (click)="removeReportingFrequency(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #freqInput
+              class="tag-input"
+              placeholder="Ex: Hebdomadaire, Mensuel..."
+              (keydown.enter)="addReportingFrequency($event, freqInput)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Santé -->
+      <div class="form-grid" *ngIf="selectedSector === 'Santé'">
+        <div class="form-group full-width">
+          <label>Diplômes requis</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let diploma of requiredDiploma; let i = index">
+                {{ diploma }}
+                <button type="button" class="remove-tag" (click)="removeRequiredDiploma(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #diplomaInput
+              class="tag-input"
+              placeholder="Ex: Diplôme d'État..."
+              (keydown.enter)="addRequiredDiploma($event, diplomaInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Spécialité médicale</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let specialty of medicalSpecialty; let i = index">
+                {{ specialty }}
+                <button type="button" class="remove-tag" (click)="removeMedicalSpecialty(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #specialtyInput
+              class="tag-input"
+              placeholder="Ex: Réanimation, Urgences..."
+              (keydown.enter)="addMedicalSpecialty($event, specialtyInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Horaires de travail</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let schedule of workSchedule; let i = index">
+                {{ schedule }}
+                <button type="button" class="remove-tag" (click)="removeWorkSchedule(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #scheduleInput
+              class="tag-input"
+              placeholder="Ex: Garde 12h, Journée..."
+              (keydown.enter)="addWorkSchedule($event, scheduleInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Numéro de licence</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let license of licenseNumber; let i = index">
+                {{ license }}
+                <button type="button" class="remove-tag" (click)="removeLicenseNumber(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #licenseInput
+              class="tag-input"
+              placeholder="Ex: Numéro RPPS..."
+              (keydown.enter)="addLicenseNumber($event, licenseInput)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Éducation -->
+      <div class="form-grid" *ngIf="selectedSector === 'Éducation'">
+        <div class="form-group full-width">
+          <label>Niveau d'enseignement</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let level of teachingLevel; let i = index">
+                {{ level }}
+                <button type="button" class="remove-tag" (click)="removeTeachingLevel(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #teachLevelInput
+              class="tag-input"
+              placeholder="Ex: Collège, Lycée..."
+              (keydown.enter)="addTeachingLevel($event, teachLevelInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Matière enseignée</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let subject of subjectTaught; let i = index">
+                {{ subject }}
+                <button type="button" class="remove-tag" (click)="removeSubjectTaught(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #subjectInput
+              class="tag-input"
+              placeholder="Ex: Mathématiques, Français..."
+              (keydown.enter)="addSubjectTaught($event, subjectInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Diplôme requis</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let degree of requiredDegree; let i = index">
+                {{ degree }}
+                <button type="button" class="remove-tag" (click)="removeRequiredDegree(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #degreeInput
+              class="tag-input"
+              placeholder="Ex: CAPES, Agrégation..."
+              (keydown.enter)="addRequiredDegree($event, degreeInput)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="classSize">Taille de classe</label>
+          <input 
+            type="number" 
+            id="classSize" 
+            formControlName="classSize" 
+            class="form-control"
+            placeholder="Ex: 30">
+        </div>
+      </div>
+
+      <!-- Commerce -->
+      <div class="form-grid" *ngIf="selectedSector === 'Commerce'">
+        <div class="form-group full-width">
+          <label>Type de vente</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let type of salesType; let i = index">
+                {{ type }}
+                <button type="button" class="remove-tag" (click)="removeSalesType(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #salesTypeInput
+              class="tag-input"
+              placeholder="Ex: B2B, B2C..."
+              (keydown.enter)="addSalesType($event, salesTypeInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Type de produit</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let product of productType; let i = index">
+                {{ product }}
+                <button type="button" class="remove-tag" (click)="removeProductType(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #productInput
+              class="tag-input"
+              placeholder="Ex: Logiciel, Services..."
+              (keydown.enter)="addProductType($event, productInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Objectifs de vente</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let target of salesTarget; let i = index">
+                {{ target }}
+                <button type="button" class="remove-tag" (click)="removeSalesTarget(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #targetInput
+              class="tag-input"
+              placeholder="Ex: 100K€/trimestre..."
+              (keydown.enter)="addSalesTarget($event, targetInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Outils CRM</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let tool of customerManagementTools; let i = index">
+                {{ tool }}
+                <button type="button" class="remove-tag" (click)="removeCustomerManagementTool(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #crmInput
+              class="tag-input"
+              placeholder="Ex: Salesforce, HubSpot..."
+              (keydown.enter)="addCustomerManagementTool($event, crmInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="mobilityRequired">Mobilité requise</label>
+          <div class="checkbox-group">
+            <input 
+              type="checkbox" 
+              id="mobilityRequired" 
+              formControlName="mobilityRequired">
+            <label for="mobilityRequired">Le poste nécessite des déplacements</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Industrie -->
+      <div class="form-grid" *ngIf="selectedSector === 'Industrie'">
+        <div class="form-group full-width">
+          <label>Machines à opérer</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let machine of machineOperation; let i = index">
+                {{ machine }}
+                <button type="button" class="remove-tag" (click)="removeMachineOperation(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #machineInput
+              class="tag-input"
+              placeholder="Ex: CNC, Presse..."
+              (keydown.enter)="addMachineOperation($event, machineInput)">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Certifications de sécurité</label>
+          <div class="tags-input">
+            <div class="tags-list">
+              <span class="tag" *ngFor="let cert of safetyCertifications; let i = index">
+                {{ cert }}
+                <button type="button" class="remove-tag" (click)="removeSafetyCertification(i)">
+                  <span class="material-icons">close</span>
+                </button>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              #safetyCertInput
+              class="tag-input"
+              placeholder="Ex: CACES, Habilitation..."
+              (keydown.enter)="addSafetyCertification($event, safetyCertInput)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="shiftType">Type d'équipe</label>
+          <input 
+            type="text" 
+            id="shiftType" 
+            formControlName="shiftType" 
+            class="form-control"
+            placeholder="Ex: 2x8, 3x8, Journée...">
+        </div>
+
+        <div class="form-group">
+          <label for="productionEnvironment">Environnement de production</label>
+          <input 
+            type="text" 
+            id="productionEnvironment" 
+            formControlName="productionEnvironment" 
+            class="form-control"
+            placeholder="Ex: Atelier, Chaîne de production...">
+        </div>
+
+        <div class="form-group">
+          <label for="qualityControl">Contrôle qualité</label>
+          <input 
+            type="text" 
+            id="qualityControl" 
+            formControlName="qualityControl" 
+            class="form-control"
+            placeholder="Ex: ISO 9001, Contrôle visuel...">
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions du formulaire -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancel()">
+        Annuler
+      </button>
+      <div class="action-group">
+        <button type="button" class="btn-secondary" (click)="saveDraft()">
+          <span class="material-icons">save</span>
+          Enregistrer brouillon
+        </button>
+        <button type="button" class="btn-primary" (click)="publishOffer()" [disabled]="!offerForm.valid">
+          <span class="material-icons">publish</span>
+          Publier l'offre
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

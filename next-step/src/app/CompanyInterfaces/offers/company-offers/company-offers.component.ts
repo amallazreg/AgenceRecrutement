@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
+import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
+import { OffersformComponent } from '../offersform/offersform.component';
 interface Offer {
   _id: string;
   companyId: string;
@@ -53,7 +54,7 @@ interface OfferDisplay extends Offer {
 @Component({
   selector: 'app-company-offers',
   standalone: true,
-  imports: [CommonModule, FormsModule ,SidebarComponent],
+  imports: [CommonModule, FormsModule ,SidebarComponent, OffersformComponent],
   templateUrl: './company-offers.component.html',
   styleUrls: ['./company-offers.component.css']
 })
@@ -63,7 +64,7 @@ export class CompanyOffersComponent implements OnInit {
   searchTerm: string = '';
   selectedSector: string = '';
   selectedStatus: string = 'Tous les statuts';
-
+  showForm = false;
   // Données
   offers: Offer[] = [];
   filteredOffers: OfferDisplay[] = [];
