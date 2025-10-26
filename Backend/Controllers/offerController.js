@@ -42,8 +42,9 @@ const createOffer = async (req, res) => {
     todayZero.setHours(0,0,0,0);
 
     const endDate = new Date(newOffer.endOffreDate);
-    const diffMs = endDate.getTime() - todayZero.getTime();
-    const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1 - 6;
+    const startDate = new Date(newOffer.startOffreDate);
+    const diffMs = endDate.getTime() - startDate.getTime();
+    const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1 ;
 
     res.status(201).json({
       success: true,

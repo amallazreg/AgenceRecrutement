@@ -10,7 +10,7 @@ function cleanOfferData(offerData) {
   };
 
   const generalFields = [
-    'companyId', 'sector', 'title', 'description', 'requiredSkills', 
+    'companyId', 'sector', 'title', 'description', 
     'experienceLevel', 'contractType', 'location', 'salaryRange', 
     'startOffreDate', 'endOffreDate', 'workingHours', 'remoteOption', 
     'status', 'createdAt', 'updatedAt','views'
@@ -58,7 +58,7 @@ function cleanOfferDataForUpdate(offer, updateData) {
 
   // Champs généraux qu'on garde toujours
   const generalFields = [
-    'title', 'description', 'requiredSkills', 'experienceLevel', 'contractType',
+    'title', 'description', 'experienceLevel', 'contractType',
     'location', 'salaryRange', 'startOffreDate', 'endOffreDate',
     'workingHours', 'remoteOption', 'status','views'
   ];

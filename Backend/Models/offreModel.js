@@ -12,15 +12,14 @@ const offerSchema = new mongoose.Schema({
   description: { type: String, required: true },
 
   // Général
-  requiredSkills: [{ type: String }],
-  experienceLevel: { type: String, enum: ['Junior','Intermediate','Senior'], default: 'Junior' },
-  contractType: { type: String, enum: ['CDI','CDD','Stage','Freelance','Alternance'], default: 'CDI' },
-  location: { type: String },
-  salaryRange: { type: String },
-  startOffreDate: { type: Date },
+  experienceLevel: { type: String, enum: ['Junior','Intermediate','Senior'], default: 'Junior' ,required: true},
+  contractType: { type: String, enum: ['CDI','CDD','Stage','Freelance','Alternance'], default: 'CDI' ,required: true},
+  location: { type: String ,required: true},
+  salaryRange: { type: String ,required: true},
+  startOffreDate: { type: Date ,required: true},
   endOffreDate: { type: Date,required: true },
   workingHours: { type: String,required: true },
-  remoteOption: { type: String, enum: ['Oui','Non','Hybride'], default: 'Non' },
+  remoteOption: { type: String, enum: ['Oui','Non','Hybride'], default: 'Non' ,required: true},
   createdAt: { type: Date, default: Date.now } ,
 
   // Champs spécifiques - Informatique 
