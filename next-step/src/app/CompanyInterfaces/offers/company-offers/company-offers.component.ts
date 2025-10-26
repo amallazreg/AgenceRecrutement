@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
 import { OffersformComponent } from '../offersform/offersform.component';
+import { MatDialog } from '@angular/material/dialog';
+
 interface Offer {
   _id: string;
   companyId: string;
@@ -303,12 +305,7 @@ export class CompanyOffersComponent implements OnInit {
     console.log('Ouvrir le filtre de statut');
   }
 
-  // Actions sur les offres
-  createOffer(): void {
-    // Navigation vers la page de création d'offre
-    console.log('Créer une nouvelle offre');
-    // this.router.navigate(['/offers/create']);
-  }
+
 
   editOffer(offer: Offer): void {
     console.log('Modifier l\'offre:', offer._id);
@@ -387,4 +384,35 @@ export class CompanyOffersComponent implements OnInit {
     
     return days <= 3 && days >= 0;
   }
+  showOfferForm = false;
+constructor(private dialog: MatDialog) {}
+
+openCreateOfferPopup(): void {
+  const dialogRef = this.dialog.open(OffersformComponent, {
+    width: '90%',
+    maxWidth: '1200px',
+    height: '90vh',
+    panelClass: 'custom-dialog-container', // pour le style
+    disableClose: true, // empêche la fermeture sans bouton
+    data: { isEditMode: false } // tu peux passer des données
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      console.log('Offre créée :', result);
+      // tu peux rafraîchir ta liste ici
+    }
+  });
+}
+closeForm() {
+  this.showOfferForm = false;
+}
+getStatusClass(status: string): string {
+  const statusMap: { [key: string]: string } = {
+    'Publié': 'status-published',
+    'Brouillon': 'status-draft',
+    'Archivé': 'status-archived'
+  };
+  return statusMap[status] || 'status-published';
+}
 }

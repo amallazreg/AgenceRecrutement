@@ -9,7 +9,7 @@
       <p class="page-subtitle">Gérez vos offres et suivez les candidatures</p>
     </div>
     <div class="header-actions">
-      <button class="btn-primary" (click)="showForm = !showForm">
+      <button class="btn-primary" mat-raised-button  (click)="openCreateOfferPopup()">
         <span class="material-icons">add</span>
         Créer une Offre
       </button>
@@ -128,6 +128,9 @@
             <span class="material-icons">person</span>
             <span>{{ offer.applicationsCount }} candidatures</span>
           </div>
+           <div class="status-badge" [ngClass]="getStatusClass(offer.status)">
+    {{ offer.status }}
+  </div>
         </div>
         <div class="footer-actions">
           <button class="btn-secondary" (click)="viewCandidates(offer)">
@@ -147,10 +150,19 @@
     <span class="material-icons">work_off</span>
     <h3>Aucune offre trouvée</h3>
     <p>Essayez de modifier vos filtres ou créez une nouvelle offre</p>
-    <button class="btn-primary" (click)="createOffer()">
+    <button class="btn-primary" (click)="openCreateOfferPopup()">
       <span class="material-icons">add</span>
       Créer une Offre
     </button>
   </div>
 </div>
 </main></div>
+    <!-- 🟣 FORMULAIRE D’AJOUT D’OFFRE -->
+    <app-offersform *ngIf="showOfferForm"></app-offersform>
+
+    <!-- Bouton de retour -->
+    <div *ngIf="showOfferForm" class="back-btn-container">
+      <button class="btn-secondary" (click)="closeForm()">
+        <span class="material-icons">arrow_back</span> Retour
+      </button>
+    </div>
