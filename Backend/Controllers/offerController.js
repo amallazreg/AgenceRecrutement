@@ -280,11 +280,17 @@ const deleteOffer = async (req, res) => {
 // Get total number of offers
 const getOffreCount = async (req, res) => {
   try {
-    const totalOffers = await Offer.countDocuments();
+    // Compter les offres par statut
+    const publishedCount = await Offer.countDocuments({ status: 'Publié' });
+    const archivedCount  = await Offer.countDocuments({ status: 'Archivé' });
+    const draftCount     = await Offer.countDocuments({ status: 'Brouillon' });
 
-    
-
-    return res.json({ totalOffers });
+    return res.json({
+      totalOffers: publishedCount + archivedCount + draftCount,
+      published: publishedCount,
+      archived: archivedCount,
+      draft: draftCount
+    });
   } catch (err) {
     console.error('Erreur lors du comptage des offres :', err);
     return res.status(500).json({ message: 'Server error' });
