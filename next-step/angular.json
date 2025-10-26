@@ -25,9 +25,9 @@
              "src/favicon.ico"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
-
             ],
             "scripts": []
           },
@@ -83,9 +83,9 @@
              "src/favicon.ico"
             ],
             "styles": [
-              "src/styles.css", 
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
-
             ],
             "scripts": []
           }
