@@ -43,7 +43,7 @@ const createOffer = async (req, res) => {
 
     const endDate = new Date(newOffer.endOffreDate);
     const diffMs = endDate.getTime() - todayZero.getTime();
-    const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1;
+    const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1 - 6;
 
     res.status(201).json({
       success: true,
@@ -105,7 +105,7 @@ const getOffersByCompany = async (req, res) => {
       }
 
       // Auto-archive si expirée
-      if (daysRemaining < 0 && offer.status !== 'Archivé') {
+      if (daysRemaining <= 0 && offer.status !== 'Archivé') {
         offer.status = 'Archivé';
         try {
           await offer.save();
@@ -177,7 +177,7 @@ const getAllOffers = async (req, res) => {
       }
 
       // Si l'offre est expirée et n'est pas encore archivée, on l'archive
-      if (daysRemaining < 0 && offer.status !== 'Archivé') {
+      if (daysRemaining <= 0 && offer.status !== 'Archivé') {
         offer.status = 'Archivé';
         // sauve la modification de statut
         try {

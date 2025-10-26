@@ -12,8 +12,8 @@ function cleanOfferData(offerData) {
   const generalFields = [
     'companyId', 'sector', 'title', 'description', 'requiredSkills', 
     'experienceLevel', 'contractType', 'location', 'salaryRange', 
-    'startDate', 'applicationDeadline', 'workingHours', 'remoteOption', 
-    'status', 'createdAt', 'updatedAt'
+    'startOffreDate', 'endOffreDate', 'workingHours', 'remoteOption', 
+    'status', 'createdAt', 'updatedAt','views'
   ];
 
   const allowedFields = [...generalFields, ...(fieldsBySector[offerData.sector] || [])];
@@ -59,8 +59,8 @@ function cleanOfferDataForUpdate(offer, updateData) {
   // Champs généraux qu'on garde toujours
   const generalFields = [
     'title', 'description', 'requiredSkills', 'experienceLevel', 'contractType',
-    'location', 'salaryRange', 'startDate', 'applicationDeadline',
-    'workingHours', 'remoteOption', 'status'
+    'location', 'salaryRange', 'startOffreDate', 'endOffreDate',
+    'workingHours', 'remoteOption', 'status','views'
   ];
 
   // Les champs autorisés sont ceux du secteur de l’offre + les champs généraux
@@ -75,6 +75,8 @@ function cleanOfferDataForUpdate(offer, updateData) {
 
   return cleanedData;
 }
+
+
 
 
 module.exports = { 

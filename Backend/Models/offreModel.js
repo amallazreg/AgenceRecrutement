@@ -7,7 +7,7 @@ const offerSchema = new mongoose.Schema({
     ref: 'Company',
     required: true,
   },
-  sector: { type: String, required: true }, // rempli automatiquement depuis la company
+  sector: { type: String, required: true }, 
   title: { type: String, required: true },
   description: { type: String, required: true },
 
@@ -18,8 +18,8 @@ const offerSchema = new mongoose.Schema({
   location: { type: String },
   salaryRange: { type: String },
   startOffreDate: { type: Date },
-  endOffreDate: { type: Date },
-  workingHours: { type: String },
+  endOffreDate: { type: Date,required: true },
+  workingHours: { type: String,required: true },
   remoteOption: { type: String, enum: ['Oui','Non','Hybride'], default: 'Non' },
   createdAt: { type: Date, default: Date.now } ,
 
