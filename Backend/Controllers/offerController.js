@@ -18,21 +18,43 @@ const createOffer = async (req, res) => {
       sector: company.sector
     };
 
-    // 2️⃣ Ensuite seulement, nettoyer selon le secteur
+    // 1b️⃣ Ajouter des dates par défaut si elles ne sont pas fournies
+    if (!offerData.startOffreDate) {
+      offerData.startOffreDate = new Date(); // aujourd'hui
+    }
+
+    if (!offerData.endOffreDate) {
+      const end = new Date();
+      end.setDate(end.getDate() + 7); // 7 jours par défaut
+      offerData.endOffreDate = end;
+    }
+
+    // 2️⃣ Nettoyer selon le secteur
     offerData = cleanOfferData(offerData);
 
     // 3️⃣ Créer et sauvegarder
-    // Créer dynamiquement le document sans remplir les champs absents
     const newOffer = new Offer(offerData);
     await newOffer.save();
 
-    await newOffer.save();
+    // 4️⃣ Calculer daysRemaining pour la réponse
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const todayZero = new Date();
+    todayZero.setHours(0,0,0,0);
 
+    const endDate = new Date(newOffer.endOffreDate);
+    const diffMs = endDate.getTime() - todayZero.getTime();
+    const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1;
 
     res.status(201).json({
       success: true,
       message: "Offre créée avec succès",
-      offer: newOffer
+      offer: {
+        ...newOffer.toObject(),
+        daysRemaining,
+        statusInfo: daysRemaining > 0 ? `Expire dans ${daysRemaining} jour(s)` :
+                     daysRemaining === 0 ? "Expire aujourd'hui" :
+                     `Expirée depuis ${Math.abs(daysRemaining)} jour(s)`
+      }
     });
 
   } catch (error) {
@@ -42,32 +64,156 @@ const createOffer = async (req, res) => {
 };
 
 
+
 // Get offers of a company
+// Get offers of a company (with remaining days and auto-archive)
 const getOffersByCompany = async (req, res) => {
   try {
     const companyId = req.company._id;
+
     const offers = await Offer.find({ companyId }).sort({ createdAt: -1 });
-    return res.json(offers);
+
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const today = new Date();
+    const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const results = [];
+
+    for (const offer of offers) {
+      const offerObj = offer.toObject();
+
+      if (!offer.endOffreDate) {
+        results.push({
+          ...offerObj,
+          daysRemaining: null,
+          statusInfo: 'Date de fin non définie'
+        });
+        continue;
+      }
+
+      const endDate = new Date(offer.endOffreDate);
+      const diffMs = endDate.getTime() - todayZero.getTime();
+      const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1; // inclusif
+
+      let statusInfo;
+      if (daysRemaining > 0) {
+        statusInfo = `Expire dans ${daysRemaining} jour(s)`;
+      } else if (daysRemaining === 0) {
+        statusInfo = "Expire aujourd'hui";
+      } else {
+        statusInfo = `Expirée depuis ${Math.abs(daysRemaining)} jour(s)`;
+      }
+
+      // Auto-archive si expirée
+      if (daysRemaining < 0 && offer.status !== 'Archivé') {
+        offer.status = 'Archivé';
+        try {
+          await offer.save();
+          offerObj.status = 'Archivé';
+        } catch (saveErr) {
+          console.error(`Erreur lors de l'archivage de l'offre ${offer._id}:`, saveErr);
+        }
+      }
+
+      results.push({
+        ...offerObj,
+        daysRemaining,
+        statusInfo
+      });
+    }
+
+    return res.json(results);
+
   } catch (err) {
+    console.error('Erreur lors de la récupération des offres de la société :', err);
     return res.status(500).json({ message: 'Server error' });
   }
 };
 
+
 // Get all offers (for public listing)
+// Get all offers (with remaining days and auto-archive)
 const getAllOffers = async (req, res) => {
   try {
-    const offers = await Offer.find({ status: 'Publié' }).populate('companyId','name sector fullAddress');
-    return res.json(offers);
+    // Récupère toutes les offres (ou limite si tu veux seulement 'Publié')
+    const offers = await Offer.find().populate('companyId', 'name sector fullAddress');
+
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const today = new Date();
+    // Normaliser la "date du jour" à 00:00:00 pour éviter les effets d'heure
+    const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const results = [];
+
+    // Utiliser for..of pour permettre des await lors des sauvegardes
+    for (const offer of offers) {
+      const offerObj = offer.toObject();
+
+      // Si pas de EndOffreDate : daysRemaining null
+      if (!offer.endOffreDate) {
+        results.push({
+          ...offerObj,
+          daysRemaining: null,
+          statusInfo: 'Date de fin non définie'
+        });
+        continue;
+      }
+
+      const endDate = new Date(offer.endOffreDate);
+
+      // Calcul inclusif des jours restants depuis aujourd'hui :
+      // daysRemaining = nombre de jours entre endDate et todayZero + 1 (inclusif)
+      const diffMs = endDate.getTime() - todayZero.getTime();
+      const daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1; // peut être négatif si expirée
+
+      // Construire un texte lisible
+      let statusInfo;
+      if (daysRemaining > 0) {
+        statusInfo = `Expire dans ${daysRemaining} jour(s)`;
+      } else if (daysRemaining === 0) {
+        statusInfo = "Expire aujourd'hui";
+      } else {
+        statusInfo = `Expirée depuis ${Math.abs(daysRemaining)} jour(s)`;
+      }
+
+      // Si l'offre est expirée et n'est pas encore archivée, on l'archive
+      if (daysRemaining < 0 && offer.status !== 'Archivé') {
+        offer.status = 'Archivé';
+        // sauve la modification de statut
+        try {
+          await offer.save();
+          // mettre à jour l'objet renvoyé pour refléter le nouveau statut
+          offerObj.status = 'Archivé';
+        } catch (saveErr) {
+          console.error(`Erreur lors de l'archivage de l'offre ${offer._id}:`, saveErr);
+          // on continue quand même à renvoyer l'info au client
+        }
+      }
+
+      results.push({
+        ...offerObj,
+        daysRemaining,
+        statusInfo
+      });
+    }
+
+    return res.json(results);
   } catch (err) {
+    console.error('Erreur lors de la récupération des offres :', err);
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Get offer by id
 const getOfferById = async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id).populate('companyId','name sector fullAddress');
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
+
+    offer.views += 1;
+    await offer.save();
+
     return res.json(offer);
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });

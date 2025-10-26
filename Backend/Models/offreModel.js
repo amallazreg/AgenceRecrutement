@@ -17,8 +17,8 @@ const offerSchema = new mongoose.Schema({
   contractType: { type: String, enum: ['CDI','CDD','Stage','Freelance','Alternance'], default: 'CDI' },
   location: { type: String },
   salaryRange: { type: String },
-  startDate: { type: Date },
-  applicationDeadline: { type: Date },
+  startOffreDate: { type: Date },
+  endOffreDate: { type: Date },
   workingHours: { type: String },
   remoteOption: { type: String, enum: ['Oui','Non','Hybride'], default: 'Non' },
   createdAt: { type: Date, default: Date.now } ,
@@ -69,7 +69,8 @@ const offerSchema = new mongoose.Schema({
   productionEnvironment: { type: String },
   qualityControl: { type: String },
 
-  status: { type: String, enum: ['Publié','Brouillon','Archivé'], default: 'Publié' }
+  status: { type: String, enum: ['Publié','Brouillon','Archivé'], default: 'Publié' },
+  views: { type: Number, default: 0 }
 },
 { timestamps: true });
 
