@@ -2,6 +2,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { OfferService } from '../../../services/offers.service';
 
 @Component({
   selector: 'app-offersform',
@@ -11,10 +12,11 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './offersform.component.css'
 })
 export class OffersformComponent implements OnInit {
-  offerForm!: FormGroup;
+ offerForm!: FormGroup;
   isEditMode = false;
   offerId?: string;
   selectedSector: string = '';
+  isSubmitting = false;
 
   // Arrays pour les champs de type tableau
   requiredSkills: string[] = [];
@@ -63,7 +65,8 @@ export class OffersformComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private offerService: OfferService
   ) {}
 
   ngOnInit(): void {
@@ -75,15 +78,15 @@ export class OffersformComponent implements OnInit {
     this.offerForm = this.fb.group({
       // Champs généraux
       sector: ['', Validators.required],
-      title: ['', Validators.required],
-      description: ['', Validators.required],
+      title: ['', [Validators.required, Validators.minLength(5)]],
+      description: ['', [Validators.required, Validators.minLength(20)]],
       experienceLevel: ['Junior', Validators.required],
       contractType: ['CDI', Validators.required],
-      location: [''],
-      salaryRange: [''],
-      startDate: [''],
-      applicationDeadline: [''],
-      workingHours: [''],
+      location: ['', Validators.required],
+      salaryRange: ['', Validators.required],
+      startOffreDate: ['', Validators.required],
+      endOffreDate: ['', Validators.required],
+      workingHours: ['', Validators.required],
       remoteOption: ['Non', Validators.required],
 
       // Informatique
@@ -113,29 +116,88 @@ export class OffersformComponent implements OnInit {
   }
 
   loadOffer(id: string): void {
-    // Charger l'offre depuis l'API
-    // this.offerService.getOfferById(id).subscribe(offer => {
-    //   this.populateForm(offer);
-    // });
-    console.log('Chargement de l\'offre:', id);
+    this.offerService.getOfferById(id).subscribe({
+      next: (offer) => {
+        this.populateForm(offer);
+      },
+      error: (error) => {
+        console.error('Erreur chargement offre:', error);
+        alert('Erreur lors du chargement de l\'offre');
+      }
+    });
   }
 
   populateForm(offer: any): void {
-    this.offerForm.patchValue(offer);
+    this.offerForm.patchValue({
+      sector: offer.sector,
+      title: offer.title,
+      description: offer.description,
+      experienceLevel: offer.experienceLevel,
+      contractType: offer.contractType,
+      location: offer.location,
+      salaryRange: offer.salaryRange,
+      startOffreDate: this.formatDateForInput(offer.startOffreDate),
+      endOffreDate: this.formatDateForInput(offer.endOffreDate),
+      workingHours: offer.workingHours,
+      remoteOption: offer.remoteOption,
+      projectType: offer.projectType,
+      classSize: offer.classSize,
+      mobilityRequired: offer.mobilityRequired,
+      shiftType: offer.shiftType,
+      productionEnvironment: offer.productionEnvironment,
+      qualityControl: offer.qualityControl
+    });
+
     this.selectedSector = offer.sector;
     
     // Remplir les tableaux
-    if (offer.requiredSkills) this.requiredSkills = [...offer.requiredSkills];
     if (offer.programmingLanguages) this.programmingLanguages = [...offer.programmingLanguages];
-    // ... etc pour tous les autres tableaux
+    if (offer.frameworks) this.frameworks = [...offer.frameworks];
+    if (offer.databaseKnowledge) this.databaseKnowledge = [...offer.databaseKnowledge];
+    if (offer.tools) this.tools = [...offer.tools];
+    if (offer.methodology) this.methodology = [...offer.methodology];
+    
+    if (offer.marketingChannels) this.marketingChannels = [...offer.marketingChannels];
+    if (offer.campaignTools) this.campaignTools = [...offer.campaignTools];
+    if (offer.targetAudience) this.targetAudience = [...offer.targetAudience];
+    if (offer.kpiFocus) this.kpiFocus = [...offer.kpiFocus];
+    
+    if (offer.financialTools) this.financialTools = [...offer.financialTools];
+    if (offer.areaOfExpertise) this.areaOfExpertise = [...offer.areaOfExpertise];
+    if (offer.certifications) this.certifications = [...offer.certifications];
+    if (offer.reportingFrequency) this.reportingFrequency = [...offer.reportingFrequency];
+    
+    if (offer.requiredDiploma) this.requiredDiploma = [...offer.requiredDiploma];
+    if (offer.medicalSpecialty) this.medicalSpecialty = [...offer.medicalSpecialty];
+    if (offer.workSchedule) this.workSchedule = [...offer.workSchedule];
+    if (offer.licenseNumber) this.licenseNumber = [...offer.licenseNumber];
+    
+    if (offer.teachingLevel) this.teachingLevel = [...offer.teachingLevel];
+    if (offer.subjectTaught) this.subjectTaught = [...offer.subjectTaught];
+    if (offer.requiredDegree) this.requiredDegree = [...offer.requiredDegree];
+    
+    if (offer.salesType) this.salesType = [...offer.salesType];
+    if (offer.productType) this.productType = [...offer.productType];
+    if (offer.salesTarget) this.salesTarget = [...offer.salesTarget];
+    if (offer.customerManagementTools) this.customerManagementTools = [...offer.customerManagementTools];
+    
+    if (offer.machineOperation) this.machineOperation = [...offer.machineOperation];
+    if (offer.safetyCertifications) this.safetyCertifications = [...offer.safetyCertifications];
+  }
+
+  formatDateForInput(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   }
 
   onSectorChange(): void {
     this.selectedSector = this.offerForm.get('sector')?.value;
-    // Réinitialiser les champs spécifiques si changement de secteur
   }
 
-  // Méthodes pour gérer les compétences requises
+  // === MÉTHODES POUR LES TAGS ===
+
+  // Compétences requises
   addSkill(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -149,7 +211,7 @@ export class OffersformComponent implements OnInit {
     this.requiredSkills.splice(index, 1);
   }
 
-  // Méthodes pour Informatique
+  // Informatique
   addProgrammingLanguage(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -215,7 +277,7 @@ export class OffersformComponent implements OnInit {
     this.methodology.splice(index, 1);
   }
 
-  // Méthodes pour Marketing
+  // Marketing
   addMarketingChannel(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -268,7 +330,7 @@ export class OffersformComponent implements OnInit {
     this.kpiFocus.splice(index, 1);
   }
 
-  // Méthodes pour Finance
+  // Finance
   addFinancialTool(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -321,7 +383,7 @@ export class OffersformComponent implements OnInit {
     this.reportingFrequency.splice(index, 1);
   }
 
-  // Méthodes pour Santé
+  // Santé
   addRequiredDiploma(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -374,7 +436,7 @@ export class OffersformComponent implements OnInit {
     this.licenseNumber.splice(index, 1);
   }
 
-  // Méthodes pour Éducation
+  // Éducation
   addTeachingLevel(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -414,7 +476,7 @@ export class OffersformComponent implements OnInit {
     this.requiredDegree.splice(index, 1);
   }
 
-  // Méthodes pour Commerce
+  // Commerce
   addSalesType(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -467,7 +529,7 @@ export class OffersformComponent implements OnInit {
     this.customerManagementTools.splice(index, 1);
   }
 
-  // Méthodes pour Industrie
+  // Industrie
   addMachineOperation(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -494,66 +556,81 @@ export class OffersformComponent implements OnInit {
     this.safetyCertifications.splice(index, 1);
   }
 
-  // Méthodes utilitaires
-  getSectorIcon(sector: string): string {
-    const iconMap: { [key: string]: string } = {
-      'Informatique': 'computer',
-      'Marketing': 'campaign',
-      'Finance': 'account_balance',
-      'Santé': 'local_hospital',
-      'Éducation': 'school',
-      'Commerce': 'store',
-      'Industrie': 'precision_manufacturing'
-    };
-    return iconMap[sector] || 'work';
-  }
-
-  // Actions du formulaire
+  // === ACTIONS DU FORMULAIRE ===
   saveDraft(): void {
-    const offerData = this.prepareOfferData('Brouillon');
-    console.log('Enregistrement brouillon:', offerData);
-    
-    // Appel API
-    // this.offerService.createOffer(offerData).subscribe({
-    //   next: (response) => {
-    //     console.log('Brouillon enregistré', response);
-    //     this.router.navigate(['/offers']);
-    //   },
-    //   error: (error) => console.error('Erreur:', error)
-    // });
-
-    // Simulation
-    alert('Brouillon enregistré avec succès !');
-    this.router.navigate(['/offers']);
+    if (this.offerForm.valid) {
+      this.isSubmitting = true;
+      const offerData = this.prepareOfferData('Brouillon');
+      
+      if (this.isEditMode && this.offerId) {
+        this.offerService.updateOffer(this.offerId, offerData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            console.log('✅ Brouillon mis à jour:', response);
+            alert('Brouillon mis à jour avec succès !');
+            this.router.navigate(['/company/offers']);
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('❌ Erreur mise à jour brouillon:', error);
+            alert('Erreur lors de la mise à jour du brouillon');
+          }
+        });
+      } else {
+        this.offerService.createOffer(offerData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            console.log('✅ Brouillon créé:', response);
+            alert('Brouillon enregistré avec succès !');
+            this.router.navigate(['/company/offers']);
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('❌ Erreur création brouillon:', error);
+            alert('Erreur lors de la création du brouillon');
+          }
+        });
+      }
+    } else {
+      alert('Veuillez remplir tous les champs obligatoires');
+      this.markFormGroupTouched(this.offerForm);
+    }
   }
 
   publishOffer(): void {
-    if (this.offerForm.valid) {
+    if (this.offerForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const offerData = this.prepareOfferData('Publié');
-      console.log('Publication de l\'offre:', offerData);
       
-      // Appel API
-      // if (this.isEditMode) {
-      //   this.offerService.updateOffer(this.offerId!, offerData).subscribe({
-      //     next: (response) => {
-      //       console.log('Offre mise à jour', response);
-      //       this.router.navigate(['/offers']);
-      //     },
-      //     error: (error) => console.error('Erreur:', error)
-      //   });
-      // } else {
-      //   this.offerService.createOffer(offerData).subscribe({
-      //     next: (response) => {
-      //       console.log('Offre créée', response);
-      //       this.router.navigate(['/offers']);
-      //     },
-      //     error: (error) => console.error('Erreur:', error)
-      //   });
-      // }
-
-      // Simulation
-      alert('Offre publiée avec succès !');
-      this.router.navigate(['/offers']);
+      if (this.isEditMode && this.offerId) {
+        this.offerService.updateOffer(this.offerId, offerData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            console.log('✅ Offre mise à jour:', response);
+            alert('Offre publiée avec succès !');
+            this.router.navigate(['/company/offers']);
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('❌ Erreur mise à jour offre:', error);
+            alert('Erreur lors de la publication de l\'offre');
+          }
+        });
+      } else {
+        this.offerService.createOffer(offerData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            console.log('✅ Offre créée:', response);
+            alert('Offre publiée avec succès !');
+            this.router.navigate(['/company/offers']);
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('❌ Erreur création offre:', error);
+            alert('Erreur lors de la création de l\'offre');
+          }
+        });
+      }
     } else {
       alert('Veuillez remplir tous les champs obligatoires');
       this.markFormGroupTouched(this.offerForm);
@@ -563,31 +640,16 @@ export class OffersformComponent implements OnInit {
   prepareOfferData(status: string): any {
     const formValue = this.offerForm.value;
     
-    const offerData: any = {
-      // Champs généraux
-      sector: formValue.sector,
-      title: formValue.title,
-      description: formValue.description,
-      requiredSkills: this.requiredSkills,
-      experienceLevel: formValue.experienceLevel,
-      contractType: formValue.contractType,
-      location: formValue.location,
-      salaryRange: formValue.salaryRange,
-      startDate: formValue.startDate,
-      applicationDeadline: formValue.applicationDeadline,
-      workingHours: formValue.workingHours,
-      remoteOption: formValue.remoteOption,
-      status: status
-    };
-
-    // Ajouter les champs spécifiques selon le secteur
-    switch (formValue.sector) {
+    // Utilisez la méthode du service pour formater les données
+    const offerData = this.offerService.formatOfferData(formValue, this.selectedSector);
+    
+    // Ajoutez les tableaux manuellement
+    switch (this.selectedSector) {
       case 'Informatique':
         offerData.programmingLanguages = this.programmingLanguages;
         offerData.frameworks = this.frameworks;
         offerData.databaseKnowledge = this.databaseKnowledge;
         offerData.tools = this.tools;
-        offerData.projectType = formValue.projectType;
         offerData.methodology = this.methodology;
         break;
 
@@ -616,7 +678,6 @@ export class OffersformComponent implements OnInit {
         offerData.teachingLevel = this.teachingLevel;
         offerData.subjectTaught = this.subjectTaught;
         offerData.requiredDegree = this.requiredDegree;
-        offerData.classSize = formValue.classSize;
         break;
 
       case 'Commerce':
@@ -624,19 +685,32 @@ export class OffersformComponent implements OnInit {
         offerData.productType = this.productType;
         offerData.salesTarget = this.salesTarget;
         offerData.customerManagementTools = this.customerManagementTools;
-        offerData.mobilityRequired = formValue.mobilityRequired;
         break;
 
       case 'Industrie':
         offerData.machineOperation = this.machineOperation;
         offerData.safetyCertifications = this.safetyCertifications;
-        offerData.shiftType = formValue.shiftType;
-        offerData.productionEnvironment = formValue.productionEnvironment;
-        offerData.qualityControl = formValue.qualityControl;
         break;
     }
 
+    // Ajoutez le statut
+    offerData.status = status;
+
     return offerData;
+  }
+
+  // === MÉTHODES UTILITAIRES ===
+  getSectorIcon(sector: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Informatique': 'computer',
+      'Marketing': 'campaign',
+      'Finance': 'account_balance',
+      'Santé': 'local_hospital',
+      'Éducation': 'school',
+      'Commerce': 'store',
+      'Industrie': 'precision_manufacturing'
+    };
+    return iconMap[sector] || 'work';
   }
 
   cancel(): void {
@@ -649,7 +723,6 @@ export class OffersformComponent implements OnInit {
     this.location.back();
   }
 
-  // Marquer tous les champs comme touchés pour afficher les erreurs
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(key => {
       const control = formGroup.get(key);

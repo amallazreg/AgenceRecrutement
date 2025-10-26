@@ -11,13 +11,13 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-secondary" (click)="saveDraft()">
+      <button class="btn-secondary" (click)="saveDraft()" [disabled]="isSubmitting">
         <span class="material-icons">save</span>
-        Enregistrer brouillon
+        {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer brouillon' }}
       </button>
-      <button class="btn-primary" (click)="publishOffer()" [disabled]="!offerForm.valid">
+      <button class="btn-primary" (click)="publishOffer()" [disabled]="!offerForm.valid || isSubmitting">
         <span class="material-icons">publish</span>
-        Publier l'offre
+        {{ isSubmitting ? 'Publication...' : 'Publier l\'offre' }}
       </button>
     </div>
   </div>
@@ -61,7 +61,7 @@
             class="form-control"
             placeholder="Ex: Développeur Full Stack Senior">
           <span class="error-message" *ngIf="offerForm.get('title')?.invalid && offerForm.get('title')?.touched">
-            Le titre est requis
+            Le titre est requis (minimum 5 caractères)
           </span>
         </div>
 
@@ -75,7 +75,7 @@
             rows="6"
             placeholder="Décrivez les missions, responsabilités et l'environnement de travail..."></textarea>
           <span class="error-message" *ngIf="offerForm.get('description')?.invalid && offerForm.get('description')?.touched">
-            La description est requise
+            La description est requise (minimum 20 caractères)
           </span>
         </div>
 
@@ -108,6 +108,9 @@
             <option value="Intermediate">Intermédiaire</option>
             <option value="Senior">Senior</option>
           </select>
+          <span class="error-message" *ngIf="offerForm.get('experienceLevel')?.invalid && offerForm.get('experienceLevel')?.touched">
+            Le niveau d'expérience est requis
+          </span>
         </div>
 
         <!-- Type de contrat -->
@@ -120,59 +123,77 @@
             <option value="Freelance">Freelance</option>
             <option value="Alternance">Alternance</option>
           </select>
+          <span class="error-message" *ngIf="offerForm.get('contractType')?.invalid && offerForm.get('contractType')?.touched">
+            Le type de contrat est requis
+          </span>
         </div>
 
         <!-- Localisation -->
         <div class="form-group">
-          <label for="location">Localisation</label>
+          <label for="location">Localisation *</label>
           <input 
             type="text" 
             id="location" 
             formControlName="location" 
             class="form-control"
             placeholder="Ex: Paris, France">
+          <span class="error-message" *ngIf="offerForm.get('location')?.invalid && offerForm.get('location')?.touched">
+            La localisation est requise
+          </span>
         </div>
 
         <!-- Fourchette salariale -->
         <div class="form-group">
-          <label for="salaryRange">Fourchette salariale</label>
+          <label for="salaryRange">Fourchette salariale *</label>
           <input 
             type="text" 
             id="salaryRange" 
             formControlName="salaryRange" 
             class="form-control"
             placeholder="Ex: 45K - 60K €">
+          <span class="error-message" *ngIf="offerForm.get('salaryRange')?.invalid && offerForm.get('salaryRange')?.touched">
+            La fourchette salariale est requise
+          </span>
         </div>
 
         <!-- Date de début -->
         <div class="form-group">
-          <label for="startDate">Date de début souhaitée</label>
+          <label for="startOffreDate">Date de début souhaitée *</label>
           <input 
             type="date" 
-            id="startDate" 
-            formControlName="startDate" 
+            id="startOffreDate" 
+            formControlName="startOffreDate" 
             class="form-control">
+          <span class="error-message" *ngIf="offerForm.get('startOffreDate')?.invalid && offerForm.get('startOffreDate')?.touched">
+            La date de début est requise
+          </span>
         </div>
 
         <!-- Date limite de candidature -->
         <div class="form-group">
-          <label for="applicationDeadline">Date limite de candidature</label>
+          <label for="endOffreDate">Date limite de candidature *</label>
           <input 
             type="date" 
-            id="applicationDeadline" 
-            formControlName="applicationDeadline" 
+            id="endOffreDate" 
+            formControlName="endOffreDate" 
             class="form-control">
+          <span class="error-message" *ngIf="offerForm.get('endOffreDate')?.invalid && offerForm.get('endOffreDate')?.touched">
+            La date limite est requise
+          </span>
         </div>
 
         <!-- Horaires de travail -->
         <div class="form-group">
-          <label for="workingHours">Horaires de travail</label>
+          <label for="workingHours">Horaires de travail *</label>
           <input 
             type="text" 
             id="workingHours" 
             formControlName="workingHours" 
             class="form-control"
             placeholder="Ex: 35h/semaine">
+          <span class="error-message" *ngIf="offerForm.get('workingHours')?.invalid && offerForm.get('workingHours')?.touched">
+            Les horaires de travail sont requis
+          </span>
         </div>
 
         <!-- Option télétravail -->
@@ -183,6 +204,9 @@
             <option value="Oui">Oui</option>
             <option value="Hybride">Hybride</option>
           </select>
+          <span class="error-message" *ngIf="offerForm.get('remoteOption')?.invalid && offerForm.get('remoteOption')?.touched">
+            L'option télétravail est requise
+          </span>
         </div>
       </div>
     </div>
@@ -797,19 +821,19 @@
       </div>
     </div>
 
-    <!-- Actions du formulaire 
+    <!-- Actions du formulaire en bas 
     <div class="form-actions">
-      <button type="button" class="btn-cancel" (click)="cancel()">
+      <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="isSubmitting">
         Annuler
       </button>
       <div class="action-group">
-        <button type="button" class="btn-secondary" (click)="saveDraft()">
+        <button type="button" class="btn-secondary" (click)="saveDraft()" [disabled]="isSubmitting">
           <span class="material-icons">save</span>
-          Enregistrer brouillon
+          {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer brouillon' }}
         </button>
-        <button type="button" class="btn-primary" (click)="publishOffer()" [disabled]="!offerForm.valid">
+        <button type="button" class="btn-primary" (click)="publishOffer()" [disabled]="!offerForm.valid || isSubmitting">
           <span class="material-icons">publish</span>
-          Publier l'offre
+          {{ isSubmitting ? 'Publication...' : 'Publier l\'offre' }}
         </button>
       </div>
     </div>-->
