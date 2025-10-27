@@ -4,32 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
 import { OffersformComponent } from '../offersform/offersform.component';
 import { MatDialog } from '@angular/material/dialog';
-
-interface Offer {
-  _id: string;
-  companyId: string;
-  sector: string;
-  title: string;
-  description: string;
-  requiredSkills: string[];
-  experienceLevel: 'Junior' | 'Intermediate' | 'Senior';
-  contractType: string;
-  location: string;
-  salaryRange: string;
-  startDate?: Date;
-  applicationDeadline?: Date;
-  workingHours?: string;
-  remoteOption: 'Oui' | 'Non' | 'Hybride';
-  status: 'Publié' | 'Brouillon' | 'Archivé';
-  views?: number;
-  applicationsCount?: number;
-  // Champs spécifiques selon le secteur
-  programmingLanguages?: string[];
-  frameworks?: string[];
-  databaseKnowledge?: string[];
-  tools?: string[];
-  // ... autres champs spécifiques
-}
+import { Offer, OfferService } from '../../../services/offers.service';
 
 interface Metric {
   value: number | string;
@@ -56,64 +31,64 @@ interface OfferDisplay extends Offer {
 @Component({
   selector: 'app-company-offers',
   standalone: true,
-  imports: [CommonModule, FormsModule ,SidebarComponent, OffersformComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, OffersformComponent],
   templateUrl: './company-offers.component.html',
   styleUrls: ['./company-offers.component.css']
 })
 export class CompanyOffersComponent implements OnInit {
-  // État de l'application
   activeTab: string = 'published';
   searchTerm: string = '';
   selectedSector: string = '';
   selectedStatus: string = 'Tous les statuts';
   showForm = false;
-  // Données
+  isLoading = true;
+  
   offers: Offer[] = [];
   filteredOffers: OfferDisplay[] = [];
   
   metrics: Metric[] = [
     {
-      value: 12,
+      value: 0,
       label: 'Offres Actives',
       icon: 'work',
       class: 'primary',
-      trendText: '+3 ce mois',
+      trendText: '+0 ce mois',
       trendIcon: 'trending_up',
       trendClass: 'up'
     },
     {
-      value: 248,
+      value: 0,
       label: 'Candidatures Totales',
       icon: 'people',
       class: 'success',
-      trendText: '+18%',
+      trendText: '+0%',
       trendIcon: 'trending_up',
       trendClass: 'up'
     },
     {
-      value: 5,
+      value: 0,
       label: 'Brouillons',
       icon: 'schedule',
       class: 'warning',
-      trendText: '-2',
-      trendIcon: 'trending_down',
-      trendClass: 'down'
+      trendText: '+0',
+      trendIcon: 'trending_up',
+      trendClass: 'up'
     },
     {
-      value: 8,
+      value: 0,
       label: 'Archivées',
       icon: 'archive',
       class: 'info',
-      trendText: '+2',
+      trendText: '+0',
       trendIcon: 'trending_up',
       trendClass: 'up'
     }
   ];
 
   tabs: Tab[] = [
-    { id: 'published', label: 'Publiées', icon: 'check_circle', count: 12 },
-    { id: 'draft', label: 'Brouillons', icon: 'edit', count: 5 },
-    { id: 'archived', label: 'Archivées', icon: 'archive', count: 8 }
+    { id: 'published', label: 'Publiées', icon: 'check_circle', count: 0 },
+    { id: 'draft', label: 'Brouillons', icon: 'edit', count: 0 },
+    { id: 'archived', label: 'Archivées', icon: 'archive', count: 0 }
   ];
 
   sectors: string[] = [
@@ -126,12 +101,34 @@ export class CompanyOffersComponent implements OnInit {
     'Industrie'
   ];
 
+  constructor(
+    private dialog: MatDialog,
+    private offerService: OfferService
+  ) {}
+
   ngOnInit(): void {
     this.loadOffers();
   }
 
   loadOffers(): void {
-    // Données de démonstration - À remplacer par un appel API
+    this.isLoading = true;
+    
+    this.offerService.getOffersByCompany().subscribe({
+      next: (offers) => {
+        this.offers = offers || [];
+        this.filterOffers();
+        this.updateMetricsAndTabs();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des offres:', error);
+        this.isLoading = false;
+        this.loadDemoData();
+      }
+    });
+  }
+
+  private loadDemoData(): void {
     this.offers = [
       {
         _id: '1',
@@ -148,7 +145,9 @@ export class CompanyOffersComponent implements OnInit {
         status: 'Publié',
         views: 342,
         applicationsCount: 28,
-        applicationDeadline: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+        startOffreDate: new Date().toISOString(),
+        endOffreDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+        workingHours: '35h/semaine',
         programmingLanguages: ['JavaScript', 'TypeScript'],
         frameworks: ['React', 'Node.js', 'Express']
       },
@@ -167,7 +166,9 @@ export class CompanyOffersComponent implements OnInit {
         status: 'Publié',
         views: 187,
         applicationsCount: 15,
-        applicationDeadline: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)
+        startOffreDate: new Date().toISOString(),
+        endOffreDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
+        workingHours: '35h/semaine'
       },
       {
         _id: '3',
@@ -181,10 +182,12 @@ export class CompanyOffersComponent implements OnInit {
         location: 'Paris La Défense',
         salaryRange: '40K - 55K €',
         remoteOption: 'Hybride',
-        status: 'Publié',
+        status: 'Brouillon',
         views: 256,
         applicationsCount: 42,
-        applicationDeadline: new Date(Date.now() + 22 * 24 * 60 * 60 * 1000)
+        startOffreDate: new Date().toISOString(),
+        endOffreDate: new Date(Date.now() + 22 * 24 * 60 * 60 * 1000).toISOString(),
+        workingHours: '35h/semaine'
       },
       {
         _id: '4',
@@ -201,7 +204,9 @@ export class CompanyOffersComponent implements OnInit {
         status: 'Publié',
         views: 124,
         applicationsCount: 9,
-        applicationDeadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
+        startOffreDate: new Date().toISOString(),
+        endOffreDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+        workingHours: '35h/semaine'
       },
       {
         _id: '5',
@@ -215,37 +220,73 @@ export class CompanyOffersComponent implements OnInit {
         location: 'Toulouse',
         salaryRange: '28K - 35K €',
         remoteOption: 'Non',
-        status: 'Publié',
+        status: 'Archivé',
         views: 98,
         applicationsCount: 12,
-        applicationDeadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+        startOffreDate: new Date().toISOString(),
+        endOffreDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        workingHours: '35h/semaine'
+      }
+    ];
+    this.filterOffers();
+    this.updateMetricsAndTabs();
+  }
+
+  private updateMetricsAndTabs(): void {
+    const publishedCount = this.offers.filter(o => o.status === 'Publié').length;
+    const draftCount = this.offers.filter(o => o.status === 'Brouillon').length;
+    const archivedCount = this.offers.filter(o => o.status === 'Archivé').length;
+    const totalApplications = this.offers.reduce((sum, offer) => sum + (offer.applicationsCount || 0), 0);
+
+    this.metrics = [
+      {
+        value: publishedCount,
+        label: 'Offres Actives',
+        icon: 'work',
+        class: 'primary',
+        trendText: '+3 ce mois',
+        trendIcon: 'trending_up',
+        trendClass: 'up'
       },
       {
-        _id: '6',
-        companyId: 'comp1',
-        sector: 'Commerce',
-        title: 'Commercial B2B - Secteur Technologique',
-        description: 'Développez notre portefeuille clients B2B dans le secteur technologique avec autonomie et opportunités de croissance.',
-        requiredSkills: ['B2B', 'Prospection', 'CRM'],
-        experienceLevel: 'Senior',
-        contractType: 'CDI',
-        location: 'Bordeaux + déplacements',
-        salaryRange: '35K - 50K € + var',
-        remoteOption: 'Hybride',
-        status: 'Publié',
-        views: 215,
-        applicationsCount: 19,
-        applicationDeadline: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000)
+        value: totalApplications,
+        label: 'Candidatures Totales',
+        icon: 'people',
+        class: 'success',
+        trendText: '+18%',
+        trendIcon: 'trending_up',
+        trendClass: 'up'
+      },
+      {
+        value: draftCount,
+        label: 'Brouillons',
+        icon: 'schedule',
+        class: 'warning',
+        trendText: '-2',
+        trendIcon: 'trending_down',
+        trendClass: 'down'
+      },
+      {
+        value: archivedCount,
+        label: 'Archivées',
+        icon: 'archive',
+        class: 'info',
+        trendText: '+2',
+        trendIcon: 'trending_up',
+        trendClass: 'up'
       }
     ];
 
-    this.filterOffers();
+    this.tabs = [
+      { id: 'published', label: 'Publiées', icon: 'check_circle', count: publishedCount },
+      { id: 'draft', label: 'Brouillons', icon: 'edit', count: draftCount },
+      { id: 'archived', label: 'Archivées', icon: 'archive', count: archivedCount }
+    ];
   }
 
   filterOffers(): void {
     let filtered = this.offers;
 
-    // Filtre par statut (onglet actif)
     if (this.activeTab === 'published') {
       filtered = filtered.filter(offer => offer.status === 'Publié');
     } else if (this.activeTab === 'draft') {
@@ -254,12 +295,10 @@ export class CompanyOffersComponent implements OnInit {
       filtered = filtered.filter(offer => offer.status === 'Archivé');
     }
 
-    // Filtre par secteur
     if (this.selectedSector) {
       filtered = filtered.filter(offer => offer.sector === this.selectedSector);
     }
 
-    // Filtre par recherche
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(offer => 
@@ -269,14 +308,14 @@ export class CompanyOffersComponent implements OnInit {
       );
     }
 
-    // Transformation pour l'affichage
     this.filteredOffers = filtered.map(offer => this.prepareOfferDisplay(offer));
   }
 
   prepareOfferDisplay(offer: Offer): OfferDisplay {
+    const requiredSkills = offer.requiredSkills || [];
     const maxSkills = 3;
-    const displaySkills = offer.requiredSkills.slice(0, maxSkills);
-    const remainingSkills = Math.max(0, offer.requiredSkills.length - maxSkills);
+    const displaySkills = requiredSkills.slice(0, maxSkills);
+    const remainingSkills = Math.max(0, requiredSkills.length - maxSkills);
 
     return {
       ...offer,
@@ -285,13 +324,38 @@ export class CompanyOffersComponent implements OnInit {
     };
   }
 
-  // Actions des onglets
+  // Méthodes utilitaires
+  getRemainingDays(endOffreDate: string): string {
+    if (!endOffreDate) return 'Pas de deadline';
+    
+    const deadline = new Date(endOffreDate);
+    const now = new Date();
+    const diff = deadline.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    
+    if (days < 0) return 'Expiré';
+    if (days === 0) return 'Expire aujourd\'hui';
+    if (days === 1) return '1 jour restant';
+    return `${days} jours restants`;
+  }
+
+  isUrgent(endOffreDate: string): boolean {
+    if (!endOffreDate) return false;
+    
+    const deadline = new Date(endOffreDate);
+    const now = new Date();
+    const diff = deadline.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    
+    return days <= 3 && days >= 0;
+  }
+
+  // Autres méthodes
   changeTab(tabId: string): void {
     this.activeTab = tabId;
     this.filterOffers();
   }
 
-  // Actions de recherche et filtres
   onSearch(): void {
     this.filterOffers();
   }
@@ -301,28 +365,18 @@ export class CompanyOffersComponent implements OnInit {
   }
 
   openStatusFilter(): void {
-    // Ouvrir un menu déroulant ou un dialog pour filtrer par statut
     console.log('Ouvrir le filtre de statut');
   }
 
-
-
-  editOffer(offer: Offer): void {
-    console.log('Modifier l\'offre:', offer._id);
-    // this.router.navigate(['/offers/edit', offer._id]);
+  editOffer(offer: OfferDisplay): void {
   }
 
-  viewCandidates(offer: Offer): void {
-    console.log('Voir les candidats pour:', offer.title);
-    // this.router.navigate(['/offers', offer._id, 'candidates']);
+  viewCandidates(offer: OfferDisplay): void {
   }
 
-  openMenu(offer: Offer): void {
-    console.log('Ouvrir le menu pour:', offer.title);
-    // Ouvrir un menu contextuel avec plus d'options
+  openMenu(offer: OfferDisplay): void {
   }
 
-  // Méthodes utilitaires
   getSectorClass(sector: string): string {
     const sectorMap: { [key: string]: string } = {
       'Informatique': 'it-sector',
@@ -362,57 +416,36 @@ export class CompanyOffersComponent implements OnInit {
     return iconMap[remoteOption] || 'laptop_chromebook';
   }
 
-  getRemainingDays(deadline?: Date): string {
-    if (!deadline) return 'Pas de deadline';
-    
-    const now = new Date();
-    const diff = deadline.getTime() - now.getTime();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    
-    if (days < 0) return 'Expiré';
-    if (days === 0) return 'Expire aujourd\'hui';
-    if (days === 1) return '1 jour restant';
-    return `${days} jours restants`;
-  }
-
-  isUrgent(deadline?: Date): boolean {
-    if (!deadline) return false;
-    
-    const now = new Date();
-    const diff = deadline.getTime() - now.getTime();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    
-    return days <= 3 && days >= 0;
-  }
   showOfferForm = false;
-constructor(private dialog: MatDialog) {}
 
-openCreateOfferPopup(): void {
-  const dialogRef = this.dialog.open(OffersformComponent, {
-    width: '90%',
-    maxWidth: '1200px',
-    height: '90vh',
-    panelClass: 'custom-dialog-container', // pour le style
-    disableClose: true, // empêche la fermeture sans bouton
-    data: { isEditMode: false } // tu peux passer des données
-  });
+  openCreateOfferPopup(): void {
+    const dialogRef = this.dialog.open(OffersformComponent, {
+      width: '90%',
+      maxWidth: '1200px',
+      height: '90vh',
+      panelClass: 'custom-dialog-container',
+      disableClose: true,
+      data: { isEditMode: false }
+    });
 
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      console.log('Offre créée :', result);
-      // tu peux rafraîchir ta liste ici ici 
-    }
-  });
-}
-closeForm() {
-  this.showOfferForm = false;
-}
-getStatusClass(status: string): string {
-  const statusMap: { [key: string]: string } = {
-    'Publié': 'status-published',
-    'Brouillon': 'status-draft',
-    'Archivé': 'status-archived'
-  };
-  return statusMap[status] || 'status-published';
-}
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Offre créée :', result);
+        this.loadOffers();
+      }
+    });
+  }
+
+  closeForm() {
+    this.showOfferForm = false;
+  }
+
+  getStatusClass(status: string = 'Publié'): string {
+    const statusMap: { [key: string]: string } = {
+      'Publié': 'status-published',
+      'Brouillon': 'status-draft',
+      'Archivé': 'status-archived'
+    };
+    return statusMap[status] || 'status-published';
+  }
 }

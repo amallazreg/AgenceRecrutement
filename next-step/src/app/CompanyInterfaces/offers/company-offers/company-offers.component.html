@@ -1,170 +1,179 @@
 <div class="app-container">
   <app-sidebar></app-sidebar>
   <main class="main-content">
-<div class="offers-dashboard">
-  <!-- Header -->
-  <div class="dashboard-header">
-    <div class="header-left">
-      <h1 class="page-title">Mes Offres d'Emploi</h1>
-      <p class="page-subtitle">Gérez vos offres et suivez les candidatures</p>
-    </div>
-    <div class="header-actions">
-      <button class="btn-primary" mat-raised-button  (click)="openCreateOfferPopup()">
-        <span class="material-icons">add</span>
-        Créer une Offre
-      </button>
-      <div class="date-filter" (click)="openStatusFilter()">
-        <span class="material-icons">filter_list</span>
-        {{ selectedStatus }}
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Stats -->
-  <div class="metrics-grid">
-    <div *ngFor="let metric of metrics" class="metric-card" [ngClass]="metric.class">
-      <div class="metric-icon">
-        <span class="material-icons">{{ metric.icon }}</span>
-      </div>
-      <div class="metric-content">
-        <h3>{{ metric.value }}</h3>
-        <p>{{ metric.label }}</p>
-        <div class="metric-trend" [ngClass]="metric.trendClass">
-          <span class="material-icons">{{ metric.trendIcon }}</span>
-          {{ metric.trendText }}
+    <div class="offers-dashboard">
+      <!-- Header -->
+      <div class="dashboard-header">
+        <div class="header-left">
+          <h1 class="page-title">Mes Offres d'Emploi</h1>
+          <p class="page-subtitle">Gérez vos offres et suivez les candidatures</p>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filters & Tabs -->
-  <div class="filters-section">
-    <div class="tabs">
-      <button 
-        *ngFor="let tab of tabs" 
-        class="tab-btn" 
-        [class.active]="activeTab === tab.id"
-        (click)="changeTab(tab.id)">
-        <span class="material-icons">{{ tab.icon }}</span>
-        {{ tab.label }} ({{ tab.count }})
-      </button>
-    </div>
-    <div class="search-filter">
-      <div class="search-box">
-        <span class="material-icons">search</span>
-        <input 
-          type="text" 
-          placeholder="Rechercher une offre..." 
-          [(ngModel)]="searchTerm"
-          (input)="onSearch()" />
-      </div>
-      <select class="filter-select" [(ngModel)]="selectedSector" (change)="onSectorFilter()">
-        <option value="">Tous les secteurs</option>
-        <option *ngFor="let sector of sectors" [value]="sector">{{ sector }}</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Offers Grid -->
-     <!-- Offers Grid -->
-
-  <div class="offers-grid">
-    <div *ngFor="let offer of filteredOffers" class="offer-card">
-      <div class="card-header-section">
-        <div class="offer-badge" [ngClass]="getSectorClass(offer.sector)">
-          <span class="material-icons">{{ getSectorIcon(offer.sector) }}</span>
-          {{ offer.sector }}
-        </div>
-        <div class="card-actions">
-          <button class="action-btn" (click)="editOffer(offer)">
-            <span class="material-icons">edit</span>
+        <div class="header-actions">
+          <button class="btn-primary" mat-raised-button (click)="openCreateOfferPopup()">
+            <span class="material-icons">add</span>
+            Créer une Offre
           </button>
-          <button class="action-btn" (click)="openMenu(offer)">
-            <span class="material-icons">more_vert</span>
-          </button>
+          <div class="date-filter" (click)="openStatusFilter()">
+            <span class="material-icons">filter_list</span>
+            {{ selectedStatus }}
+          </div>
         </div>
       </div>
 
-      <div class="card-body">
-        <h3 class="offer-title">{{ offer.title }}</h3>
-        <p class="offer-description">{{ offer.description }}</p>
-
-        <div class="offer-tags">
-          <span class="tag" *ngFor="let skill of offer.displaySkills">{{ skill }}</span>
-          <span class="tag" *ngIf="offer.remainingSkills > 0">+{{ offer.remainingSkills }}</span>
-        </div>
-
-        <div class="offer-details">
-          <div class="detail-item">
-            <span class="material-icons">location_on</span>
-            <span>{{ offer.location }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="material-icons">work</span>
-            <span>{{ offer.contractType }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="material-icons">{{ getRemoteIcon(offer.remoteOption) }}</span>
-            <span>{{ offer.remoteOption }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="material-icons">euro</span>
-            <span>{{ offer.salaryRange }}</span>
-          </div>
-        </div>
-
-        <div class="experience-level">
-          <span class="level-badge" [ngClass]="getExperienceClass(offer.experienceLevel)">
-            {{ offer.experienceLevel }}
-          </span>
-        </div>
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement de vos offres...</p>
       </div>
 
-      <div class="card-footer">
-        <div class="footer-stats">
-          <div class="stat-item">
-            <span class="material-icons">visibility</span>
-            <span>{{ offer.views }} vues</span>
+      <!-- Content when not loading -->
+      <div *ngIf="!isLoading">
+        <!-- Quick Stats -->
+        <div class="metrics-grid">
+          <div *ngFor="let metric of metrics" class="metric-card" [ngClass]="metric.class">
+            <div class="metric-icon">
+              <span class="material-icons">{{ metric.icon }}</span>
+            </div>
+            <div class="metric-content">
+              <h3>{{ metric.value }}</h3>
+              <p>{{ metric.label }}</p>
+              <div class="metric-trend" [ngClass]="metric.trendClass">
+                <span class="material-icons">{{ metric.trendIcon }}</span>
+                {{ metric.trendText }}
+              </div>
+            </div>
           </div>
-          <div class="stat-item applications">
-            <span class="material-icons">person</span>
-            <span>{{ offer.applicationsCount }} candidatures</span>
-          </div>
-           <div class="status-badge" [ngClass]="getStatusClass(offer.status)">
-    {{ offer.status }}
-  </div>
         </div>
-        <div class="footer-actions">
-          <button class="btn-secondary" (click)="viewCandidates(offer)">
-            Voir les candidats
+
+        <!-- Filters & Tabs -->
+        <div class="filters-section">
+          <div class="tabs">
+            <button 
+              *ngFor="let tab of tabs" 
+              class="tab-btn" 
+              [class.active]="activeTab === tab.id"
+              (click)="changeTab(tab.id)">
+              <span class="material-icons">{{ tab.icon }}</span>
+              {{ tab.label }} ({{ tab.count }})
+            </button>
+          </div>
+          <div class="search-filter">
+            <div class="search-box">
+              <span class="material-icons">search</span>
+              <input 
+                type="text" 
+                placeholder="Rechercher une offre..." 
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()" />
+            </div>
+            <select class="filter-select" [(ngModel)]="selectedSector" (change)="onSectorFilter()">
+              <option value="">Tous les secteurs</option>
+              <option *ngFor="let sector of sectors" [value]="sector">{{ sector }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Offers Grid -->
+        <div class="offers-grid">
+          <div *ngFor="let offer of filteredOffers" class="offer-card">
+            <div class="card-header-section">
+              <div class="offer-badge" [ngClass]="getSectorClass(offer.sector)">
+                <span class="material-icons">{{ getSectorIcon(offer.sector) }}</span>
+                {{ offer.sector }}
+              </div>
+              <div class="card-actions">
+                <button class="action-btn" (click)="editOffer(offer)">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="action-btn" (click)="openMenu(offer)">
+                  <span class="material-icons">more_vert</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <h3 class="offer-title">{{ offer.title }}</h3>
+              <p class="offer-description">{{ offer.description }}</p>
+
+              <div class="offer-tags">
+                <span class="tag" *ngFor="let skill of offer.displaySkills">{{ skill }}</span>
+                <span class="tag" *ngIf="offer.remainingSkills > 0">+{{ offer.remainingSkills }}</span>
+              </div>
+
+              <div class="offer-details">
+                <div class="detail-item">
+                  <span class="material-icons">location_on</span>
+                  <span>{{ offer.location }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="material-icons">work</span>
+                  <span>{{ offer.contractType }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="material-icons">{{ getRemoteIcon(offer.remoteOption) }}</span>
+                  <span>{{ offer.remoteOption }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="material-icons">euro</span>
+                  <span>{{ offer.salaryRange }}</span>
+                </div>
+              </div>
+
+              <div class="experience-level">
+                <span class="level-badge" [ngClass]="getExperienceClass(offer.experienceLevel)">
+                  {{ offer.experienceLevel }}
+                </span>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div class="footer-stats">
+                <div class="stat-item">
+                  <span class="material-icons">visibility</span>
+                  <span>{{ offer.views || 0 }} vues</span>
+                </div>
+                <div class="stat-item applications">
+                  <span class="material-icons">person</span>
+                  <span>{{ offer.applicationsCount || 0 }} candidatures</span>
+                </div>
+                <div class="status-badge" [ngClass]="getStatusClass(offer.status || 'Publié')">
+                  {{ offer.status || 'Publié' }}
+                </div>
+              </div>
+              <div class="footer-actions">
+                <button class="btn-secondary" (click)="viewCandidates(offer)">
+                  Voir les candidats
+                </button>
+                <span class="deadline-info" [class.urgent]="isUrgent(offer.endOffreDate)">
+                  <span class="material-icons">schedule</span>
+                  {{ getRemainingDays(offer.endOffreDate) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredOffers.length === 0" class="empty-state">
+          <span class="material-icons">work_off</span>
+          <h3>Aucune offre trouvée</h3>
+          <p>Essayez de modifier vos filtres ou créez une nouvelle offre</p>
+          <button class="btn-primary" (click)="openCreateOfferPopup()">
+            <span class="material-icons">add</span>
+            Créer une Offre
           </button>
-          <span class="deadline-info" [class.urgent]="isUrgent(offer.applicationDeadline)">
-            <span class="material-icons">schedule</span>
-            {{ getRemainingDays(offer.applicationDeadline) }}
-          </span>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="filteredOffers.length === 0" class="empty-state">
-    <span class="material-icons">work_off</span>
-    <h3>Aucune offre trouvée</h3>
-    <p>Essayez de modifier vos filtres ou créez une nouvelle offre</p>
-    <button class="btn-primary" (click)="openCreateOfferPopup()">
-      <span class="material-icons">add</span>
-      Créer une Offre
-    </button>
-  </div>
+  </main>
 </div>
-</main></div>
-    <!-- 🟣 FORMULAIRE D’AJOUT D’OFFRE -->
-    <app-offersform *ngIf="showOfferForm"></app-offersform>
 
-    <!-- Bouton de retour -->
-    <div *ngIf="showOfferForm" class="back-btn-container">
-      <button class="btn-secondary" (click)="closeForm()">
-        <span class="material-icons">arrow_back</span> Retour
-      </button>
-    </div>
+<!-- FORMULAIRE D'AJOUT D'OFFRE -->
+<app-offersform *ngIf="showOfferForm"></app-offersform>
+
+<!-- Bouton de retour -->
+<div *ngIf="showOfferForm" class="back-btn-container">
+  <button class="btn-secondary" (click)="closeForm()">
+    <span class="material-icons">arrow_back</span> Retour
+  </button> 
+</div>

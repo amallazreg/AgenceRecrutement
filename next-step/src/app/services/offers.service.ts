@@ -8,6 +8,7 @@ export interface Offer {
   sector: string;
   title: string;
   description: string;
+  requiredSkills: string[];
   experienceLevel: string;
   contractType: string;
   location: string;
@@ -18,6 +19,7 @@ export interface Offer {
   remoteOption: string;
   status?: string;
   views?: number;
+  applicationsCount?: number;
   createdAt?: string;
   updatedAt?: string;
   
