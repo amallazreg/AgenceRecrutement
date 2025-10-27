@@ -647,7 +647,7 @@ export class OffersformComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    const offerData = this.prepareOfferData('Publiée');
+    const offerData = this.prepareOfferData('Publié');
 
     this.offerService.createOffer(offerData).subscribe({
       next: (response: any) => {
