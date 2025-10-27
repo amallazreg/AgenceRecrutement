@@ -34,22 +34,15 @@
       
       <div class="form-grid">
         <!-- Secteur -->
-        <div class="form-group full-width">
-          <label for="sector">Secteur d'activité *</label>
-          <select id="sector" formControlName="sector" class="form-control" (change)="onSectorChange()">
-            <option value="">Sélectionnez un secteur</option>
-            <option value="Technologie">Technologie</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Finance">Finance</option>
-            <option value="Santé">Santé</option>
-            <option value="Éducation">Éducation</option>
-            <option value="Commerce">Commerce</option>
-            <option value="Industrie">Industrie</option>
-          </select>
-          <span class="error-message" *ngIf="offerForm.get('sector')?.invalid && offerForm.get('sector')?.touched">
-            Le secteur est requis
-          </span>
-        </div>
+      <!-- Secteur (affiché en lecture seule) -->
+<div class="form-group full-width">
+  <label>Secteur d'activité</label>
+  <div class="sector-display">
+    <span class="material-icons">{{ getSectorIcon(selectedSector) }}</span>
+    <span class="sector-name">{{ selectedSector || 'Chargement...' }}</span>
+  </div>
+  <input type="hidden" formControlName="sector">
+</div>
 
         <!-- Titre -->
         <div class="form-group full-width">

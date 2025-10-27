@@ -12,7 +12,7 @@ import { OfferService } from '../../../services/offers.service';
   styleUrl: './offersform.component.css'
 })
 export class OffersformComponent implements OnInit {
- offerForm!: FormGroup;
+  offerForm!: FormGroup;
   isEditMode = false;
   offerId?: string;
   selectedSector: string = '';
@@ -71,13 +71,53 @@ export class OffersformComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.loadCompanySector(); // Charger le secteur automatiquement
     this.checkEditMode();
+  }
+
+  loadCompanySector(): void {
+    // Récupérer le secteur depuis le localStorage ou le service d'authentification
+    const userData = localStorage.getItem('user');
+    
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        if (user.sector) {
+          this.selectedSector = user.sector;
+          // Mettre à jour le formulaire avec le secteur
+          this.offerForm.patchValue({
+            sector: this.selectedSector
+          });
+          console.log('Secteur chargé automatiquement:', this.selectedSector);
+        }
+      } catch (error) {
+        console.error('Erreur lors du parsing des données utilisateur:', error);
+      }
+    }
+
+    // Alternative: récupérer depuis le token JWT
+    const token = localStorage.getItem('token');
+    if (token && !this.selectedSector) {
+      try {
+        // Décoder le token JWT pour extraire le secteur
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.sector) {
+          this.selectedSector = payload.sector;
+          this.offerForm.patchValue({
+            sector: this.selectedSector
+          });
+          console.log('Secteur chargé depuis le token:', this.selectedSector);
+        }
+      } catch (error) {
+        console.error('Erreur lors du décodage du token:', error);
+      }
+    }
   }
 
   initForm(): void {
     this.offerForm = this.fb.group({
       // Champs généraux
-      sector: ['', Validators.required],
+      sector: ['', Validators.required], // Sera auto-rempli
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: ['', [Validators.required, Validators.minLength(20)]],
       experienceLevel: ['Junior', Validators.required],
@@ -191,13 +231,15 @@ export class OffersformComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
+  // Cette méthode n'est plus nécessaire car le secteur est auto-chargé
+  // mais on la garde au cas où
   onSectorChange(): void {
     this.selectedSector = this.offerForm.get('sector')?.value;
   }
 
   // === MÉTHODES POUR LES TAGS ===
+  // (Le reste du code reste identique...)
 
-  // Compétences requises
   addSkill(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -597,36 +639,38 @@ export class OffersformComponent implements OnInit {
     }
   }
 
- publishOffer() {
-  if (this.offerForm.invalid) return;
-
-  const offerData = this.offerForm.value;
-
-  this.isSubmitting = true;
-
-  this.offerService.createOffer(offerData).subscribe({
-    next: (response: any) => {
-      console.log('✅ Offre créée avec succès :', response);
-      alert('Offre publiée avec succès !');
-      this.isSubmitting = false;
-    },
-    error: (err) => {
-      console.error('❌ Erreur lors de la création de l’offre :', err);
-      if (err.status === 401) {
-        alert('Vous devez être connecté pour créer une offre.');
-      } else {
-        alert('Une erreur est survenue.');
-      }
-      this.isSubmitting = false;
+  publishOffer(): void {
+    if (this.offerForm.invalid) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      this.markFormGroupTouched(this.offerForm);
+      return;
     }
-  });
-}
 
+    this.isSubmitting = true;
+    const offerData = this.prepareOfferData('Publiée');
+
+    this.offerService.createOffer(offerData).subscribe({
+      next: (response: any) => {
+        console.log('✅ Offre créée avec succès :', response);
+        alert('Offre publiée avec succès !');
+        this.isSubmitting = false;
+        this.router.navigate(['/company/offers']);
+      },
+      error: (err) => {
+        console.error('❌ Erreur lors de la création de l\'offre :', err);
+        if (err.status === 401) {
+          alert('Vous devez être connecté pour créer une offre.');
+        } else {
+          alert('Une erreur est survenue.');
+        }
+        this.isSubmitting = false;
+      }
+    });
+  }
 
   prepareOfferData(status: string): any {
     const formValue = this.offerForm.value;
     
-    // Utilisez la méthode du service pour formater les données
     const offerData = this.offerService.formatOfferData(formValue, this.selectedSector);
     
     // Ajoutez les tableaux manuellement
@@ -679,13 +723,11 @@ export class OffersformComponent implements OnInit {
         break;
     }
 
-    // Ajoutez le statut
     offerData.status = status;
 
     return offerData;
   }
 
-  // === MÉTHODES UTILITAIRES ===
   getSectorIcon(sector: string): string {
     const iconMap: { [key: string]: string } = {
       'Technologie': 'computer',

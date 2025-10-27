@@ -6,7 +6,26 @@
   margin: 0 auto;
   font-family: 'Inter', sans-serif;
 }
+.sector-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f0f9ff;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #1e40af;
+}
 
+.sector-display .material-icons {
+  font-size: 24px;
+  color: #3b82f6;
+}
+
+.sector-name {
+  font-size: 16px;
+}
 /* Header */
 .form-header {
   display: flex;
