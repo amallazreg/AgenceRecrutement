@@ -14,64 +14,67 @@ import { SidebarAcceuilComponent } from '../../../shared/sidebar-acceuil/sidebar
   styleUrls: ['./login.component.css'] 
 })
 export class LoginComponent {  
+ constructor(private authService: AuthServiceService, private router: Router) {}
 
-  constructor(private authService: AuthServiceService, private router: Router) {}
-
-  showPassword: boolean = false;   // pour afficher/masquer le mot de passe
-    errorMessage: string = '';
-
+  showPassword: boolean = false;
+  errorMessage: string = '';
+  loginMode: 'user' | 'company' = 'user'; // Mode par défaut
 
   // Données du formulaire
   formData = {
     name: '',
     password: '',
     acceptTerms: false
-
   };
+
+  // Méthode pour basculer entre user et company
+  toggleLoginMode(mode: 'user' | 'company') {
+    this.loginMode = mode;
+    this.errorMessage = ''; // Réinitialiser les erreurs
+  }
 
   // Méthode pour toggle mot de passe
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
-onSubmit(form: NgForm, event: Event) {
-  event.preventDefault(); // Empêche le reload
 
-  if (form.valid) {
-    this.authService.signin({
-      name: this.formData.name,
-      password: this.formData.password
-    }).subscribe({
-      next: (res) => {
-        console.log('Connexion réussie ✅', res);
+  onSubmit(form: NgForm, event: Event) {
+    event.preventDefault();
 
-        // ✅ Enregistre les informations dans le localStorage
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('role', res.role);
-        localStorage.setItem('sector', res.sector); // 👈 ajoute le sector ici
+    if (form.valid) {
+      const credentials = {
+        name: this.formData.name,
+        password: this.formData.password
+      };
 
-        // ✅ Redirige selon le rôle
-        if (res.role === 'admin') {
-          this.router.navigate(['/adminDashboard']);
-        } else if (res.role === 'company') {
-          this.router.navigate(['/companyDashboard']);
-        } else if (res.role === 'user') {
-          this.router.navigate(['/userDashboard']);
-        } else {
-          this.router.navigate(['/login']); // sécurité
+      // Choisir la bonne méthode selon le mode
+      const authObservable = this.loginMode === 'company' 
+        ? this.authService.signinCompany(credentials)
+        : this.authService.signinUser(credentials);
+
+      authObservable.subscribe({
+        next: (res) => {
+          console.log(`Connexion ${this.loginMode} réussie ✅`, res);
+
+          // Redirection selon le rôle
+          if (res.role === 'admin') {
+            this.router.navigate(['/adminDashboard']);
+          } else if (res.role === 'company') {
+            this.router.navigate(['/companyDashboard']);
+          } else if (res.role === 'user') {
+            this.router.navigate(['/userDashboard']);
+          } else {
+            this.router.navigate(['/login']);
+          }
+        },
+        error: (err) => {
+          console.error('Erreur connexion ❌', err);
+          this.errorMessage = err.error?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
         }
-      },
-      error: (err) => {
-        console.error('Erreur connexion ❌', err);
-        this.errorMessage = err.error?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
-      }
-    });
-  } else {
-    console.log('Formulaire invalide ❌');
-    this.errorMessage = 'Veuillez remplir tous les champs correctement.';
+      });
+    } else {
+      console.log('Formulaire invalide ❌');
+      this.errorMessage = 'Veuillez remplir tous les champs correctement.';
+    }
   }
-}
-
-
-
-
 }

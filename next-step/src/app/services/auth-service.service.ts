@@ -17,20 +17,30 @@ export class AuthServiceService {
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/user/signup`, userData);
   }
-
-   signin(credentials: { name: string, password: string }): Observable<AuthResponse> {
+  // 🔹 Connexion user
+  signinUser(credentials: { name: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/user/signin`, credentials).pipe(
       tap((res: any) => {
         if (res.token) {
-          // Enregistrer le token et les informations de l'utilisateur dans le localStorage
-          localStorage.setItem('tokenuser', res.token);
-          localStorage.setItem('userId', res.id); // Enregistrer l'ID de l'utilisateur (si renvoyé dans la réponse)
-          localStorage.setItem('userInfo', JSON.stringify(res.user));
-          localStorage.setItem('sector', res.sector); 
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('role', res.role);
+          localStorage.setItem('userName', res.name);
+          console.log('Connexion user réussie ✅');
+        }
+      })
+    );
+  }
+  signinCompany(credentials: { name: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/company/signin`, credentials).pipe(
+      tap((res: any) => {
+        if (res.token) {
+          // ✅ Sauvegarde des infos dans le localStorage
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('role', res.role);
+          localStorage.setItem('sector', res.sector);
+          localStorage.setItem('companyName', res.name);
 
-          // Si tu veux décoder le token pour extraire l'ID directement (sans bibliothèque externe)
-          const decodedToken = this.decodeToken(res.token);
-          localStorage.setItem('userId', decodedToken.id); // Sauvegarder l'ID depuis le token décodé
+          console.log('Connexion réussie ✅');
         }
       })
     );

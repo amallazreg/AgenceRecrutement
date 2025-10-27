@@ -1,647 +1,543 @@
-/*
-.login-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 96vh;
-  background: #f9fbff;
-  font-family: "Poppins", Arial, sans-serif;
-  overflow: hidden;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.login-illustration {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 10%;
-    width: 43%
-}
-.login-illustration img {
-  width: 80%;
-  max-width: 500px;
-  animation: float 3s ease-in-out infinite;
-  margin-right: 28%;
-}
-@keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
 }
 
+.login-container {
+    display: flex;
+    height: 87vh;
+    width: 100%;
+}
+
+/* Section Gauche */
+.left-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.animated-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.grid-pattern {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.shape {
+    position: absolute;
+    opacity: 0.15;
+    animation: floatShape 20s infinite ease-in-out;
+}
+
+.shape1 {
+    width: 150px;
+    height: 150px;
+    border: 3px solid white;
+    border-radius: 50%;
+    top: 10%;
+    left: 10%;
+}
+
+.shape2 {
+    width: 120px;
+    height: 120px;
+    border: 3px solid white;
+    border-radius: 20px;
+    bottom: 15%;
+    right: 15%;
+    animation-delay: 5s;
+}
+
+.shape3 {
+    width: 80px;
+    height: 80px;
+    background: white;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    top: 60%;
+    left: 20%;
+    animation-delay: 10s;
+}
+
+@keyframes floatShape {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(30px, -30px) rotate(120deg); }
+    66% { transform: translate(-20px, 40px) rotate(240deg); }
+}
+
+.left-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 30px;
+    max-width: 500px;
+}
+
+.illustration {
+    width: 320px;
+    height: 300px;
+    margin: 0 auto 25px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-stack {
+    position: relative;
+    width: 280px;
+    height: 280px;
+}
+
+.card {
+    position: absolute;
+    width: 220px;
+    height: 130px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.5s ease;
+}
+
+.card1 {
+    top: 0;
+    left: 30px;
+    transform: rotate(-8deg);
+    animation: cardFloat1 6s infinite ease-in-out;
+}
+
+.card2 {
+    top: 75px;
+    left: 0;
+    transform: rotate(3deg);
+    animation: cardFloat2 6s infinite ease-in-out;
+}
+
+.card3 {
+    top: 150px;
+    left: 60px;
+    transform: rotate(-5deg);
+    animation: cardFloat3 6s infinite ease-in-out;
+}
+
+@keyframes cardFloat1 {
+    0%, 100% { transform: translateY(0) rotate(-8deg); }
+    50% { transform: translateY(-10px) rotate(-5deg); }
+}
+
+@keyframes cardFloat2 {
+    0%, 100% { transform: translateY(0) rotate(3deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+@keyframes cardFloat3 {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-8px) rotate(-2deg); }
+}
+
+.card-icon {
+    font-size: 36px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.card-text {
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.left-content h1 {
+    color: white;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.left-content p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 300;
+}
+
+/* Section Droite */
+.right-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+    padding: 40px;
+    overflow-y: auto;
+}
 
 .login-card {
-  flex: 1;
-  max-width: 400px;
-  background: #fff;
-  padding: 40px 35px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 20px;
-  animation: slideIn 0.6s ease;
+    width: 100%;
+    max-width: 420px;
+    animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(40px); }
-  to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-.logo img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.logo h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #111827;
-}
-.logo span {
-  color: #4f46e5;
+.login-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
+    text-align: center;
 }
 
-h2 {
-  font-size: 20px;
-  margin: 10px 0 25px;
-  text-align: center;
-  color: #111827;
+/* Toggle Switch professionnel */
+.mode-toggle {
+    display: flex;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 5px;
+    border-radius: 12px;
+    margin-bottom: 25px;
 }
 
+.toggle-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
 
-.form-group {
-  margin-bottom: 16px;
+.toggle-btn:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.toggle-btn.active {
+    background: white;
+    color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-icon {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.toggle-btn.active .toggle-icon {
+    transform: scale(1.1);
+}
+
+.toggle-label {
+    font-weight: 600;
+}
+
+/* Message d'erreur global */
+.global-error {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: errorShake 0.5s ease;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-icon {
+    font-size: 18px;
+}
+
+/* Champs de formulaire */
+.input-group {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-wrapper:focus-within {
+    background: white;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .input-icon {
-  display: flex;
-  align-items: center;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: #fafafa;
-  transition: border-color 0.3s ease;
+    padding-left: 16px;
+    font-size: 18px;
+    color: #64748b;
+    transition: color 0.3s ease;
 }
-.input-icon:focus-within {
-  border-color: #4f46e5;
-  background: #fff;
+
+.input-wrapper:focus-within .input-icon {
+    color: #3b82f6;
 }
-.input-icon i {
-  color: #6b7280;
-  font-size: 16px;
-  margin-right: 8px;
+
+input {
+    flex: 1;
+    padding: 14px 16px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    color: #0f172a;
+    outline: none;
 }
-.input-icon input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 14px;
-  background: transparent;
+
+input::placeholder {
+    color: #94a3b8;
 }
 
 .toggle-password {
-  cursor: pointer;
-  font-size: 16px;
-  margin-left: 8px;
-  color: #6b7280;
+    padding-right: 16px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #64748b;
+    transition: all 0.3s ease;
+    user-select: none;
 }
 
-.error {
-  color: #dc2626;
-  font-size: 12px;
-  margin-top: 4px;
+.toggle-password:hover {
+    color: #3b82f6;
+    transform: scale(1.1);
 }
 
 .remember {
-  align-items: center;
-  margin: 12px 0 18px;
+    
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
 }
+
+input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
 .remember label {
-  font-size: 14px;
-  color: #555;
-  margin-left: 6px;
+    font-size: 14px;
+    color: #475569;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.error {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 6px;
+    padding-left: 4px;
 }
 
 .btn {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(90deg, #4f46e5, #6366f1);
-  border: none;
-  color: white;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  transition: all 0.3s ease;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    letter-spacing: 0.3px;
 }
+
 .btn:hover {
-  background: linear-gradient(90deg, #4338ca, #4f46e5);
-  transform: translateY(-2px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
 }
+
+.btn:active {
+    transform: translateY(0);
+}
+
 .btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-.signup-text {
-  text-align: center;
-  margin-top: 18px;
-  font-size: 14px;
-}
-.signup-text a {
-  color: #4f46e5;
-  text-decoration: none;
-}
-.signup-text a:hover {
-  text-decoration: underline;
+.footer-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #64748b;
 }
 
-footer {
-  text-align: center;
-  margin-top: 25px;
-  font-size: 12px;
-  color: #9ca3af;
+.footer-text a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-
-@media (max-width: 900px) {
-  .login-page {
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 40px 20px;
-    height: auto;
-  }
-  .login-illustration {
-    margin-bottom: 20px;
-  }
-  .login-illustration img {
-    width: 60%;
-  }
-  .login-card {
-    max-width: 100%;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
+.footer-text a:hover {
+    color: #2563eb;
+    text-decoration: underline;
 }
-*/
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        }
-
-        .login-container {
-            display: flex;
-            height: 87vh;
-            width: 100%;
-        }
-
-        /* Section Gauche */
-        .left-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .animated-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .grid-pattern {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.15;
-            animation: floatShape 20s infinite ease-in-out;
-        }
-
-        .shape1 {
-            width: 150px;
-            height: 150px;
-            border: 3px solid white;
-            border-radius: 50%;
-            top: 10%;
-            left: 10%;
-        }
-
-        .shape2 {
-            width: 120px;
-            height: 120px;
-            border: 3px solid white;
-            border-radius: 20px;
-            bottom: 15%;
-            right: 15%;
-            animation-delay: 5s;
-        }
-
-        .shape3 {
-            width: 80px;
-            height: 80px;
-            background: white;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            top: 60%;
-            left: 20%;
-            animation-delay: 10s;
-        }
-
-        @keyframes floatShape {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(30px, -30px) rotate(120deg); }
-            66% { transform: translate(-20px, 40px) rotate(240deg); }
-        }
-
-        .left-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            padding: 30px;
-            max-width: 500px;
-        }
-
-        .illustration {
-            width: 320px;
-            height: 300px;
-            margin: 0 auto 25px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .card-stack {
-            position: relative;
-            width: 280px;
-            height: 280px;
-        }
-
-        .card {
-            position: absolute;
-            width: 220px;
-            height: 130px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.5s ease;
-        }
-
-        .card1 {
-            top: 0;
-            left: 30px;
-            transform: rotate(-8deg);
-            animation: cardFloat1 6s infinite ease-in-out;
-        }
-
-        .card2 {
-            top: 75px;
-            left: 0;
-            transform: rotate(3deg);
-            animation: cardFloat2 6s infinite ease-in-out;
-        }
-
-        .card3 {
-            top: 150px;
-            left: 60px;
-            transform: rotate(-5deg);
-            animation: cardFloat3 6s infinite ease-in-out;
-        }
-
-        @keyframes cardFloat1 {
-            0%, 100% { transform: translateY(0) rotate(-8deg); }
-            50% { transform: translateY(-10px) rotate(-5deg); }
-        }
-
-        @keyframes cardFloat2 {
-            0%, 100% { transform: translateY(0) rotate(3deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
-        }
-
-        @keyframes cardFloat3 {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-8px) rotate(-2deg); }
-        }
-
-        .card-icon {
-            font-size: 36px;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-        }
-
-        .card-text {
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .left-content h1 {
-            color: white;
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -1px;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .left-content p {
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 16px;
-            line-height: 1.5;
-            font-weight: 300;
-        }
-
-        /* Section Droite */
-        .right-section {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #ffffff;
-            padding: 40px;
-            overflow-y: auto;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            background: white;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-title {
-            font-size: 30px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 30px;
-            letter-spacing: -0.5px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-            position: relative;
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .input-wrapper:focus-within {
-            background: white;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .input-icon {
-            padding-left: 16px;
-            font-size: 18px;
-            color: #64748b;
-        }
-
-        input {
-            flex: 1;
-            padding: 14px 16px;
-            border: none;
-            background: transparent;
-            font-size: 15px;
-            color: #0f172a;
-            outline: none;
-        }
-
-        input::placeholder {
-            color: #94a3b8;
-        }
-
-        .toggle-password {
-            padding-right: 16px;
-            cursor: pointer;
-            font-size: 20px;
-            color: #64748b;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-
-        .toggle-password:hover {
-            color: #3b82f6;
-            transform: scale(1.1);
-        }
-
-        .remember {
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-
-        input[type="checkbox"] {
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-            accent-color: #3b82f6;
-        }
-
-        .remember label {
-            font-size: 14px;
-            color: #475569;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .error {
-            color: #dc2626;
-            font-size: 13px;
-            margin-top: 6px;
-            padding-left: 4px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-            letter-spacing: 0.3px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        .footer-text a {
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .footer-text a:hover {
-            color: #2563eb;
-            text-decoration: underline;
-        }
-
-        .copyright {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        @media (max-width: 1024px) {
-            .card {
-                width: 200px;
-                height: 120px;
-            }
-
-            .card-icon {
-                font-size: 32px;
-            }
-
-            .left-content h1 {
-                font-size: 28px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-            }
-
-            .left-section {
-                flex: 0 0 40%;
-                padding: 20px;
-            }
-
-            .illustration {
-                width: 240px;
-                height: 220px;
-            }
-
-            .card {
-                width: 180px;
-                height: 100px;
-            }
-
-            .card1 { top: 0; }
-            .card2 { top: 60px; }
-            .card3 { top: 120px; }
-
-            .card-icon {
-                font-size: 28px;
-            }
-
-            .card-text {
-                font-size: 11px;
-            }
-
-            .left-content h1 {
-                font-size: 24px;
-                margin-bottom: 8px;
-            }
-
-            .left-content p {
-                font-size: 14px;
-            }
-
-            .right-section {
-                padding: 30px 20px;
-            }
-
-            .login-title {
-                font-size: 26px;
-                margin-bottom: 25px;
-            }
-        }
+
+.copyright {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+    .card {
+        width: 200px;
+        height: 120px;
+    }
+
+    .card-icon {
+        font-size: 32px;
+    }
+
+    .left-content h1 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .left-section {
+        flex: 0 0 40%;
+        padding: 20px;
+    }
+
+    .illustration {
+        width: 240px;
+        height: 220px;
+    }
+
+    .card {
+        width: 180px;
+        height: 100px;
+    }
+
+    .card1 { top: 0; }
+    .card2 { top: 60px; }
+    .card3 { top: 120px; }
+
+    .card-icon {
+        font-size: 28px;
+    }
+
+    .card-text {
+        font-size: 11px;
+    }
+
+    .left-content h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .left-content p {
+        font-size: 14px;
+    }
+
+    .right-section {
+        padding: 30px 20px;
+    }
+
+    .login-title {
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    .toggle-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
