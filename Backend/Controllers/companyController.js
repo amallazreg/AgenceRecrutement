@@ -46,7 +46,7 @@ const signinController = async (req, res) => {
         const { name, password } = req.body;
 
         // Vérifier si l'agence existe
-        const company = await Company.findOne({ name }).select('name password role _id').exec();
+        const company = await Company.findOne({ name }).select('name password role _id sector').exec();
         if (!company) {
             return res.status(401).json({ success: false, message: "Company non trouvée" });
         }
@@ -65,13 +65,13 @@ const signinController = async (req, res) => {
 
         // Générer le token avec l'ID de l'agence
         const token = jwt.sign(
-            { id: company._id, name: company.name, role: company.role },
+            { id: company._id, name: company.name, role: company.role,sector:company.sector },
             secret,
             { expiresIn: "24h" }
         );
 
         // Réponse
-        res.json({ success: true, message: "Company authentifiée", token, role: company.role });
+        res.json({ success: true, message: "Company authentifiée", token, role: company.role,sector:company.sector });
 
     } catch (err) {
         console.error("Erreur dans signinController:", err);

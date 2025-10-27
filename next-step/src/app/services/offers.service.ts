@@ -91,13 +91,16 @@ export class OfferService {
 
   constructor(private http: HttpClient) { }
 
-  // 🟢 CRÉATION d'une offre
-  createOffer(offerData: any): Observable<OfferResponse> {
-    const token = this.getToken();
-    const headers = this.getHeaders(token);
+ createOffer(offerData: any) {
+    const token = localStorage.getItem('token'); // ✅ récupère le token de la société connectée
 
-    return this.http.post<OfferResponse>(`${this.apiUrl}/createOffre`, offerData, { headers });
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`  // ✅ ajoute le token dans le header
+    });
+
+    return this.http.post(`${this.apiUrl}/createOffre`, offerData, { headers });
   }
+
 
   // 🔵 RÉCUPÉRATION des offres de l'entreprise connectée
   getOffersByCompany(): Observable<Offer[]> {

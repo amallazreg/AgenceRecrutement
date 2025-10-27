@@ -21,7 +21,7 @@ export class OffersformComponent implements OnInit {
   // Arrays pour les champs de type tableau
   requiredSkills: string[] = [];
   
-  // Informatique
+  // Technologie
   programmingLanguages: string[] = [];
   frameworks: string[] = [];
   databaseKnowledge: string[] = [];
@@ -89,7 +89,7 @@ export class OffersformComponent implements OnInit {
       workingHours: ['', Validators.required],
       remoteOption: ['Non', Validators.required],
 
-      // Informatique
+      // Technologie
       projectType: [''],
 
       // Éducation
@@ -211,7 +211,7 @@ export class OffersformComponent implements OnInit {
     this.requiredSkills.splice(index, 1);
   }
 
-  // Informatique
+  // Technologie
   addProgrammingLanguage(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     const value = input.value.trim();
@@ -597,45 +597,31 @@ export class OffersformComponent implements OnInit {
     }
   }
 
-  publishOffer(): void {
-    if (this.offerForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
-      const offerData = this.prepareOfferData('Publié');
-      
-      if (this.isEditMode && this.offerId) {
-        this.offerService.updateOffer(this.offerId, offerData).subscribe({
-          next: (response) => {
-            this.isSubmitting = false;
-            console.log('✅ Offre mise à jour:', response);
-            alert('Offre publiée avec succès !');
-            this.router.navigate(['/company/offers']);
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('❌ Erreur mise à jour offre:', error);
-            alert('Erreur lors de la publication de l\'offre');
-          }
-        });
+ publishOffer() {
+  if (this.offerForm.invalid) return;
+
+  const offerData = this.offerForm.value;
+
+  this.isSubmitting = true;
+
+  this.offerService.createOffer(offerData).subscribe({
+    next: (response: any) => {
+      console.log('✅ Offre créée avec succès :', response);
+      alert('Offre publiée avec succès !');
+      this.isSubmitting = false;
+    },
+    error: (err) => {
+      console.error('❌ Erreur lors de la création de l’offre :', err);
+      if (err.status === 401) {
+        alert('Vous devez être connecté pour créer une offre.');
       } else {
-        this.offerService.createOffer(offerData).subscribe({
-          next: (response) => {
-            this.isSubmitting = false;
-            console.log('✅ Offre créée:', response);
-            alert('Offre publiée avec succès !');
-            this.router.navigate(['/company/offers']);
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('❌ Erreur création offre:', error);
-            alert('Erreur lors de la création de l\'offre');
-          }
-        });
+        alert('Une erreur est survenue.');
       }
-    } else {
-      alert('Veuillez remplir tous les champs obligatoires');
-      this.markFormGroupTouched(this.offerForm);
+      this.isSubmitting = false;
     }
-  }
+  });
+}
+
 
   prepareOfferData(status: string): any {
     const formValue = this.offerForm.value;
@@ -645,7 +631,7 @@ export class OffersformComponent implements OnInit {
     
     // Ajoutez les tableaux manuellement
     switch (this.selectedSector) {
-      case 'Informatique':
+      case 'Technologie':
         offerData.programmingLanguages = this.programmingLanguages;
         offerData.frameworks = this.frameworks;
         offerData.databaseKnowledge = this.databaseKnowledge;
@@ -702,7 +688,7 @@ export class OffersformComponent implements OnInit {
   // === MÉTHODES UTILITAIRES ===
   getSectorIcon(sector: string): string {
     const iconMap: { [key: string]: string } = {
-      'Informatique': 'computer',
+      'Technologie': 'computer',
       'Marketing': 'campaign',
       'Finance': 'account_balance',
       'Santé': 'local_hospital',

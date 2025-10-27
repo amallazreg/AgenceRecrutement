@@ -26,7 +26,8 @@ export class AuthServiceService {
           localStorage.setItem('tokenuser', res.token);
           localStorage.setItem('userId', res.id); // Enregistrer l'ID de l'utilisateur (si renvoyé dans la réponse)
           localStorage.setItem('userInfo', JSON.stringify(res.user));
-  
+          localStorage.setItem('sector', res.sector); 
+
           // Si tu veux décoder le token pour extraire l'ID directement (sans bibliothèque externe)
           const decodedToken = this.decodeToken(res.token);
           localStorage.setItem('userId', decodedToken.id); // Sauvegarder l'ID depuis le token décodé

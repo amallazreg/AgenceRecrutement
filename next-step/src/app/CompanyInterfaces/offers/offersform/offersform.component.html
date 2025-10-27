@@ -38,7 +38,7 @@
           <label for="sector">Secteur d'activité *</label>
           <select id="sector" formControlName="sector" class="form-control" (change)="onSectorChange()">
             <option value="">Sélectionnez un secteur</option>
-            <option value="Informatique">Informatique</option>
+            <option value="Technologie">Technologie</option>
             <option value="Marketing">Marketing</option>
             <option value="Finance">Finance</option>
             <option value="Santé">Santé</option>
@@ -218,8 +218,8 @@
         <h2>Informations spécifiques - {{ selectedSector }}</h2>
       </div>
 
-      <!-- Informatique -->
-      <div class="form-grid" *ngIf="selectedSector === 'Informatique'">
+      <!-- Technologie -->
+      <div class="form-grid" *ngIf="selectedSector === 'Technologie'">
         <div class="form-group full-width">
           <label>Langages de programmation</label>
           <div class="tags-input">

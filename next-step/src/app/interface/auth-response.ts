@@ -5,5 +5,6 @@ export interface AuthResponse {
         role: string;
         email: string;
         username: string;
+        sector:string;
         _id : string;      
 }

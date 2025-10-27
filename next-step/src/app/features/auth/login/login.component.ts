@@ -33,7 +33,6 @@ export class LoginComponent {
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
-
 onSubmit(form: NgForm, event: Event) {
   event.preventDefault(); // Empêche le reload
 
@@ -45,11 +44,12 @@ onSubmit(form: NgForm, event: Event) {
       next: (res) => {
         console.log('Connexion réussie ✅', res);
 
-        // ✅ Enregistre le token et le rôle dans le localStorage
+        // ✅ Enregistre les informations dans le localStorage
         localStorage.setItem('token', res.token);
         localStorage.setItem('role', res.role);
+        localStorage.setItem('sector', res.sector); // 👈 ajoute le sector ici
 
-        // ✅ Redirige vers le bon dashboard selon le rôle
+        // ✅ Redirige selon le rôle
         if (res.role === 'admin') {
           this.router.navigate(['/adminDashboard']);
         } else if (res.role === 'company') {
@@ -57,7 +57,7 @@ onSubmit(form: NgForm, event: Event) {
         } else if (res.role === 'user') {
           this.router.navigate(['/userDashboard']);
         } else {
-          this.router.navigate(['/login']); // par sécurité
+          this.router.navigate(['/login']); // sécurité
         }
       },
       error: (err) => {
@@ -70,6 +70,7 @@ onSubmit(form: NgForm, event: Event) {
     this.errorMessage = 'Veuillez remplir tous les champs correctement.';
   }
 }
+
 
 
 
