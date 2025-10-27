@@ -400,7 +400,7 @@ openCreateOfferPopup(): void {
   dialogRef.afterClosed().subscribe(result => {
     if (result) {
       console.log('Offre créée :', result);
-      // tu peux rafraîchir ta liste ici
+      // tu peux rafraîchir ta liste ici ici 
     }
   });
 }
