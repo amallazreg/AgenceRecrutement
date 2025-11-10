@@ -6,5 +6,6 @@ export interface AuthResponse {
         email: string;
         username: string;
         sector:string;
-        _id : string;      
+        _id : string; 
+        profileStatus : string;      
 }

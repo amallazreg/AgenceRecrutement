@@ -5,14 +5,10 @@ import { routes } from './app/app.routes';
 import { HttpClientModule } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 
-
-bootstrapApplication(AppComponent, {
-  providers: [provideRouter(routes)]
-}).catch(err => console.error(err));
-
+// ✅ Un seul appel à bootstrapApplication
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(HttpClientModule),
-    provideRouter(routes)
+    provideRouter(routes),
+    importProvidersFrom(HttpClientModule) // ✅ Ajout du HttpClientModule ici
   ]
-});
+}).catch(err => console.error(err));

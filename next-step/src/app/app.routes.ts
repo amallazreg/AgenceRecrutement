@@ -10,7 +10,7 @@ import { CondidateComponent } from './AdminInterfaces/condidate/condidate.compon
 
 import { AcceuilComponent } from './dashboards/acceuil/acceuil.component';
 import { CompanyOffersComponent } from './CompanyInterfaces/offers/company-offers/company-offers.component';
-
+import { ProfileCompletionComponent } from './userInterfaces/profile-completion/profile-completion.component';
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/signup', component: SignupComponent },
@@ -22,7 +22,13 @@ export const routes: Routes = [
   {path :'candidates',component : CondidateComponent},
   {path : 'acceuil', component : AcceuilComponent},
   {path:'offers', component: CompanyOffersComponent}, 
-  { path: '**', redirectTo: 'auth/login' }, 
+  {
+    path: 'profile-completion',
+    loadComponent: () =>
+      import('./userInterfaces/profile-completion/profile-completion.component')
+        .then(c => c.ProfileCompletionComponent)
+  },
+
 
 
 ]

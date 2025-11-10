@@ -25,6 +25,11 @@ export class AuthServiceService {
           localStorage.setItem('token', res.token);
           localStorage.setItem('role', res.role);
           localStorage.setItem('userName', res.name);
+
+            // ✅ Sauvegarder le profileStatus
+          if (res.profileStatus) {
+            localStorage.setItem('profileStatus', res.profileStatus);
+          }
           console.log('Connexion user réussie ✅');
         }
       })
@@ -53,9 +58,36 @@ export class AuthServiceService {
     return JSON.parse(decodedPayload); // Retourner l'objet JSON
   }
 
-  logout() {
+
+isAuthenticated(): boolean {
+  return !!localStorage.getItem('token');
+}
+  // ✅ Récupérer le profileStatus
+  getProfileStatus(): string | null {
+    return localStorage.getItem('profileStatus');
+  }
+getUserName(): string {
+  // user
+  if (localStorage.getItem('userName')) {
+    return localStorage.getItem('userName')!;
+  }
+
+  // company
+  if (localStorage.getItem('companyName')) {
+    return localStorage.getItem('companyName')!;
+  }
+
+  return '';
+}
+
+logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('role');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('companyName');
+  localStorage.removeItem('sector');
+  localStorage.removeItem('profileStatus');
+
 }
 
 }

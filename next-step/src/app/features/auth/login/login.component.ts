@@ -38,43 +38,63 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  onSubmit(form: NgForm, event: Event) {
-    event.preventDefault();
+onSubmit(form: NgForm, event: Event) {
+  event.preventDefault();
 
-    if (form.valid) {
-      const credentials = {
-        name: this.formData.name,
-        password: this.formData.password
-      };
+  if (form.valid) {
+    const credentials = {
+      name: this.formData.name,
+      password: this.formData.password
+    };
 
-      // Choisir la bonne méthode selon le mode
-      const authObservable = this.loginMode === 'company' 
-        ? this.authService.signinCompany(credentials)
-        : this.authService.signinUser(credentials);
+    // Choisir la bonne méthode selon le mode
+    const authObservable = this.loginMode === 'company' 
+      ? this.authService.signinCompany(credentials)
+      : this.authService.signinUser(credentials);
 
-      authObservable.subscribe({
-        next: (res) => {
-          console.log(`Connexion ${this.loginMode} réussie ✅`, res);
+    authObservable.subscribe({
+      next: (res) => {
+        console.log(`Connexion ${this.loginMode} réussie ✅`, res);
 
-          // Redirection selon le rôle
-          if (res.role === 'admin') {
-            this.router.navigate(['/adminDashboard']);
-          } else if (res.role === 'company') {
-            this.router.navigate(['/companyDashboard']);
-          } else if (res.role === 'user') {
-            this.router.navigate(['/userDashboard']);
-          } else {
-            this.router.navigate(['/login']);
-          }
-        },
-        error: (err) => {
-          console.error('Erreur connexion ❌', err);
-          this.errorMessage = err.error?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
+        // Sauvegarder le token et les infos utilisateur
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.username || res));
+        localStorage.setItem('userRole', res.role);
+
+        // ✅ VÉRIFIER SI LE PROFIL EST COMPLET (UNIQUEMENT POUR LES USERS)
+
+          // ✅ VÉRIFIER LE PROFIL UNIQUEMENT POUR LES USERS
+          if (res.role === 'user') {
+            // ✅ Accéder directement à res.profileStatus (pas res.username.profileStatus)
+            const profileStatus = res.profileStatus || 'Incomplet';
+            
+            console.log('Profile Status:', profileStatus);
+
+            if (profileStatus === 'Incomplet') {
+              console.log('🔄 Redirection vers profile-completion');
+              this.router.navigate(['/profile-completion']);
+            } else {
+              console.log('✅ Profil complet, redirection vers accueil');
+              this.router.navigate(['/acceuil']);
+            }
+          } 
+        // Redirection normale pour admin et company
+        else if (res.role === 'admin') {
+          this.router.navigate(['/adminDashboard']);
+        } else if (res.role === 'company') {
+          this.router.navigate(['/companyDashboard']);
+        } else {
+          this.router.navigate(['/login']);
         }
-      });
-    } else {
-      console.log('Formulaire invalide ❌');
-      this.errorMessage = 'Veuillez remplir tous les champs correctement.';
-    }
+      },
+      error: (err) => {
+        console.error('Erreur connexion ❌', err);
+        this.errorMessage = err.error?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
+      }
+    });
+  } else {
+    console.log('Formulaire invalide ❌');
+    this.errorMessage = 'Veuillez remplir tous les champs correctement.';
   }
+}
 }
