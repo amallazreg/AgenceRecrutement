@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+
 
 interface Education {
   degree: string;
@@ -36,6 +37,13 @@ interface Step {
   styleUrl: './profile-completion.component.css'
 })
 export class ProfileCompletionComponent implements OnInit {
+   // ⚠️ IMPORTANT: Ces propriétés DOIVENT être présentes
+  @Output() profileCompleted = new EventEmitter<any>();
+  @Output() modalClosed = new EventEmitter<void>();
+  
+  // ⚠️ CETTE PROPRIÉTÉ EST ESSENTIELLE
+  isModalVisible: boolean = false;
+  
   currentStep: number = 1;
   totalSteps: number = 5;
   
@@ -70,68 +78,39 @@ export class ProfileCompletionComponent implements OnInit {
   };
 
   subSpecialtiesMap: { [key: string]: string[] } = {
-    'Informatique': [
-      'Web Development', 
-      'Mobile Development', 
-      'Data Science', 
-      'Cybersecurity', 
-      'Networks', 
-      'DevOps', 
-      'AI & Machine Learning'
-    ],
-    'Marketing': [
-      'Digital Marketing', 
-      'SEO / SEA', 
-      'Communication', 
-      'Branding', 
-      'Market Research'
-    ],
-    'Finance': [
-      'Accounting', 
-      'Audit', 
-      'Banking', 
-      'Management Control', 
-      'Financial Analysis'
-    ],
-    'Santé': [
-      'Medicine', 
-      'Pharmacy', 
-      'Nursing', 
-      'Biotechnology', 
-      'Medical Research'
-    ],
-    'Éducation': [
-      'Primary Education', 
-      'Secondary Education', 
-      'Professional Training', 
-      'Digital Pedagogy'
-    ],
-    'Commerce': [
-      'Sales', 
-      'Business Management', 
-      'E-commerce', 
-      'Logistics', 
-      'Import/Export'
-    ],
-    'Industrie': [
-      'Production', 
-      'Maintenance', 
-      'Quality', 
-      'Energy', 
-      'Mechanics'
-    ]
+    'Informatique': ['Web Development', 'Mobile Development', 'Data Science', 'Cybersecurity', 'Networks', 'DevOps', 'AI & Machine Learning'],
+    'Marketing': ['Digital Marketing', 'SEO / SEA', 'Communication', 'Branding', 'Market Research'],
+    'Finance': ['Accounting', 'Audit', 'Banking', 'Management Control', 'Financial Analysis'],
+    'Santé': ['Medicine', 'Pharmacy', 'Nursing', 'Biotechnology', 'Medical Research'],
+    'Éducation': ['Primary Education', 'Secondary Education', 'Professional Training', 'Digital Pedagogy'],
+    'Commerce': ['Sales', 'Business Management', 'E-commerce', 'Logistics', 'Import/Export'],
+    'Industrie': ['Production', 'Maintenance', 'Quality', 'Energy', 'Mechanics']
   };
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Récupérer les informations de base de l'utilisateur depuis le localStorage ou un service
     const userData = localStorage.getItem('user');
     if (userData) {
       const user = JSON.parse(userData);
-      // Pré-remplir les champs si disponibles
-      // this.profileData.name = user.name;
-      // etc...
+    }
+  }
+
+  // ⚠️ MÉTHODES ESSENTIELLES - DOIVENT ÊTRE PRÉSENTES
+  showModal(): void {
+    this.isModalVisible = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    document.body.style.overflow = 'auto';
+    this.modalClosed.emit();
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
+      this.closeModal();
     }
   }
 
@@ -148,7 +127,6 @@ export class ProfileCompletionComponent implements OnInit {
   }
 
   onSpecialtyChange(): void {
-    // Reset sub-specialties when main specialty changes
     this.profileData.subSpecialties = [];
   }
 
@@ -227,14 +205,14 @@ export class ProfileCompletionComponent implements OnInit {
   nextStep(): void {
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
-      this.scrollToTop();
+      this.scrollModalToTop();
     }
   }
 
   previousStep(): void {
     if (this.currentStep > 1) {
       this.currentStep--;
-      this.scrollToTop();
+      this.scrollModalToTop();
     }
   }
 
@@ -243,64 +221,26 @@ export class ProfileCompletionComponent implements OnInit {
     this.nextStep();
   }
 
-  scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  validateCurrentStep(): boolean {
-    // Validation basique selon l'étape
-    switch (this.currentStep) {
-      case 1:
-        return !!(this.profileData.dateOfBirth && 
-                  this.profileData.gender && 
-                  this.profileData.address && 
-                  this.profileData.nationality);
-      case 2:
-        return !!(this.profileData.specialty && 
-                  this.profileData.subSpecialties.length > 0);
-      case 3:
-        return this.profileData.education.some(edu => 
-          edu.degree && edu.institution && edu.startYear && edu.endYear
-        );
-      default:
-        return true;
+  scrollModalToTop(): void {
+    const formContainer = document.querySelector('.modal-form-container');
+    if (formContainer) {
+      formContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   onSubmit(): void {
     console.log('Profile Data to submit:', this.profileData);
     
-    // Préparer les données pour l'API
     const payload = {
       ...this.profileData,
-      profileStatus: 'Complet'
+      profileStatus: 'complete'
     };
 
-    // TODO: Appeler votre service API
-    // this.profileService.completeProfile(payload).subscribe({
-    //   next: (response) => {
-    //     console.log('Profile completed successfully', response);
-    //     localStorage.setItem('profileStatus', 'Complet');
-    //     this.router.navigate(['/dashboard']);
-    //   },
-    //   error: (error) => {
-    //     console.error('Error completing profile', error);
-    //     alert('An error occurred while saving your profile. Please try again.');
-    //   }
-    // });
-
-    // Pour l'instant, simulation
-    alert('Profile completed successfully! Redirecting to dashboard...');
-    localStorage.setItem('profileStatus', 'Complet');
+    localStorage.setItem('profileStatus', 'complete');
+    this.profileCompleted.emit(payload);
+    this.closeModal();
     
-    // Redirection vers le dashboard
-    setTimeout(() => {
-      this.router.navigate(['/dashboard']);
-    }, 1500);
-  }
-
-  // Méthode helper pour debug
-  logProfileData(): void {
-    console.log('Current Profile Data:', this.profileData);
+    alert('Profil complété avec succès!');
   }
 }
+

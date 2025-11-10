@@ -72,7 +72,7 @@ onSubmit(form: NgForm, event: Event) {
 
             if (profileStatus === 'Incomplet') {
               console.log('🔄 Redirection vers profile-completion');
-              this.router.navigate(['/profile-completion']);
+              this.router.navigate(['/acceuil']);
             } else {
               console.log('✅ Profil complet, redirection vers accueil');
               this.router.navigate(['/acceuil']);

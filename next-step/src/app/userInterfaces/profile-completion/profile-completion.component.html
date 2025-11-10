@@ -1,290 +1,302 @@
-<div class="profile-completion-container">
-  <div class="completion-wrapper">
-    <!-- Progress Bar -->
-    <div class="progress-section">
-      <h2>Complete Your Profile</h2>
-      <p class="progress-subtitle">{{ currentStep }}/{{ totalSteps }} - {{ getStepTitle() }}</p>
+<!-- Modal Backdrop -->
+<div class="modal-backdrop" *ngIf="isModalVisible" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="completion-wrapper">
       
-      <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="progressPercentage"></div>
-      </div>
-      
-      <div class="steps-indicator">
-        <div class="step" *ngFor="let step of steps; let i = index" 
-             [class.active]="i + 1 === currentStep"
-             [class.completed]="i + 1 < currentStep">
-          <div class="step-circle">
-            <span *ngIf="i + 1 < currentStep">✓</span>
-            <span *ngIf="i + 1 >= currentStep">{{ i + 1 }}</span>
+      <!-- Close Button -->
+      <button class="modal-close-btn" (click)="closeModal()" type="button" title="Close">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Progress Section -->
+      <div class="progress-section">
+        <h2>Complete Your Profile</h2>
+        <p class="progress-subtitle">{{ currentStep }}/{{ totalSteps }} - {{ getStepTitle() }}</p>
+        
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+        </div>
+        
+        <div class="steps-indicator">
+          <div class="step" *ngFor="let step of steps; let i = index" 
+               [class.active]="i + 1 === currentStep"
+               [class.completed]="i + 1 < currentStep">
+            <div class="step-circle">
+              <span *ngIf="i + 1 < currentStep">✓</span>
+              <span *ngIf="i + 1 >= currentStep">{{ i + 1 }}</span>
+            </div>
+            <span class="step-label">{{ step.title }}</span>
           </div>
-          <span class="step-label">{{ step.title }}</span>
         </div>
       </div>
-    </div>
 
-    <!-- Form Container -->
-    <div class="form-container">
-      <form #profileForm="ngForm" (ngSubmit)="onSubmit()">
-        
-        <!-- Step 1: Personal Information -->
-        <div class="form-step" *ngIf="currentStep === 1">
-          <h3>Personal Information</h3>
-          <p class="step-description">Tell us more about yourself</p>
+      <!-- Form Container -->
+      <div class="modal-form-container">
+        <form #profileForm="ngForm" (ngSubmit)="onSubmit()">
+          
+          <!-- Step 1: Personal Information -->
+          <div class="form-step" *ngIf="currentStep === 1">
+            <h3>Personal Information</h3>
+            <p class="step-description">Tell us more about yourself</p>
 
-          <div class="form-row">
-            <div class="input-group">
-              <label for="dateOfBirth">Date of Birth</label>
-              <input type="date" id="dateOfBirth" name="dateOfBirth" 
-                     [(ngModel)]="profileData.dateOfBirth" required>
+            <div class="form-row">
+              <div class="input-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input type="date" id="dateOfBirth" name="dateOfBirth" 
+                       [(ngModel)]="profileData.dateOfBirth" required>
+              </div>
+
+              <div class="input-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" [(ngModel)]="profileData.gender" required>
+                  <option value="">Select gender</option>
+                  <option value="Homme">Male</option>
+                  <option value="Femme">Female</option>
+                </select>
+              </div>
             </div>
 
             <div class="input-group">
-              <label for="gender">Gender</label>
-              <select id="gender" name="gender" [(ngModel)]="profileData.gender" required>
-                <option value="">Select gender</option>
-                <option value="Homme">Male</option>
-                <option value="Femme">Female</option>
+              <label for="address">Address</label>
+              <input type="text" id="address" name="address" 
+                     placeholder="Your full address"
+                     [(ngModel)]="profileData.address" required>
+            </div>
+
+            <div class="input-group">
+              <label for="nationality">Nationality</label>
+              <input type="text" id="nationality" name="nationality" 
+                     placeholder="Your nationality"
+                     [(ngModel)]="profileData.nationality" required>
+            </div>
+          </div>
+
+          <!-- Step 2: Specialty & Skills -->
+          <div class="form-step" *ngIf="currentStep === 2">
+            <h3>Specialty & Expertise</h3>
+            <p class="step-description">Define your professional domain</p>
+
+            <div class="input-group">
+              <label for="specialty">Main Specialty</label>
+              <select id="specialty" name="specialty" 
+                      [(ngModel)]="profileData.specialty" 
+                      (change)="onSpecialtyChange()" required>
+                <option value="">Select your specialty</option>
+                <option value="Informatique">Computer Science</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Finance">Finance</option>
+                <option value="Santé">Healthcare</option>
+                <option value="Éducation">Education</option>
+                <option value="Commerce">Business</option>
+                <option value="Industrie">Industry</option>
               </select>
             </div>
-          </div>
 
-          <div class="input-group">
-            <label for="address">Address</label>
-            <input type="text" id="address" name="address" 
-                   placeholder="Your full address"
-                   [(ngModel)]="profileData.address" required>
-          </div>
-
-          <div class="input-group">
-            <label for="nationality">Nationality</label>
-            <input type="text" id="nationality" name="nationality" 
-                   placeholder="Your nationality"
-                   [(ngModel)]="profileData.nationality" required>
-          </div>
-        </div>
-
-        <!-- Step 2: Specialty & Skills -->
-        <div class="form-step" *ngIf="currentStep === 2">
-          <h3>Specialty & Expertise</h3>
-          <p class="step-description">Define your professional domain</p>
-
-          <div class="input-group">
-            <label for="specialty">Main Specialty</label>
-            <select id="specialty" name="specialty" 
-                    [(ngModel)]="profileData.specialty" 
-                    (change)="onSpecialtyChange()" required>
-              <option value="">Select your specialty</option>
-              <option value="Informatique">Computer Science</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Finance">Finance</option>
-              <option value="Santé">Healthcare</option>
-              <option value="Éducation">Education</option>
-              <option value="Commerce">Business</option>
-              <option value="Industrie">Industry</option>
-            </select>
-          </div>
-
-          <div class="input-group" *ngIf="profileData.specialty">
-            <label>Sub-Specialties (Select multiple)</label>
-            <div class="checkbox-group">
-              <label *ngFor="let subSpec of getSubSpecialties()" class="checkbox-label">
-                <input type="checkbox" 
-                       [value]="subSpec"
-                       (change)="onSubSpecialtyChange($event, subSpec)">
-                <span>{{ subSpec }}</span>
-              </label>
+            <div class="input-group" *ngIf="profileData.specialty">
+              <label>Sub-Specialties (Select multiple)</label>
+              <div class="checkbox-group">
+                <label *ngFor="let subSpec of getSubSpecialties()" class="checkbox-label">
+                  <input type="checkbox" 
+                         [value]="subSpec"
+                         (change)="onSubSpecialtyChange($event, subSpec)">
+                  <span>{{ subSpec }}</span>
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div class="input-group">
-            <label for="skills">Skills (Press Enter to add)</label>
-            <div class="skills-input">
-              <input type="text" id="skills" placeholder="e.g., JavaScript, React, Node.js"
-                     (keydown.enter)="addSkill($event)">
-              <div class="skills-tags">
-                <span class="skill-tag" *ngFor="let skill of profileData.skills; let i = index">
-                  {{ skill }}
-                  <button type="button" (click)="removeSkill(i)">×</button>
-                </span>
+            <div class="input-group">
+              <label for="skills">Skills (Press Enter to add)</label>
+              <div class="skills-input">
+                <input type="text" id="skills" placeholder="e.g., JavaScript, React, Node.js"
+                       (keydown.enter)="addSkill($event)">
+                <div class="skills-tags">
+                  <span class="skill-tag" *ngFor="let skill of profileData.skills; let i = index">
+                    {{ skill }}
+                    <button type="button" (click)="removeSkill(i)">×</button>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Step 3: Education -->
-        <div class="form-step" *ngIf="currentStep === 3">
-          <h3>Education Background</h3>
-          <p class="step-description">Add your academic achievements</p>
+          <!-- Step 3: Education -->
+          <div class="form-step" *ngIf="currentStep === 3">
+            <h3>Education Background</h3>
+            <p class="step-description">Add your academic achievements</p>
 
-          <div class="dynamic-section" *ngFor="let edu of profileData.education; let i = index">
-            <div class="section-header">
-              <h4>Education {{ i + 1 }}</h4>
-              <button type="button" class="btn-remove" *ngIf="profileData.education.length > 1"
-                      (click)="removeEducation(i)">Remove</button>
-            </div>
-
-            <div class="input-group">
-              <label>Degree</label>
-              <input type="text" placeholder="e.g., Bachelor in Computer Science"
-                     [(ngModel)]="edu.degree" [name]="'degree_' + i" required>
-            </div>
-
-            <div class="input-group">
-              <label>Institution</label>
-              <input type="text" placeholder="University name"
-                     [(ngModel)]="edu.institution" [name]="'institution_' + i" required>
-            </div>
-
-            <div class="form-row">
-              <div class="input-group">
-                <label>Start Year</label>
-                <input type="number" placeholder="2020"
-                       [(ngModel)]="edu.startYear" [name]="'startYear_' + i" required>
+            <div class="dynamic-section" *ngFor="let edu of profileData.education; let i = index">
+              <div class="section-header">
+                <h4>Education {{ i + 1 }}</h4>
+                <button type="button" class="btn-remove" *ngIf="profileData.education.length > 1"
+                        (click)="removeEducation(i)">Remove</button>
               </div>
 
               <div class="input-group">
-                <label>End Year</label>
-                <input type="number" placeholder="2024"
-                       [(ngModel)]="edu.endYear" [name]="'endYear_' + i" required>
-              </div>
-            </div>
-          </div>
-
-          <button type="button" class="btn-add" (click)="addEducation()">
-            + Add Another Education
-          </button>
-        </div>
-
-        <!-- Step 4: Experience -->
-        <div class="form-step" *ngIf="currentStep === 4">
-          <h3>Professional Experience</h3>
-          <p class="step-description">Share your work history</p>
-
-          <div class="dynamic-section" *ngFor="let exp of profileData.experiences; let i = index">
-            <div class="section-header">
-              <h4>Experience {{ i + 1 }}</h4>
-              <button type="button" class="btn-remove" *ngIf="profileData.experiences.length > 1"
-                      (click)="removeExperience(i)">Remove</button>
-            </div>
-
-            <div class="input-group">
-              <label>Company</label>
-              <input type="text" placeholder="Company name"
-                     [(ngModel)]="exp.company" [name]="'company_' + i">
-            </div>
-
-            <div class="input-group">
-              <label>Position</label>
-              <input type="text" placeholder="Job title"
-                     [(ngModel)]="exp.position" [name]="'position_' + i">
-            </div>
-
-            <div class="form-row">
-              <div class="input-group">
-                <label>Start Date</label>
-                <input type="date" [(ngModel)]="exp.startDate" [name]="'expStart_' + i">
+                <label>Degree</label>
+                <input type="text" placeholder="e.g., Bachelor in Computer Science"
+                       [(ngModel)]="edu.degree" [name]="'degree_' + i" required>
               </div>
 
               <div class="input-group">
-                <label>End Date</label>
-                <input type="date" [(ngModel)]="exp.endDate" [name]="'expEnd_' + i">
+                <label>Institution</label>
+                <input type="text" placeholder="University name"
+                       [(ngModel)]="edu.institution" [name]="'institution_' + i" required>
               </div>
-            </div>
 
-            <div class="input-group">
-              <label>Description</label>
-              <textarea rows="3" placeholder="Describe your responsibilities..."
-                        [(ngModel)]="exp.description" [name]="'expDesc_' + i"></textarea>
-            </div>
-          </div>
-
-          <button type="button" class="btn-add" (click)="addExperience()">
-            + Add Another Experience
-          </button>
-        </div>
-
-        <!-- Step 5: Languages & Links -->
-        <div class="form-step" *ngIf="currentStep === 5">
-          <h3>Languages & Social Links</h3>
-          <p class="step-description">Almost done! Just a few more details</p>
-
-          <div class="languages-section">
-            <h4>Languages</h4>
-            <div class="dynamic-section" *ngFor="let lang of profileData.languages; let i = index">
               <div class="form-row">
                 <div class="input-group">
-                  <label>Language</label>
-                  <input type="text" placeholder="e.g., English"
-                         [(ngModel)]="lang.name" [name]="'lang_' + i">
+                  <label>Start Year</label>
+                  <input type="number" placeholder="2020"
+                         [(ngModel)]="edu.startYear" [name]="'startYear_' + i" required>
                 </div>
 
                 <div class="input-group">
-                  <label>Level</label>
-                  <select [(ngModel)]="lang.level" [name]="'level_' + i">
-                    <option value="Débutant">Beginner</option>
-                    <option value="Intermédiaire">Intermediate</option>
-                    <option value="Avancé">Advanced</option>
-                    <option value="Courant">Fluent</option>
-                    <option value="Natif">Native</option>
-                  </select>
+                  <label>End Year</label>
+                  <input type="number" placeholder="2024"
+                         [(ngModel)]="edu.endYear" [name]="'endYear_' + i" required>
                 </div>
-
-                <button type="button" class="btn-remove-inline" 
-                        *ngIf="profileData.languages.length > 1"
-                        (click)="removeLanguage(i)">×</button>
               </div>
             </div>
-            <button type="button" class="btn-add" (click)="addLanguage()">
-              + Add Language
+
+            <button type="button" class="btn-add" (click)="addEducation()">
+              + Add Another Education
             </button>
           </div>
 
-          <div class="links-section">
-            <h4>Professional Links</h4>
-            <div class="input-group">
-              <label for="linkedin">LinkedIn</label>
-              <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourprofile"
-                     [(ngModel)]="profileData.linkedin" name="linkedin">
+          <!-- Step 4: Experience -->
+          <div class="form-step" *ngIf="currentStep === 4">
+            <h3>Professional Experience</h3>
+            <p class="step-description">Share your work history</p>
+
+            <div class="dynamic-section" *ngFor="let exp of profileData.experiences; let i = index">
+              <div class="section-header">
+                <h4>Experience {{ i + 1 }}</h4>
+                <button type="button" class="btn-remove" *ngIf="profileData.experiences.length > 1"
+                        (click)="removeExperience(i)">Remove</button>
+              </div>
+
+              <div class="input-group">
+                <label>Company</label>
+                <input type="text" placeholder="Company name"
+                       [(ngModel)]="exp.company" [name]="'company_' + i">
+              </div>
+
+              <div class="input-group">
+                <label>Position</label>
+                <input type="text" placeholder="Job title"
+                       [(ngModel)]="exp.position" [name]="'position_' + i">
+              </div>
+
+              <div class="form-row">
+                <div class="input-group">
+                  <label>Start Date</label>
+                  <input type="date" [(ngModel)]="exp.startDate" [name]="'expStart_' + i">
+                </div>
+
+                <div class="input-group">
+                  <label>End Date</label>
+                  <input type="date" [(ngModel)]="exp.endDate" [name]="'expEnd_' + i">
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label>Description</label>
+                <textarea rows="3" placeholder="Describe your responsibilities..."
+                          [(ngModel)]="exp.description" [name]="'expDesc_' + i"></textarea>
+              </div>
             </div>
 
-            <div class="input-group">
-              <label for="github">GitHub</label>
-              <input type="url" id="github" placeholder="https://github.com/yourusername"
-                     [(ngModel)]="profileData.github" name="github">
+            <button type="button" class="btn-add" (click)="addExperience()">
+              + Add Another Experience
+            </button>
+          </div>
+
+          <!-- Step 5: Languages & Links -->
+          <div class="form-step" *ngIf="currentStep === 5">
+            <h3>Languages & Social Links</h3>
+            <p class="step-description">Almost done! Just a few more details</p>
+
+            <div class="languages-section">
+              <h4>Languages</h4>
+              <div class="dynamic-section" *ngFor="let lang of profileData.languages; let i = index">
+                <div class="form-row">
+                  <div class="input-group">
+                    <label>Language</label>
+                    <input type="text" placeholder="e.g., English"
+                           [(ngModel)]="lang.name" [name]="'lang_' + i">
+                  </div>
+
+                  <div class="input-group">
+                    <label>Level</label>
+                    <select [(ngModel)]="lang.level" [name]="'level_' + i">
+                      <option value="Débutant">Beginner</option>
+                      <option value="Intermédiaire">Intermediate</option>
+                      <option value="Avancé">Advanced</option>
+                      <option value="Courant">Fluent</option>
+                      <option value="Natif">Native</option>
+                    </select>
+                  </div>
+
+                  <button type="button" class="btn-remove-inline" 
+                          *ngIf="profileData.languages.length > 1"
+                          (click)="removeLanguage(i)">×</button>
+                </div>
+              </div>
+              <button type="button" class="btn-add" (click)="addLanguage()">
+                + Add Language
+              </button>
             </div>
 
-            <div class="input-group">
-              <label for="portfolio">Portfolio</label>
-              <input type="url" id="portfolio" placeholder="https://yourportfolio.com"
-                     [(ngModel)]="profileData.portfolio" name="portfolio">
+            <div class="links-section">
+              <h4>Professional Links</h4>
+              <div class="input-group">
+                <label for="linkedin">LinkedIn</label>
+                <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourprofile"
+                       [(ngModel)]="profileData.linkedin" name="linkedin">
+              </div>
+
+              <div class="input-group">
+                <label for="github">GitHub</label>
+                <input type="url" id="github" placeholder="https://github.com/yourusername"
+                       [(ngModel)]="profileData.github" name="github">
+              </div>
+
+              <div class="input-group">
+                <label for="portfolio">Portfolio</label>
+                <input type="url" id="portfolio" placeholder="https://yourportfolio.com"
+                       [(ngModel)]="profileData.portfolio" name="portfolio">
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Navigation Buttons -->
-        <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" 
-                  *ngIf="currentStep > 1" 
-                  (click)="previousStep()">
-            ← Previous
-          </button>
-          
-          <button type="button" class="btn btn-primary" 
-                  *ngIf="currentStep < totalSteps" 
-                  (click)="nextStep()">
-            Next →
-          </button>
-          
-          <button type="submit" class="btn btn-success" 
-                  *ngIf="currentStep === totalSteps">
-            Complete Profile ✓
-          </button>
-        </div>
+          <!-- Navigation Buttons -->
+          <div class="form-navigation">
+            <button type="button" class="btn btn-secondary" 
+                    *ngIf="currentStep > 1" 
+                    (click)="previousStep()">
+              ← Previous
+            </button>
+            
+            <button type="button" class="btn btn-primary" 
+                    *ngIf="currentStep < totalSteps" 
+                    (click)="nextStep()">
+              Next →
+            </button>
+            
+            <button type="submit" class="btn btn-success" 
+                    *ngIf="currentStep === totalSteps">
+              Complete Profile ✓
+            </button>
+          </div>
 
-        <div class="skip-section" *ngIf="currentStep < totalSteps">
-          <a href="#" (click)="skipStep($event)">Skip this step</a>
-        </div>
-      </form>
+          <div class="skip-section" *ngIf="currentStep < totalSteps">
+            <a href="#" (click)="skipStep($event)">Skip this step</a>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
