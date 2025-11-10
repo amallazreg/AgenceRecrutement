@@ -140,8 +140,98 @@ const signinController = async (req, res) => {
 };
 
 
+
+// 🔹 Mise à jour du profil candidat
+const updateProfile = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const {
+      name,
+      phone,
+      dateOfBirth,
+      address,
+      nationality,
+      gender,
+      specialty,
+      subSpecialties,
+      education,
+      experiences,
+      projects,
+      skills,
+      languages,
+      certifications,
+      linkedin,
+      github,
+      portfolio,
+    } = req.body;
+
+    // 🔹 Si l'utilisateur a uploadé des fichiers (CV, lettre de motivation)
+    const cv = req.files?.cv ? req.files.cv[0].filename : undefined;
+    const motivationLetter = req.files?.motivationLetter ? req.files.motivationLetter[0].filename : undefined;
+
+    // 🔹 Construire un objet de mise à jour dynamique
+    const updateData = {
+      name,
+      phone,
+      dateOfBirth,
+      address,
+      nationality,
+      gender,
+      specialty,
+      subSpecialties: Array.isArray(subSpecialties) ? subSpecialties : subSpecialties?.split(','),
+      linkedin,
+      github,
+      portfolio,
+      cv,
+      motivationLetter,
+    };
+
+    // Ajouter les tableaux si présents
+    if (education) updateData.education = JSON.parse(education);
+    if (experiences) updateData.experiences = JSON.parse(experiences);
+    if (projects) updateData.projects = JSON.parse(projects);
+    if (skills) updateData.skills = Array.isArray(skills) ? skills : skills?.split(',');
+    if (languages) updateData.languages = JSON.parse(languages);
+    if (certifications) updateData.certifications = JSON.parse(certifications);
+
+    // 🔹 Mettre à jour l'utilisateur
+    const updatedUser = await User.findByIdAndUpdate(_id, updateData, { new: true });
+
+    if (!updatedUser) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+
+    // 🔹 Vérifier si tous les champs importants sont remplis → profil complet
+    const requiredFields = [
+      updatedUser.name,
+      updatedUser.phone,
+      updatedUser.address,
+      updatedUser.specialty,
+      updatedUser.skills?.length,
+      updatedUser.education?.length,
+      updatedUser.experiences?.length,
+      updatedUser.cv,
+    ];
+
+    const isComplete = requiredFields.every(field => field && field !== '' && field !== null);
+
+    updatedUser.profileStatus = isComplete ? 'Complet' : 'Incomplet';
+    await updatedUser.save();
+
+    res.status(200).json({
+      message: 'Profil mis à jour avec succès',
+      profileStatus: updatedUser.profileStatus,
+      updatedUser,
+    });
+
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du profil :', error);
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
+
+
 module.exports = {
     signupController,
-    signinController
+    signinController,
+    updateProfile
    
 };

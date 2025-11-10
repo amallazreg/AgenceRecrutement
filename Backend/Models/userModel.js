@@ -2,40 +2,192 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 
-// Définition du schéma de l'utilisateur
+
+
+// Schéma principal du candidat
 const UserSchema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    phone:{ type: String},
-    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+  // Informations personnelles
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  phone: { type: String },
+  dateOfBirth: { type: Date },
+  address: { type: String },
+  nationality: { type: String },
+  gender: { type: String, enum: ['Homme', 'Femme'] },
+
+  // Spécialité principale
+  specialty: {
+    type: String,
+    enum: [
+      'Informatique',
+      'Marketing',
+      'Finance',
+      'Santé',
+      'Éducation',
+      'Commerce',
+      'Industrie',
+    ],
+  },
+
+  // Sous-spécialités selon le domaine
+  subSpecialties: [
+    {
+      type: String,
+      enum: [
+        // Informatique
+        'Développement Web',
+        'Développement Mobile',
+        'Data Science',
+        'Cybersécurité',
+        'Réseaux',
+        'DevOps',
+        'IA et Machine Learning',
+
+        // Marketing
+        'Marketing Digital',
+        'SEO / SEA',
+        'Communication',
+        'Branding',
+        'Études de Marché',
+
+        // Finance
+        'Comptabilité',
+        'Audit',
+        'Banque',
+        'Contrôle de gestion',
+        'Analyse financière',
+
+        // Santé
+        'Médecine',
+        'Pharmacie',
+        'Infirmier',
+        'Biotechnologie',
+        'Recherche médicale',
+
+        // Éducation
+        'Enseignement primaire',
+        'Enseignement secondaire',
+        'Formation professionnelle',
+        'Pédagogie numérique',
+
+        // Commerce
+        'Vente',
+        'Gestion commerciale',
+        'E-commerce',
+        'Logistique',
+        'Import/Export',
+
+        // Industrie
+        'Production',
+        'Maintenance',
+        'Qualité',
+        'Énergie',
+        'Mécanique',
+      ],
+    },
+  ],
+
+  // Informations académiques
+  education: [
+    {
+      degree: { type: String },
+      institution: { type: String },
+      startYear: { type: Number },
+      endYear: { type: Number },
+    },
+  ],
+
+  // Expériences professionnelles
+  experiences: [
+    {
+        company: { type: String },
+        position: { type: String },
+        startDate: { type: Date },
+        endDate: { type: Date },
+        description: { type: String },
+    }
+  ],
+
+  // Projets académiques ou personnels
+  projects: [
+    {
+        title: { type: String },
+        description: { type: String },
+        technologies: [String],
+        link: { type: String },
+    }
+  ],
+
+  // Compétences
+  skills: [String],
+
+  // Langues
+  languages: [
+    {
+        name: { type: String },
+        level: {
+            type: String,
+            enum: ['Débutant', 'Intermédiaire', 'Avancé', 'Courant', 'Natif'],
+        },
+    }      
+  ],
+
+  // Certifications
+  certifications: [
+    {
+        title: { type: String },
+        issuer: { type: String },
+        date: { type: Date },
+        certificateFile: { type: String },
+    }
+  ],
+
+  // Liens externes
+  linkedin: { type: String },
+  github: { type: String },
+  portfolio: { type: String },
+
+  // Documents
+  cv: { type: String },
+  motivationLetter: { type: String },
+
+  // Rôle utilisateur
+  role: { type: String, enum: ['admin', 'user'], default: 'usyer' },
+
+  // Statut du profil
+  profileStatus: {
+    type: String,
+    enum: ['En attente', 'Complet', 'Incomplet'],
+    default: 'Incomplet',
+  },
+
+  // Date d’inscription
+  createdAt: { type: Date, default: Date.now },
 });
 
-// Méthode pour comparer le mot de passe hashé
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-    try {
-        const isMatch = await bcrypt.compare(candidatePassword, this.password);
-        console.log('Comparing passwords:', { candidatePassword, hashedPassword: this.password, isMatch });
-        return isMatch;
-    } catch (error) {
-        console.error('Error comparing passwords:', error);
-        return false;
-    }
+// Méthode de comparaison de mot de passe
+UserSchema.methods.comparePassword = async function (userPassword) {
+  try {
+    const isMatch = await bcrypt.compare(userPassword, this.password);
+    return isMatch;
+  } catch (error) {
+    console.error('Erreur lors de la comparaison du mot de passe :', error);
+    return false;
+  }
 };
 
-// Middleware pour hasher le mot de passe avant de sauvegarder
-UserSchema.pre('save', function(next) {
-    var user = this;
+// Hashage du mot de passe avant sauvegarde
+UserSchema.pre('save', function (next) {
+  const user = this;
+  if (!user.isModified('password')) return next();
+  const saltRounds = 10;
 
-    if (!user.isModified('password')) return next();
-
-    const saltRounds = 10;
-
-    bcrypt.hash(user.password, saltRounds, function(err, hash) {
-        if (err) return next(err);
-        user.password = hash;
-        next();
-    });
+  bcrypt.hash(user.password, saltRounds, function (err, hash) {
+    if (err) return next(err);
+    user.password = hash;
+    next();
+  });
 });
 
 module.exports = mongoose.model('User', UserSchema);
