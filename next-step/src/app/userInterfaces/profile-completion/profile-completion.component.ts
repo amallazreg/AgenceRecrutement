@@ -43,15 +43,22 @@ export class ProfileCompletionComponent implements OnInit {
 
   isModalVisible = false;
   currentStep = 1;
-  totalSteps = 5;
+  totalSteps = 6; // Augmenté de 5 à 6
 
   steps: Step[] = [
     { title: 'Personal Info', icon: '👤' },
     { title: 'Specialty', icon: '💼' },
     { title: 'Education', icon: '🎓' },
     { title: 'Experience', icon: '💻' },
-    { title: 'Languages & Links', icon: '🌐' }
+    { title: 'Languages & Links', icon: '🌐' },
+    { title: 'Documents', icon: '📄' } // Nouvelle étape
   ];
+
+  // Fichiers uploadés
+  cvFile: File | null = null;
+  motivationLetterFile: File | null = null;
+  cvFileName: string = '';
+  motivationLetterFileName: string = '';
 
   profileData = {
     dateOfBirth: '',
@@ -75,6 +82,10 @@ export class ProfileCompletionComponent implements OnInit {
     portfolio: ''
   };
 
+  // Fichiers uploadés
+  cv: File | null = null;
+  motivationLetter: File | null = null;
+  
   isStepValid(step: number): boolean {
     switch (step) {
       case 1:
@@ -101,6 +112,10 @@ export class ProfileCompletionComponent implements OnInit {
         return this.profileData.languages.every(lang => 
           lang.name && lang.level
         );
+      
+      case 6:
+        // Documents - optionnels mais au moins un recommandé
+        return true; // Vous pouvez rendre obligatoire en changeant cette logique
       
       default:
         return false;
@@ -241,6 +256,59 @@ export class ProfileCompletionComponent implements OnInit {
     }
   }
 
+  // --- Gestion des fichiers ---
+// --- Gestion des fichiers ---
+onFileSelected(event: any, fileType: 'cv' | 'motivationLetter'): void {
+  const file = event.target.files[0];
+  
+  if (file) {
+    // Validation de la taille (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('Le fichier est trop volumineux. Taille maximale : 5MB');
+      event.target.value = '';
+      return;
+    }
+
+    // Validation du type de fichier
+    const allowedTypes = ['application/pdf', 'application/msword', 
+                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert('Format non supporté. Veuillez uploader un fichier PDF ou Word.');
+      event.target.value = '';
+      return;
+    }
+
+    // ✅ Stocker l'objet File directement
+    if (fileType === 'cv') {
+      this.cvFile = file;
+      this.cvFileName = file.name;
+      console.log('✅ CV sélectionné:', file.name);
+    } else {
+      this.motivationLetterFile = file;
+      this.motivationLetterFileName = file.name;
+      console.log('✅ Lettre de motivation sélectionnée:', file.name);
+    }
+  }
+}
+
+removeFile(fileType: 'cv' | 'motivationLetter'): void {
+  if (fileType === 'cv') {
+    this.cvFile = null;
+    this.cvFileName = '';
+    const input = document.getElementById('cvFile') as HTMLInputElement;
+    if (input) input.value = '';
+    console.log('❌ CV supprimé');
+  } else {
+    this.motivationLetterFile = null;
+    this.motivationLetterFileName = '';
+    const input = document.getElementById('motivationLetterFile') as HTMLInputElement;
+    if (input) input.value = '';
+    console.log('❌ Lettre de motivation supprimée');
+  }
+}
+
   // --- Sous-spécialités ---
   getSubSpecialties(): string[] {
     return this.subSpecialtiesMap[this.profileData.specialty] || [];
@@ -306,90 +374,82 @@ export class ProfileCompletionComponent implements OnInit {
     }
   }
 
-  // --- Soumission du profil (CORRIGÉ POUR FORMDATA) ---
-  onSubmit(): void {
-    if (!this.isFormValid()) {
-      alert('Please fill all required fields correctly.');
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const userId = user._id || user.userId;
-
-    if (!userId) {
-      console.error('❌ Aucun ID utilisateur trouvé dans localStorage');
-      alert('Erreur : utilisateur introuvable.');
-      this.isSubmitting = false;
-      return;
-    }
-
-    // 🔥 Préparation des données pour FormData (compatible avec Multer)
-    const formattedEducation = this.profileData.education.map(edu => ({
-      degree: edu.degree,
-      institution: edu.institution,
-      startYear: edu.startYear ? Number(edu.startYear) : null,
-      endYear: edu.endYear ? Number(edu.endYear) : null
-    }));
-
-    const formattedExperiences = this.profileData.experiences.map(exp => ({
-      company: exp.company,
-      position: exp.position,
-      startDate: exp.startDate || null,
-      endDate: exp.endDate || null,
-      description: exp.description
-    }));
-
-    const profilePayload = {
-      dateOfBirth: this.profileData.dateOfBirth || '',
-      gender: this.profileData.gender,
-      address: this.profileData.address,
-      nationality: this.profileData.nationality,
-      specialty: this.profileData.specialty,
-      subSpecialties: this.profileData.subSpecialties,
-      skills: this.profileData.skills,
-      education: formattedEducation,
-      experiences: formattedExperiences,
-      languages: this.profileData.languages,
-      linkedin: this.profileData.linkedin || '',
-      github: this.profileData.github || '',
-      portfolio: this.profileData.portfolio || ''
-    };
-
-    console.log('📤 Données envoyées:', profilePayload);
-
-    this.profileService.updateProfile(userId, profilePayload).subscribe({
-      next: (res) => {
-        console.log('✅ Profil mis à jour avec succès', res);
-        
-        // Mise à jour du localStorage
-        const updatedUser = { 
-          ...user, 
-          ...res.updatedUser, 
-          profileStatus: res.profileStatus || 'Complet' 
-        };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        localStorage.setItem('profileStatus', res.profileStatus || 'Complet');
-        
-        this.profileCompleted.emit(res);
-        this.isSubmitting = false;
-        this.closeModal();
-        alert('✅ Profil complété avec succès !');
-      },
-      error: (err) => {
-        console.error('❌ Erreur backend :', err);
-        
-        let errorMessage = 'Erreur lors de la mise à jour du profil';
-        if (err.error?.message) {
-          errorMessage += ': ' + err.error.message;
-        } else if (err.message) {
-          errorMessage += ': ' + err.message;
-        }
-        
-        alert(errorMessage);
-        this.isSubmitting = false;
-      }
-    });
+ 
+// --- Soumission du profil avec FormData ---
+onSubmit(): void {
+  if (!this.isFormValid()) {
+    alert('Veuillez remplir tous les champs obligatoires.');
+    return;
   }
+
+  this.isSubmitting = true;
+
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user._id || user.userId;
+
+  if (!userId) {
+    console.error('❌ Aucun ID utilisateur trouvé dans localStorage');
+    alert('Erreur : utilisateur introuvable.');
+    this.isSubmitting = false;
+    return;
+  }
+
+  // ✅ Préparer le payload avec les fichiers File
+  const profilePayload = {
+    dateOfBirth: this.profileData.dateOfBirth || '',
+    gender: this.profileData.gender,
+    address: this.profileData.address,
+    nationality: this.profileData.nationality,
+    specialty: this.profileData.specialty,
+    subSpecialties: this.profileData.subSpecialties,
+    skills: this.profileData.skills,
+    education: this.profileData.education,
+    experiences: this.profileData.experiences,
+    languages: this.profileData.languages,
+    linkedin: this.profileData.linkedin || '',
+    github: this.profileData.github || '',
+    portfolio: this.profileData.portfolio || '',
+    // ✅ Ajouter les fichiers (objets File, pas les noms)
+    cv: this.cvFile,
+    motivationLetter: this.motivationLetterFile
+  };
+
+  console.log('📤 Données envoyées:', {
+    ...profilePayload,
+    cv: this.cvFile ? `File: ${this.cvFile.name}` : 'Non fourni',
+    motivationLetter: this.motivationLetterFile ? `File: ${this.motivationLetterFile.name}` : 'Non fourni'
+  });
+
+  this.profileService.updateProfile(userId, profilePayload).subscribe({
+    next: (res) => {
+      console.log('✅ Profil mis à jour avec succès', res);
+      
+      const updatedUser = { 
+        ...user, 
+        ...res.updatedUser, 
+        profileStatus: res.profileStatus || 'Complet' 
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem('profileStatus', res.profileStatus || 'Complet');
+      
+      this.profileCompleted.emit(res);
+      this.isSubmitting = false;
+      this.closeModal();
+      alert('✅ Profil complété avec succès !');
+    },
+    error: (err) => {
+      console.error('❌ Erreur backend :', err);
+      
+      let errorMessage = 'Erreur lors de la mise à jour du profil';
+      if (err.error?.message) {
+        errorMessage += ': ' + err.error.message;
+      } else if (err.message) {
+        errorMessage += ': ' + err.message;
+      }
+      
+      alert(errorMessage);
+      this.isSubmitting = false;
+    }
+  });
+}
 }

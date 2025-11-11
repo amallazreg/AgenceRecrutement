@@ -45,7 +45,18 @@ export class ProfileService {
       formData.append('languages', JSON.stringify(profileData.languages));
     }
 
-    console.log('📦 FormData préparée pour envoi');
+    // ✅ Ajouter les fichiers (CV et lettre de motivation)
+    if (profileData.cv instanceof File) {
+      formData.append('cv', profileData.cv, profileData.cv.name);
+      console.log('📎 CV ajouté:', profileData.cv.name);
+    }
+    
+    if (profileData.motivationLetter instanceof File) {
+      formData.append('motivationLetter', profileData.motivationLetter, profileData.motivationLetter.name);
+      console.log('📎 Lettre de motivation ajoutée:', profileData.motivationLetter.name);
+    }
+
+    console.log('📦 FormData préparée pour envoi avec fichiers');
 
     // ⚠️ Ne PAS définir Content-Type manuellement, le navigateur le fait avec boundary
     return this.http.put(`${this.apiUrl}/update/${userId}`, formData);
