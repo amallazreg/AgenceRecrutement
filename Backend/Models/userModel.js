@@ -34,58 +34,7 @@ const UserSchema = new Schema({
   subSpecialties: [
     {
       type: String,
-      enum: [
-        // Informatique
-        'Développement Web',
-        'Développement Mobile',
-        'Data Science',
-        'Cybersécurité',
-        'Réseaux',
-        'DevOps',
-        'IA et Machine Learning',
-
-        // Marketing
-        'Marketing Digital',
-        'SEO / SEA',
-        'Communication',
-        'Branding',
-        'Études de Marché',
-
-        // Finance
-        'Comptabilité',
-        'Audit',
-        'Banque',
-        'Contrôle de gestion',
-        'Analyse financière',
-
-        // Santé
-        'Médecine',
-        'Pharmacie',
-        'Infirmier',
-        'Biotechnologie',
-        'Recherche médicale',
-
-        // Éducation
-        'Enseignement primaire',
-        'Enseignement secondaire',
-        'Formation professionnelle',
-        'Pédagogie numérique',
-
-        // Commerce
-        'Vente',
-        'Gestion commerciale',
-        'E-commerce',
-        'Logistique',
-        'Import/Export',
-
-        // Industrie
-        'Production',
-        'Maintenance',
-        'Qualité',
-        'Énergie',
-        'Mécanique',
-      ],
-    },
+    }
   ],
 
   // Informations académiques
