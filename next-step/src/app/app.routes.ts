@@ -11,6 +11,7 @@ import { CondidateComponent } from './AdminInterfaces/condidate/condidate.compon
 import { AcceuilComponent } from './dashboards/acceuil/acceuil.component';
 import { CompanyOffersComponent } from './CompanyInterfaces/offers/company-offers/company-offers.component';
 import { ProfileCompletionComponent } from './userInterfaces/profile-completion/profile-completion.component';
+import { JobOffersComponent } from './userInterfaces/job-offers/job-offers.component';
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/signup', component: SignupComponent },
@@ -28,7 +29,10 @@ export const routes: Routes = [
       import('./userInterfaces/profile-completion/profile-completion.component')
         .then(c => c.ProfileCompletionComponent)
   },
-
+{
+  path: 'offres',
+  component: JobOffersComponent
+}
 
 
 ]

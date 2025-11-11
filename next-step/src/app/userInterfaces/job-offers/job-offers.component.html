@@ -1,0 +1,324 @@
+<!-- Container Principal -->
+  <app-sidebar-acceuil></app-sidebar-acceuil>
+<div class="job-offers-container">
+ 
+
+
+  <!-- Header avec animation -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">💼</span>
+        Offres d'Emploi
+      </h1>
+      <p class="page-subtitle">Découvrez {{ filteredOffers.length }} opportunités de carrière</p>
+    </div>
+    
+    <div class="header-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ jobOffers.length }}</span>
+          <span class="stat-label">Offres</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getUniqueLocations().length }}</span>
+          <span class="stat-label">Villes</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌟</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ categories.length }}</span>
+          <span class="stat-label">Catégories</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre de Recherche Créative -->
+  <div class="search-section">
+    <div class="search-bar-wrapper">
+      <div class="search-input-group">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Rechercher par titre, entreprise, compétences..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()">
+        <button class="clear-search-btn" *ngIf="searchQuery" (click)="searchQuery = ''; onSearchChange()">
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres Avancés -->
+  <div class="filters-section">
+    <div class="filters-container">
+      
+      <!-- Catégorie -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">📂</span>
+          Catégorie
+        </label>
+        <select class="filter-select" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+          <option value="all">Toutes les catégories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- Type de contrat -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">📝</span>
+          Type de contrat
+        </label>
+        <select class="filter-select" [(ngModel)]="selectedType" (change)="applyFilters()">
+          <option value="all">Tous les types</option>
+          <option *ngFor="let type of contractTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <!-- Localisation -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">📍</span>
+          Localisation
+        </label>
+        <select class="filter-select" [(ngModel)]="selectedLocation" (change)="applyFilters()">
+          <option value="all">Toutes les villes</option>
+          <option *ngFor="let loc of getUniqueLocations()" [value]="loc">{{ loc }}</option>
+        </select>
+      </div>
+
+      <!-- Remote Only -->
+      <div class="filter-group checkbox-group">
+        <label class="checkbox-filter">
+          <input type="checkbox" [(ngModel)]="showRemoteOnly" (change)="applyFilters()">
+          <span class="checkbox-label">
+            <span class="checkbox-icon">🏠</span>
+            Télétravail uniquement
+          </span>
+        </label>
+      </div>
+
+    </div>
+
+    <div class="filters-actions">
+      <button class="btn-reset-filters" (click)="resetFilters()">
+        <span>🔄</span> Réinitialiser
+      </button>
+      
+      <button class="btn-toggle-view" (click)="toggleViewMode()">
+        <span *ngIf="viewMode === 'grid'">☰</span>
+        <span *ngIf="viewMode === 'list'">▦</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des offres...</p>
+  </div>
+
+  <!-- Liste des Offres -->
+  <div class="offers-grid" [class.list-view]="viewMode === 'list'" *ngIf="!isLoading">
+    
+    <!-- Aucun résultat -->
+    <div class="no-results" *ngIf="filteredOffers.length === 0">
+      <div class="no-results-icon">😕</div>
+      <h3>Aucune offre trouvée</h3>
+      <p>Essayez de modifier vos critères de recherche</p>
+      <button class="btn-primary" (click)="resetFilters()">Réinitialiser les filtres</button>
+    </div>
+
+    <!-- Cards des offres -->
+    <div class="offer-card" *ngFor="let offer of filteredOffers" (click)="openOfferDetails(offer)">
+      
+      <!-- Header de la card -->
+      <div class="offer-card-header">
+        <div class="company-logo">{{ offer.logo }}</div>
+        <div class="offer-badges">
+          <span class="badge badge-type" [class]="'badge-' + offer.type.toLowerCase()">
+            {{ offer.type }}
+          </span>
+          <span class="badge badge-remote" *ngIf="offer.remote">🏠 Remote</span>
+        </div>
+      </div>
+
+      <!-- Contenu de la card -->
+      <div class="offer-card-body">
+        <h3 class="offer-title">{{ offer.title }}</h3>
+        <p class="offer-company">
+          <span class="company-icon">🏢</span>
+          {{ offer.company }}
+        </p>
+        
+        <div class="offer-info">
+          <span class="info-item">
+            <span class="info-icon">📍</span>
+            {{ offer.location }}
+          </span>
+          <span class="info-item" *ngIf="offer.salary">
+            <span class="info-icon">💰</span>
+            {{ offer.salary }}
+          </span>
+          <span class="info-item">
+            <span class="info-icon">⏱️</span>
+            {{ offer.experience }}
+          </span>
+        </div>
+
+        <p class="offer-description">
+          {{ offer.description.substring(0, 120) }}...
+        </p>
+
+        <!-- Compétences -->
+        <div class="offer-skills">
+          <span class="skill-tag" *ngFor="let skill of offer.skills.slice(0, 4)">
+            {{ skill }}
+          </span>
+          <span class="skill-more" *ngIf="offer.skills.length > 4">
+            +{{ offer.skills.length - 4 }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Footer de la card -->
+      <div class="offer-card-footer">
+        <span class="posted-date">
+          📅 {{ formatDate(offer.postedDate) }}
+        </span>
+        <span class="deadline" [class.urgent]="getDaysRemaining(offer.deadline) <= 7">
+          <span *ngIf="getDaysRemaining(offer.deadline) > 0">
+            ⏰ {{ getDaysRemaining(offer.deadline) }} jours restants
+          </span>
+          <span *ngIf="getDaysRemaining(offer.deadline) <= 0" class="expired">
+            ⚠️ Expiré
+          </span>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Détails de l'Offre -->
+<div class="modal-backdrop" *ngIf="isDetailModalOpen && selectedOffer" (click)="closeDetailModal()">
+  <div class="modal-container detail-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Close Button -->
+    <button class="modal-close-btn" (click)="closeDetailModal()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Header du Modal -->
+    <div class="modal-detail-header">
+      <div class="company-logo-large">{{ selectedOffer.logo }}</div>
+      <div class="header-info">
+        <h2 class="detail-title">{{ selectedOffer.title }}</h2>
+        <p class="detail-company">
+          <span class="company-icon">🏢</span>
+          {{ selectedOffer.company }}
+        </p>
+        <div class="detail-badges">
+          <span class="badge badge-type" [class]="'badge-' + selectedOffer.type.toLowerCase()">
+            {{ selectedOffer.type }}
+          </span>
+          <span class="badge badge-remote" *ngIf="selectedOffer.remote">🏠 Télétravail</span>
+          <span class="badge badge-location">📍 {{ selectedOffer.location }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu du Modal -->
+    <div class="modal-detail-content">
+      
+      <!-- Informations Clés -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <span class="section-icon">ℹ️</span>
+          Informations Clés
+        </h3>
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">💰 Salaire</span>
+            <span class="info-value">{{ selectedOffer.salary || 'Non spécifié' }}</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">⏱️ Expérience</span>
+            <span class="info-value">{{ selectedOffer.experience }}</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">📅 Publié le</span>
+            <span class="info-value">{{ formatDate(selectedOffer.postedDate) }}</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">⏰ Date limite</span>
+            <span class="info-value" [class.urgent]="getDaysRemaining(selectedOffer.deadline) <= 7">
+              {{ formatDate(selectedOffer.deadline) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <span class="section-icon">📋</span>
+          Description du poste
+        </h3>
+        <p class="detail-description">{{ selectedOffer.description }}</p>
+      </div>
+
+      <!-- Exigences -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <span class="section-icon">✅</span>
+          Exigences
+        </h3>
+        <ul class="requirements-list">
+          <li *ngFor="let req of selectedOffer.requirements">
+            <span class="bullet">▸</span> {{ req }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Compétences Requises -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <span class="section-icon">🎯</span>
+          Compétences Requises
+        </h3>
+        <div class="skills-grid">
+          <span class="skill-badge" *ngFor="let skill of selectedOffer.skills">
+            {{ skill }}
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer du Modal avec Actions -->
+    <div class="modal-detail-footer">
+      <button class="btn btn-secondary" (click)="closeDetailModal()">
+        Fermer
+      </button>
+      <button class="btn btn-primary" (click)="applyToOffer(selectedOffer._id)">
+        <span>📤</span> Postuler Maintenant
+      </button>
+    </div>
+
+  </div>
+</div>

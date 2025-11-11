@@ -11,8 +11,8 @@
       <li><a href="#roles">Roles</a></li>
 
       <!-- ✅ If NOT logged in -->
-           <ng-container *ngIf="!isLoggedIn">
-         <li><a href="#OFFRE">Offre disponible</a></li>
+           <ng-container *ngIf="isLoggedIn">
+         <li><a routerLink="/offres">Offre disponible</a></li>
       </ng-container>
       <ng-container *ngIf="!isLoggedIn">
         <li><a routerLink="/auth/signup" >Sign Up</a></li>
