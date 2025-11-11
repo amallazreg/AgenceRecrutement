@@ -14,20 +14,12 @@ const UserSchema = new Schema({
   dateOfBirth: { type: Date },
   address: { type: String },
   nationality: { type: String },
-  gender: { type: String, enum: ['Homme', 'Femme'] },
+  gender: { type: String},
 
   // Spécialité principale
   specialty: {
     type: String,
-    enum: [
-      'Informatique',
-      'Marketing',
-      'Finance',
-      'Santé',
-      'Éducation',
-      'Commerce',
-      'Industrie',
-    ],
+  
   },
 
   // Sous-spécialités selon le domaine
@@ -77,7 +69,6 @@ const UserSchema = new Schema({
         name: { type: String },
         level: {
             type: String,
-            enum: ['Débutant', 'Intermédiaire', 'Avancé', 'Courant', 'Natif'],
         },
     }      
   ],
