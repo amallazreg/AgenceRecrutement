@@ -85,8 +85,54 @@ const getCandidatureForOffer = async (req, res) => {
   }
 };
 
+const getMyCandidature = async (req, res) => {
+  try {
+    const { candidateId } = req.params;
+
+    const candidatures = await Candidature.find({ candidateId })
+      .populate('offerId', 'title companyId description sector location contractType startOffreDate endOffreDate workingHours remoteOption')
+      .sort({ submittedAt: -1 });
+
+    res.status(200).json(candidatures);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la récupération des candidatures", error });
+  }
+};
+
+const updateCandidatureStatus = async (req, res) => {
+  try {
+    const { candidatureId } = req.params;
+    const { status } = req.body; // "Accepté" ou "Refusé"
+
+    if (!['Accepté', 'Refusé'].includes(status)) {
+      return res.status(400).json({ message: "Statut invalide" });
+    }
+
+    const updatedCandidature = await Candidature.findByIdAndUpdate(
+      candidatureId,
+      { status },
+      { new: true }
+    ).populate('candidateId', 'name email phone')
+     .populate('offerId', 'title');
+
+    if (!updatedCandidature) {
+      return res.status(404).json({ message: "Candidature non trouvée" });
+    }
+
+    res.status(200).json({
+      message: `Statut mis à jour avec succès en '${status}'`,
+      candidature: updatedCandidature
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la mise à jour du statut", error });
+  }
+};
+
+
 
 module.exports = {
     applyOffer,
-    getCandidatureForOffer
+    getCandidatureForOffer,
+    getMyCandidature,
+    updateCandidatureStatus
 }

@@ -16,7 +16,11 @@ const candidatureSchema = new mongoose.Schema({
   motivationLetter: { type: String,required: true },
   additionalDocuments: [{ type: String }], //certificats, etc.
   submittedAt: { type: Date, default: Date.now },
-  status: { type: String, enum: ['En attente', 'Accepté', 'Refusé'], default: 'En attente' }
+  status: { type: String, enum: ['En attente', 'Accepté', 'Refusé'], default: 'En attente' },
+  submittedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model('Condidature', candidatureSchema);
