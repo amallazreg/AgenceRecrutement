@@ -7,6 +7,7 @@ const userRoute = require('./Routes/userRoute');
 const companyRoute = require('./Routes/companyRoute');
 const adminRoute = require('./Routes/adminRoute'); 
 const offreRoute = require('./Routes/offreRoute'); 
+const candidatureRoute = require('./Routes/candidatureRoute');
 
 
 
@@ -41,6 +42,8 @@ app.use('/user', userRoute);
 app.use('/company',companyRoute);
 app.use('/admin',adminRoute) ;
 app.use('/company',offreRoute) ;
+app.use('/candidature',candidatureRoute) ;
+
 
 
 // Démarrage du serveur
