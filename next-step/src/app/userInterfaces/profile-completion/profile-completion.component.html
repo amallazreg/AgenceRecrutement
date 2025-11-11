@@ -46,16 +46,29 @@
               <div class="input-group">
                 <label for="dateOfBirth">Date of Birth</label>
                 <input type="date" id="dateOfBirth" name="dateOfBirth" 
-                       [(ngModel)]="profileData.dateOfBirth" required>
+                       [(ngModel)]="profileData.dateOfBirth" 
+                       #dateOfBirthInput="ngModel"
+                       [class.error]="dateOfBirthInput.invalid && dateOfBirthInput.touched"
+                       required>
+                <div class="error-message" *ngIf="dateOfBirthInput.invalid && dateOfBirthInput.touched">
+                  Date of birth is required
+                </div>
               </div>
 
               <div class="input-group">
                 <label for="gender">Gender</label>
-                <select id="gender" name="gender" [(ngModel)]="profileData.gender" required>
+                <select id="gender" name="gender" 
+                        [(ngModel)]="profileData.gender" 
+                        #genderInput="ngModel"
+                        [class.error]="genderInput.invalid && genderInput.touched"
+                        required>
                   <option value="">Select gender</option>
                   <option value="Homme">Male</option>
                   <option value="Femme">Female</option>
                 </select>
+                <div class="error-message" *ngIf="genderInput.invalid && genderInput.touched">
+                  Gender is required
+                </div>
               </div>
             </div>
 
@@ -63,14 +76,26 @@
               <label for="address">Address</label>
               <input type="text" id="address" name="address" 
                      placeholder="Your full address"
-                     [(ngModel)]="profileData.address" required>
+                     [(ngModel)]="profileData.address" 
+                     #addressInput="ngModel"
+                     [class.error]="addressInput.invalid && addressInput.touched"
+                     required>
+              <div class="error-message" *ngIf="addressInput.invalid && addressInput.touched">
+                Address is required
+              </div>
             </div>
 
             <div class="input-group">
               <label for="nationality">Nationality</label>
               <input type="text" id="nationality" name="nationality" 
                      placeholder="Your nationality"
-                     [(ngModel)]="profileData.nationality" required>
+                     [(ngModel)]="profileData.nationality" 
+                     #nationalityInput="ngModel"
+                     [class.error]="nationalityInput.invalid && nationalityInput.touched"
+                     required>
+              <div class="error-message" *ngIf="nationalityInput.invalid && nationalityInput.touched">
+                Nationality is required
+              </div>
             </div>
           </div>
 
@@ -83,6 +108,8 @@
               <label for="specialty">Main Specialty</label>
               <select id="specialty" name="specialty" 
                       [(ngModel)]="profileData.specialty" 
+                      #specialtyInput="ngModel"
+                      [class.error]="specialtyInput.invalid && specialtyInput.touched"
                       (change)="onSpecialtyChange()" required>
                 <option value="">Select your specialty</option>
                 <option value="Informatique">Computer Science</option>
@@ -93,6 +120,9 @@
                 <option value="Commerce">Business</option>
                 <option value="Industrie">Industry</option>
               </select>
+              <div class="error-message" *ngIf="specialtyInput.invalid && specialtyInput.touched">
+                Specialty is required
+              </div>
             </div>
 
             <div class="input-group" *ngIf="profileData.specialty">
@@ -101,6 +131,7 @@
                 <label *ngFor="let subSpec of getSubSpecialties()" class="checkbox-label">
                   <input type="checkbox" 
                          [value]="subSpec"
+                         [checked]="profileData.subSpecialties.includes(subSpec)"
                          (change)="onSubSpecialtyChange($event, subSpec)">
                   <span>{{ subSpec }}</span>
                 </label>
@@ -111,7 +142,11 @@
               <label for="skills">Skills (Press Enter to add)</label>
               <div class="skills-input">
                 <input type="text" id="skills" placeholder="e.g., JavaScript, React, Node.js"
-                       (keydown.enter)="addSkill($event)">
+                       (keydown.enter)="addSkill($event)"
+                       [class.error]="profileData.skills.length === 0 && currentStep === 2">
+                <div class="error-message" *ngIf="profileData.skills.length === 0 && currentStep === 2">
+                  At least one skill is required
+                </div>
                 <div class="skills-tags">
                   <span class="skill-tag" *ngFor="let skill of profileData.skills; let i = index">
                     {{ skill }}
@@ -137,26 +172,50 @@
               <div class="input-group">
                 <label>Degree</label>
                 <input type="text" placeholder="e.g., Bachelor in Computer Science"
-                       [(ngModel)]="edu.degree" [name]="'degree_' + i" required>
+                       [(ngModel)]="edu.degree" [name]="'degree_' + i" 
+                       #degreeInput="ngModel"
+                       [class.error]="degreeInput.invalid && degreeInput.touched"
+                       required>
+                <div class="error-message" *ngIf="degreeInput.invalid && degreeInput.touched">
+                  Degree is required
+                </div>
               </div>
 
               <div class="input-group">
                 <label>Institution</label>
                 <input type="text" placeholder="University name"
-                       [(ngModel)]="edu.institution" [name]="'institution_' + i" required>
+                       [(ngModel)]="edu.institution" [name]="'institution_' + i"
+                       #institutionInput="ngModel"
+                       [class.error]="institutionInput.invalid && institutionInput.touched"
+                       required>
+                <div class="error-message" *ngIf="institutionInput.invalid && institutionInput.touched">
+                  Institution is required
+                </div>
               </div>
 
               <div class="form-row">
                 <div class="input-group">
                   <label>Start Year</label>
                   <input type="number" placeholder="2020"
-                         [(ngModel)]="edu.startYear" [name]="'startYear_' + i" required>
+                         [(ngModel)]="edu.startYear" [name]="'startYear_' + i"
+                         #startYearInput="ngModel"
+                         [class.error]="startYearInput.invalid && startYearInput.touched"
+                         required min="1900" max="2030">
+                  <div class="error-message" *ngIf="startYearInput.invalid && startYearInput.touched">
+                    Valid start year is required
+                  </div>
                 </div>
 
                 <div class="input-group">
                   <label>End Year</label>
                   <input type="number" placeholder="2024"
-                         [(ngModel)]="edu.endYear" [name]="'endYear_' + i" required>
+                         [(ngModel)]="edu.endYear" [name]="'endYear_' + i"
+                         #endYearInput="ngModel"
+                         [class.error]="endYearInput.invalid && endYearInput.touched"
+                         required min="1900" max="2030">
+                  <div class="error-message" *ngIf="endYearInput.invalid && endYearInput.touched">
+                    Valid end year is required
+                  </div>
                 </div>
               </div>
             </div>
@@ -181,31 +240,61 @@
               <div class="input-group">
                 <label>Company</label>
                 <input type="text" placeholder="Company name"
-                       [(ngModel)]="exp.company" [name]="'company_' + i">
+                       [(ngModel)]="exp.company" [name]="'company_' + i"
+                       #companyInput="ngModel"
+                       [class.error]="companyInput.invalid && companyInput.touched"
+                       required>
+                <div class="error-message" *ngIf="companyInput.invalid && companyInput.touched">
+                  Company name is required
+                </div>
               </div>
 
               <div class="input-group">
                 <label>Position</label>
                 <input type="text" placeholder="Job title"
-                       [(ngModel)]="exp.position" [name]="'position_' + i">
+                       [(ngModel)]="exp.position" [name]="'position_' + i"
+                       #positionInput="ngModel"
+                       [class.error]="positionInput.invalid && positionInput.touched"
+                       required>
+                <div class="error-message" *ngIf="positionInput.invalid && positionInput.touched">
+                  Position is required
+                </div>
               </div>
 
               <div class="form-row">
                 <div class="input-group">
                   <label>Start Date</label>
-                  <input type="date" [(ngModel)]="exp.startDate" [name]="'expStart_' + i">
+                  <input type="date" [(ngModel)]="exp.startDate" [name]="'expStart_' + i"
+                         #startDateInput="ngModel"
+                         [class.error]="startDateInput.invalid && startDateInput.touched"
+                         required>
+                  <div class="error-message" *ngIf="startDateInput.invalid && startDateInput.touched">
+                    Start date is required
+                  </div>
                 </div>
 
                 <div class="input-group">
                   <label>End Date</label>
-                  <input type="date" [(ngModel)]="exp.endDate" [name]="'expEnd_' + i">
+                  <input type="date" [(ngModel)]="exp.endDate" [name]="'expEnd_' + i"
+                         #endDateInput="ngModel"
+                         [class.error]="endDateInput.invalid && endDateInput.touched"
+                         required>
+                  <div class="error-message" *ngIf="endDateInput.invalid && endDateInput.touched">
+                    End date is required
+                  </div>
                 </div>
               </div>
 
               <div class="input-group">
                 <label>Description</label>
                 <textarea rows="3" placeholder="Describe your responsibilities..."
-                          [(ngModel)]="exp.description" [name]="'expDesc_' + i"></textarea>
+                          [(ngModel)]="exp.description" [name]="'expDesc_' + i"
+                          #descriptionInput="ngModel"
+                          [class.error]="descriptionInput.invalid && descriptionInput.touched"
+                          required></textarea>
+                <div class="error-message" *ngIf="descriptionInput.invalid && descriptionInput.touched">
+                  Description is required
+                </div>
               </div>
             </div>
 
@@ -226,18 +315,31 @@
                   <div class="input-group">
                     <label>Language</label>
                     <input type="text" placeholder="e.g., English"
-                           [(ngModel)]="lang.name" [name]="'lang_' + i">
+                           [(ngModel)]="lang.name" [name]="'lang_' + i"
+                           #langNameInput="ngModel"
+                           [class.error]="langNameInput.invalid && langNameInput.touched"
+                           required>
+                    <div class="error-message" *ngIf="langNameInput.invalid && langNameInput.touched">
+                      Language name is required
+                    </div>
                   </div>
 
                   <div class="input-group">
                     <label>Level</label>
-                    <select [(ngModel)]="lang.level" [name]="'level_' + i">
+                    <select [(ngModel)]="lang.level" [name]="'level_' + i"
+                            #langLevelInput="ngModel"
+                            [class.error]="langLevelInput.invalid && langLevelInput.touched"
+                            required>
+                      <option value="">Select level</option>
                       <option value="Débutant">Beginner</option>
                       <option value="Intermédiaire">Intermediate</option>
                       <option value="Avancé">Advanced</option>
                       <option value="Courant">Fluent</option>
                       <option value="Natif">Native</option>
                     </select>
+                    <div class="error-message" *ngIf="langLevelInput.invalid && langLevelInput.touched">
+                      Language level is required
+                    </div>
                   </div>
 
                   <button type="button" class="btn-remove-inline" 
@@ -255,19 +357,31 @@
               <div class="input-group">
                 <label for="linkedin">LinkedIn</label>
                 <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourprofile"
-                       [(ngModel)]="profileData.linkedin" name="linkedin">
+                       [(ngModel)]="profileData.linkedin" name="linkedin"
+                       pattern="https?://.+\..+">
+                <div class="error-message" *ngIf="profileData.linkedin && !isValidUrl(profileData.linkedin)">
+                  Please enter a valid URL
+                </div>
               </div>
 
               <div class="input-group">
                 <label for="github">GitHub</label>
                 <input type="url" id="github" placeholder="https://github.com/yourusername"
-                       [(ngModel)]="profileData.github" name="github">
+                       [(ngModel)]="profileData.github" name="github"
+                       pattern="https?://.+\..+">
+                <div class="error-message" *ngIf="profileData.github && !isValidUrl(profileData.github)">
+                  Please enter a valid URL
+                </div>
               </div>
 
               <div class="input-group">
                 <label for="portfolio">Portfolio</label>
                 <input type="url" id="portfolio" placeholder="https://yourportfolio.com"
-                       [(ngModel)]="profileData.portfolio" name="portfolio">
+                       [(ngModel)]="profileData.portfolio" name="portfolio"
+                       pattern="https?://.+\..+">
+                <div class="error-message" *ngIf="profileData.portfolio && !isValidUrl(profileData.portfolio)">
+                  Please enter a valid URL
+                </div>
               </div>
             </div>
           </div>
@@ -282,17 +396,25 @@
             
             <button type="button" class="btn btn-primary" 
                     *ngIf="currentStep < totalSteps" 
-                    (click)="nextStep()">
+                    (click)="nextStep()"
+                    [disabled]="!isStepValid(currentStep)">
               Next →
             </button>
             
             <button type="submit" class="btn btn-success" 
-                    *ngIf="currentStep === totalSteps">
+                    *ngIf="currentStep === totalSteps"
+                    [disabled]="!isFormValid()">
               Complete Profile ✓
             </button>
           </div>
 
-          <div class="skip-section" *ngIf="currentStep < totalSteps">
+          <!-- Loading State -->
+          <div class="loading-overlay" *ngIf="isSubmitting">
+            <div class="loading-spinner"></div>
+            <p>Saving your profile...</p>
+          </div>
+
+          <div class="skip-section" *ngIf="currentStep < totalSteps && !isStepValid(currentStep)">
             <a href="#" (click)="skipStep($event)">Skip this step</a>
           </div>
         </form>

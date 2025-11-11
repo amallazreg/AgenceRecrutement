@@ -10,34 +10,46 @@ import { CommonModule } from '@angular/common';
   styleUrl: './acceuil.component.css'
 })
 export class AcceuilComponent implements OnInit, AfterViewInit {
-  @ViewChild(ProfileCompletionComponent) profileModal!: ProfileCompletionComponent;
-  
-  userProfileStatus: string = 'incomplete';
+  @ViewChild(ProfileCompletionComponent)
+  profileModal!: ProfileCompletionComponent;
+
+  userProfileStatus: 'complete' | 'incomplete' = 'incomplete';
+  isLoggedIn: boolean = false;
 
   ngOnInit(): void {
+    this.checkLogin();
     this.checkProfileStatus();
   }
 
   ngAfterViewInit(): void {
-    if (this.userProfileStatus === 'incomplete') {
+    if (this.isLoggedIn && this.userProfileStatus === 'incomplete') {
       setTimeout(() => {
         this.profileModal?.showModal();
-      }, 500);
+      }, 300);
     }
   }
 
-  checkProfileStatus(): void {
-    const status = localStorage.getItem('profileStatus');
-    this.userProfileStatus = status || 'incomplete';
+  // ✅ Vérifie si user est connecté (via token)
+  checkLogin(): void {
+    const token = localStorage.getItem('token');
+    this.isLoggedIn = !!token;  // true si token existe, sinon false
   }
 
+  // ✅ Vérifie le statut du profil
+  checkProfileStatus(): void {
+    const status = localStorage.getItem('profileStatus');
+    this.userProfileStatus = status === 'complete' ? 'complete' : 'incomplete';
+  }
+
+  // ✅ Quand le profil est complété
   onProfileCompleted(profileData: any): void {
-    console.log('Profile completed:', profileData);
+    console.log('✅ Profil complété :', profileData);
+
     this.userProfileStatus = 'complete';
     localStorage.setItem('profileStatus', 'complete');
   }
 
   onModalClosed(): void {
-    console.log('Modal closed by user');
+    console.log('❌ Modal fermé');
   }
 }

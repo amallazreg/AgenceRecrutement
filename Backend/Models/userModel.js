@@ -93,7 +93,7 @@ const UserSchema = new Schema({
   motivationLetter: { type: String },
 
   // Rôle utilisateur
-  role: { type: String, enum: ['admin', 'user'], default: 'usyer' },
+  role: { type: String, enum: ['admin', 'user'], default: 'user' },
 
   // Statut du profil
   profileStatus: {

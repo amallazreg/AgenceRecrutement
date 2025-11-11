@@ -208,7 +208,7 @@ const updateProfile = async (req, res) => {
       updatedUser.skills?.length,
       updatedUser.education?.length,
       updatedUser.experiences?.length,
-      updatedUser.cv,
+      //updatedUser.cv,
     ];
 
     const isComplete = requiredFields.every(field => field && field !== '' && field !== null);
