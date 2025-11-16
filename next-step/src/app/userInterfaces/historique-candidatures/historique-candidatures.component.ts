@@ -5,22 +5,81 @@ import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CandidatureService } from '../../services/candidature.service';
 import { AuthServiceService } from '../../services/auth-service.service';
+import { CompanyService } from '../../services/company.service';
 
-interface Offer {
-  _id: string;
-  title: string;
-  company?: string;
-  location: string;
-  contractType: string;
-  sector: string;
-  description?: string;
-  requirements?: string[];
-  salary?: string;
-  benefits?: string[];
-  companyId?: {
-    name: string;
+
+export interface Offer {
+  _id?: string;
+companyId: {
     _id: string;
-  };
+    name: string;
+  };  sector: string;
+  title: string;
+  description: string;
+  requiredSkills: string[];
+  experienceLevel: string;
+  contractType: string;
+  location: string;
+  salaryRange: string;
+  startOffreDate: string;
+  endOffreDate: string;
+  workingHours: string;
+  remoteOption: string;
+  status?: string;
+  views?: number;
+  applicationsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  
+  // Champs spécifiques - Informatique
+  programmingLanguages?: string[];
+  frameworks?: string[];
+  databaseKnowledge?: string[];
+  tools?: string[];
+  projectType?: string;
+  methodology?: string[];
+  
+  // Champs spécifiques - Marketing
+  marketingChannels?: string[];
+  campaignTools?: string[];
+  targetAudience?: string[];
+  kpiFocus?: string[];
+  
+  // Champs spécifiques - Finance
+  financialTools?: string[];
+  areaOfExpertise?: string[];
+  certifications?: string[];
+  reportingFrequency?: string[];
+  
+  // Champs spécifiques - Santé
+  requiredDiploma?: string[];
+  medicalSpecialty?: string[];
+  workSchedule?: string[];
+  licenseNumber?: string[];
+  
+  // Champs spécifiques - Éducation
+  teachingLevel?: string[];
+  subjectTaught?: string[];
+  requiredDegree?: string[];
+  classSize?: number;
+  
+  // Champs spécifiques - Commerce
+  salesType?: string[];
+  productType?: string[];
+  salesTarget?: string[];
+  customerManagementTools?: string[];
+  mobilityRequired?: boolean;
+  
+  // Champs spécifiques - Industrie
+  machineOperation?: string[];
+  safetyCertifications?: string[];
+  shiftType?: string;
+  productionEnvironment?: string;
+  qualityControl?: string;
+
+  // Champs calculés (optionnels pour l'affichage)
+  daysRemaining?: number;
+  statusInfo?: string;
 }
 
 interface Candidature {
@@ -64,7 +123,8 @@ export class HistoriqueCandidaturesComponent implements OnInit {
   constructor(
     private router: Router,
     private candidatureService: CandidatureService,
-    private authService: AuthServiceService
+    private authService: AuthServiceService,
+    private companyService: CompanyService
   ) {}
 
   ngOnInit(): void {
@@ -92,10 +152,7 @@ getCompanyName(offer: Offer): string {
   }
 
   // Cas 3 → company est directement présent
-  if (offer.company) {
-    return offer.company;
-  }
-
+ 
   return 'Entreprise inconnue';
   
 }
@@ -107,8 +164,22 @@ getCompanyName(offer: Offer): string {
       next: (data) => {
         console.log('✅ Candidatures chargées:', data);
         this.candidatures = data;
+
+         this.candidatures.forEach((candidature, index) => {
+        const companyId = candidature.offerId.companyId; // string ID reçu depuis backend
+
+        if (companyId && typeof companyId === 'string') {
+          this.companyService.getCompanyById(companyId).subscribe(company => {
+            this.candidatures[index].offerId.companyId = company;
+            this.applyFilters(); // mettre à jour l'affichage
+          });
+        }
+      });
+
+      
         this.filteredCandidatures = data;
         this.isLoading = false;
+
       },
       error: (err) => {
         console.error('❌ Erreur chargement candidatures:', err);
@@ -143,7 +214,6 @@ getCompanyName(offer: Offer): string {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(c => 
         c.offerId.title.toLowerCase().includes(query) ||
-        (c.offerId.company?.toLowerCase().includes(query)) ||
         (c.offerId.companyId?.name?.toLowerCase().includes(query))
       );
     }

@@ -127,7 +127,7 @@
             <h3 class="offer-title">{{ candidature.offerId.title }}</h3>
             <p class="company-name">
               <span class="icon">🏢</span>
-              {{ candidature.offerId.companyId?.name || candidature.offerId.company }}
+              {{ candidature.offerId.companyId.name  }}
             </p>
           </div>
         </div>
@@ -221,7 +221,7 @@
           <h2 class="modal-title">{{ selectedOffer.title }}</h2>
           <p class="modal-company">
             <span class="icon">🏢</span>
-            {{ selectedOffer.companyId?.name || selectedOffer.company }}
+            {{ selectedOffer.companyId.name }}
           </p>
         </div>
       </div>
@@ -254,11 +254,11 @@
             <span class="info-value">{{ selectedOffer.sector }}</span>
           </div>
         </div>
-        <div class="info-item" *ngIf="selectedOffer.salary">
+        <div class="info-item" *ngIf="selectedOffer.salaryRange">
           <span class="info-icon">💰</span>
           <div class="info-content">
             <span class="info-label">Salaire</span>
-            <span class="info-value">{{ selectedOffer.salary }}</span>
+            <span class="info-value">{{ selectedOffer.salaryRange }}</span>
           </div>
         </div>
       </div>
@@ -273,29 +273,18 @@
       </div>
 
       <!-- Exigences -->
-      <div class="modal-section" *ngIf="selectedOffer.requirements && selectedOffer.requirements.length > 0">
+      <div class="modal-section" *ngIf="selectedOffer.requiredDiploma && selectedOffer.requiredDiploma.length > 0">
         <h3 class="section-title">
           <span class="section-icon">✓</span>
           Exigences
         </h3>
         <ul class="requirements-list">
-          <li *ngFor="let req of selectedOffer.requirements">{{ req }}</li>
+          <li *ngFor="let req of selectedOffer.requiredDiploma">{{ req }}</li>
         </ul>
       </div>
 
       <!-- Avantages -->
-      <div class="modal-section" *ngIf="selectedOffer.benefits && selectedOffer.benefits.length > 0">
-        <h3 class="section-title">
-          <span class="section-icon">🎁</span>
-          Avantages
-        </h3>
-        <div class="benefits-grid">
-          <div class="benefit-tag" *ngFor="let benefit of selectedOffer.benefits">
-            <span class="benefit-icon">✨</span>
-            {{ benefit }}
-          </div>
-        </div>
-      </div>
+     
 
     </div>
 

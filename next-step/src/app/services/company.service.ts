@@ -21,6 +21,7 @@ export interface Company {
 })
 export class CompanyService {
   private apiUrl = `http://localhost:3000/company`;
+  private apiUrl2 = `http://localhost:3000/admin/getCompanyById`
 
   constructor(private http: HttpClient) { }
 
@@ -50,6 +51,6 @@ export class CompanyService {
 
   // Optionnel: Récupérer company par ID
   getCompanyById(companyId: string): Observable<Company> {
-    return this.http.get<Company>(`${this.apiUrl}/${companyId}`);
+    return this.http.get<Company>(`${this.apiUrl2}/${companyId}`);
   }
 }

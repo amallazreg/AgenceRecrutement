@@ -59,6 +59,7 @@ const getCandidatureForOffer = async (req, res) => {
 
     // Transformer en DTO pour sécuriser la réponse
     const candidatureDTO = candidature.map(app => ({
+      _id: app._id,
       candidateId: app.candidateId._id,
       candidateName: app.candidateId.name,
       candidateEmail: app.candidateId.email,

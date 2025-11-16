@@ -44,7 +44,7 @@ interface Certification {
 }
 
 interface Candidat {
-  _id?: string;
+  _id: string;
   candidateId: string;
   candidateName: string;
   candidateEmail: string;
@@ -118,6 +118,7 @@ export class CandidatesListComponent implements OnInit {
       next: (response: any) => {
         console.log('✅ Candidats chargés:', response);
         this.candidates = response.candidature || [];
+console.log(this.candidates[0]._id); // affiche l'_id du premier candidat
         this.filteredCandidates = this.candidates;
         this.isLoading = false;
       },
@@ -189,29 +190,29 @@ export class CandidatesListComponent implements OnInit {
   }
 
   // Confirmer l'action
-  confirmAction(): void {
-    if (!this.selectedCandidate || !this.actionType || !this.selectedCandidate._id) return;
+confirmAction(): void {
+  if (!this.selectedCandidate || !this.actionType || !this.selectedCandidate._id) return;
 
-    this.candidatureService.updateCandidatureStatus(this.selectedCandidate._id, this.actionType).subscribe({
-      next: (response) => {
-        console.log('✅ Statut mis à jour:', response);
-        
-        // Mettre à jour localement
-        const index = this.candidates.findIndex(c => c._id === this.selectedCandidate?._id);
-        if (index !== -1) {
-          this.candidates[index].status = this.actionType!;
-        }
-        
-        this.applyFilters();
-        this.closeActionModal();
-      },
-      error: (err) => {
-        console.error('❌ Erreur mise à jour statut:', err);
-        alert('Erreur lors de la mise à jour du statut');
-        this.closeActionModal();
+  this.candidatureService.updateCandidatureStatus(this.selectedCandidate._id, this.actionType).subscribe({
+    next: (response) => {
+      console.log('✅ Statut mis à jour:', response);
+      
+      const index = this.candidates.findIndex(c => c._id === this.selectedCandidate?._id);
+      if (index !== -1) {
+        this.candidates[index].status = this.actionType!;
       }
-    });
-  }
+
+      this.applyFilters();
+      this.closeActionModal();
+    },
+    error: (err) => {
+      console.error('❌ Erreur mise à jour statut:', err);
+      alert('Erreur lors de la mise à jour du statut');
+      this.closeActionModal();
+    }
+  });
+}
+
 
   closeActionModal(): void {
     this.showActionModal = false;

@@ -2,18 +2,78 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 export interface Offer {
-  _id: string;
-  title: string;
-  company?: string;
-  location: string;
-  contractType: string;
-  sector: string;
-  companyId?: {
-    name: string;
+  _id?: string;
+companyId: {
     _id: string;
-  };
-}
+    name: string;
+  };  sector: string;
+  title: string;
+  description: string;
+  requiredSkills: string[];
+  experienceLevel: string;
+  contractType: string;
+  location: string;
+  salaryRange: string;
+  startOffreDate: string;
+  endOffreDate: string;
+  workingHours: string;
+  remoteOption: string;
+  status?: string;
+  views?: number;
+  applicationsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  
+  // Champs spécifiques - Informatique
+  programmingLanguages?: string[];
+  frameworks?: string[];
+  databaseKnowledge?: string[];
+  tools?: string[];
+  projectType?: string;
+  methodology?: string[];
+  
+  // Champs spécifiques - Marketing
+  marketingChannels?: string[];
+  campaignTools?: string[];
+  targetAudience?: string[];
+  kpiFocus?: string[];
+  
+  // Champs spécifiques - Finance
+  financialTools?: string[];
+  areaOfExpertise?: string[];
+  certifications?: string[];
+  reportingFrequency?: string[];
+  
+  // Champs spécifiques - Santé
+  requiredDiploma?: string[];
+  medicalSpecialty?: string[];
+  workSchedule?: string[];
+  licenseNumber?: string[];
+  
+  // Champs spécifiques - Éducation
+  teachingLevel?: string[];
+  subjectTaught?: string[];
+  requiredDegree?: string[];
+  classSize?: number;
+  
+  // Champs spécifiques - Commerce
+  salesType?: string[];
+  productType?: string[];
+  salesTarget?: string[];
+  customerManagementTools?: string[];
+  mobilityRequired?: boolean;
+  
+  // Champs spécifiques - Industrie
+  machineOperation?: string[];
+  safetyCertifications?: string[];
+  shiftType?: string;
+  productionEnvironment?: string;
+  qualityControl?: string;
 
+  // Champs calculés (optionnels pour l'affichage)
+  daysRemaining?: number;
+  statusInfo?: string;
+}
 export interface Candidature {
   _id: string;
   candidateId: string;
