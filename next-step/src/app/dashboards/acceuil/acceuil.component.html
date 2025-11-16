@@ -158,6 +158,7 @@
 
 <!-- MODAL DE COMPLETION DE PROFIL - S'affiche si le statut est 'incomplete' -->
 <app-profile-completion 
+*ngIf="profileStatus === 'incomplete'"
   (profileCompleted)="onProfileCompleted($event)"
   (modalClosed)="onModalClosed()">
 </app-profile-completion>

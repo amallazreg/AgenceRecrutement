@@ -64,20 +64,28 @@ onSubmit(form: NgForm, event: Event) {
         // ✅ VÉRIFIER SI LE PROFIL EST COMPLET (UNIQUEMENT POUR LES USERS)
 
           // ✅ VÉRIFIER LE PROFIL UNIQUEMENT POUR LES USERS
-          if (res.role === 'user') {
-            // ✅ Accéder directement à res.profileStatus (pas res.username.profileStatus)
-            const profileStatus = res.profileStatus || 'Incomplet';
-            
-            console.log('Profile Status:', profileStatus);
+         if (res.role === 'user') {
+  
+  // Stockage user dans le localStorage
+             localStorage.setItem('user', JSON.stringify({
+                   userId: res.userId,
+                   name: res.name,
+                   role: res.role,
+                   profileStatus: res.profileStatus
+  }));
 
-            if (profileStatus === 'Incomplet') {
-              console.log('🔄 Redirection vers profile-completion');
-              this.router.navigate(['/acceuil']);
-            } else {
-              console.log('✅ Profil complet, redirection vers accueil');
-              this.router.navigate(['/acceuil']);
-            }
-          } 
+  const profileStatus = res.profileStatus || 'Incomplet';
+  console.log('Profile Status:', profileStatus);
+
+  if (profileStatus === 'Incomplet') {
+    console.log('🔄 Redirection vers profile-completion');
+    this.router.navigate(['/acceuil']);
+  } else {
+    console.log('✅ Profil complet, redirection vers accueil');
+    this.router.navigate(['/acceuil']);
+  }
+}
+
         // Redirection normale pour admin et company
         else if (res.role === 'admin') {
           this.router.navigate(['/adminDashboard']);
