@@ -14,6 +14,9 @@
            <ng-container *ngIf="isLoggedIn">
          <li><a routerLink="/offres">Offre disponible</a></li>
       </ng-container>
+         <ng-container *ngIf="isLoggedIn">
+         <li><a routerLink="/historique">Historique Candidatures</a></li>
+      </ng-container>
       <ng-container *ngIf="!isLoggedIn">
         <li><a routerLink="/auth/signup" >Sign Up</a></li>
         <li><a routerLink="/auth/login" class="btn-signup">Sign In</a></li>

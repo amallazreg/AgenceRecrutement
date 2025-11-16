@@ -12,6 +12,9 @@ import { AcceuilComponent } from './dashboards/acceuil/acceuil.component';
 import { CompanyOffersComponent } from './CompanyInterfaces/offers/company-offers/company-offers.component';
 import { ProfileCompletionComponent } from './userInterfaces/profile-completion/profile-completion.component';
 import { JobOffersComponent } from './userInterfaces/job-offers/job-offers.component';
+import { HistoriqueCandidaturesComponent } from './userInterfaces/historique-candidatures/historique-candidatures.component';
+import { CandidatesListComponent } from './CompanyInterfaces/candidates-list/candidates-list.component';
+import { AllcandidatesComponent } from './CompanyInterfaces/allcandidates/allcandidates.component';
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/signup', component: SignupComponent },
@@ -32,7 +35,13 @@ export const routes: Routes = [
 {
   path: 'offres',
   component: JobOffersComponent
-}
+},
+{path:'historique',component:HistoriqueCandidaturesComponent},
+{
+  path: 'company/candidates/:offerId',
+  component: CandidatesListComponent
+},
+{path: 'allcandidate' ,component: AllcandidatesComponent}
 
 
 ]

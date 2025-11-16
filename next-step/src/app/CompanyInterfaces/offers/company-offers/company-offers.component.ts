@@ -6,6 +6,7 @@ import { OffersformComponent } from '../offersform/offersform.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Offer, OfferService } from '../../../services/offers.service';
 import { CandidatureService } from '../../../services/candidature.service';
+import { Router } from '@angular/router';
 
 interface Metric {
   value: number | string;
@@ -105,7 +106,8 @@ export class CompanyOffersComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private offerService: OfferService,
-    private candidatureService : CandidatureService
+    private candidatureService : CandidatureService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -282,8 +284,12 @@ export class CompanyOffersComponent implements OnInit {
   editOffer(offer: OfferDisplay): void {
   }
 
-  viewCandidates(offer: OfferDisplay): void {
-  }
+viewCandidates(offer: OfferDisplay): void {
+  // Naviguer vers la liste des candidats avec l'ID de l'offre
+  this.router.navigate(['/company/candidates', offer._id], {
+    queryParams: { title: offer.title }
+  });
+}
 
   openMenu(offer: OfferDisplay): void {
   }

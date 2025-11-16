@@ -1,0 +1,334 @@
+<div class="candidates-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <span class="icon">←</span> Retour aux offres
+    </button>
+    
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">👥</span>
+        Candidats pour : {{ offerTitle }}
+      </h1>
+      <p class="page-subtitle">{{ filteredCandidates.length }} candidature(s)</p>
+    </div>
+    
+    <!-- Stats -->
+    <div class="header-stats">
+      <div class="stat-card stat-pending">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getStatusCount('En attente') }}</span>
+          <span class="stat-label">En attente</span>
+        </div>
+      </div>
+      <div class="stat-card stat-accepted">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getStatusCount('Accepté') }}</span>
+          <span class="stat-label">Acceptés</span>
+        </div>
+      </div>
+      <div class="stat-card stat-rejected">
+        <div class="stat-icon">❌</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getStatusCount('Refusé') }}</span>
+          <span class="stat-label">Refusés</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="search-section">
+    <div class="search-bar-wrapper">
+      <div class="search-input-group">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Rechercher par nom, email, compétences..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()">
+        <button class="clear-search-btn" *ngIf="searchQuery" (click)="searchQuery = ''; onSearchChange()">
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="status-filters">
+      <button 
+        class="filter-btn"
+        [class.active]="activeFilter === 'all'"
+        (click)="filterByStatus('all')">
+        <span class="filter-emoji">📊</span>
+        Tous
+      </button>
+      <button 
+        class="filter-btn filter-pending"
+        [class.active]="activeFilter === 'En attente'"
+        (click)="filterByStatus('En attente')">
+        <span class="filter-emoji">⏳</span>
+        En attente
+      </button>
+      <button 
+        class="filter-btn filter-accepted"
+        [class.active]="activeFilter === 'Accepté'"
+        (click)="filterByStatus('Accepté')">
+        <span class="filter-emoji">✅</span>
+        Acceptés
+      </button>
+      <button 
+        class="filter-btn filter-rejected"
+        [class.active]="activeFilter === 'Refusé'"
+        (click)="filterByStatus('Refusé')">
+        <span class="filter-emoji">❌</span>
+        Refusés
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des candidatures...</p>
+  </div>
+
+  <!-- Liste des candidats -->
+  <div class="candidates-list" *ngIf="!isLoading">
+    
+    <!-- Aucun résultat -->
+    <div class="no-results" *ngIf="filteredCandidates.length === 0">
+      <div class="no-results-icon">😕</div>
+      <h3>Aucun candidat trouvé</h3>
+      <p>Aucune candidature pour cette offre pour le moment</p>
+    </div>
+
+    <!-- Cards candidats -->
+    <div class="candidate-card" *ngFor="let candidate of filteredCandidates">
+      
+      <!-- Status Badge -->
+      <div class="status-badge" [ngClass]="getStatusClass(candidate.status)">
+        <span class="status-icon">{{ getStatusIcon(candidate.status) }}</span>
+        <span class="status-text">{{ candidate.status }}</span>
+      </div>
+
+      <div class="card-content">
+        
+        <!-- En-tête candidat -->
+        <div class="candidate-header">
+          <div class="candidate-avatar">
+            <span class="avatar-text">{{ candidate.candidateName.charAt(0).toUpperCase() }}</span>
+          </div>
+          <div class="candidate-info">
+            <h3 class="candidate-name">{{ candidate.candidateName }}</h3>
+            <p class="candidate-email">
+              <span class="icon">📧</span>
+              {{ candidate.candidateEmail }}
+            </p>
+            <p class="candidate-phone">
+              <span class="icon">📱</span>
+              {{ candidate.phone }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Compétences -->
+        <div class="skills-section" *ngIf="candidate.skills && candidate.skills.length > 0">
+          <h4 class="section-title">
+            <span class="icon">💼</span>
+            Compétences
+          </h4>
+          <div class="skills-list">
+            <span class="skill-tag" *ngFor="let skill of parseSkills(candidate.skills).slice(0, 5)">{{ skill }}</span>
+            <span class="skill-tag more" *ngIf="parseSkills(candidate.skills).length > 5">
+              +{{ parseSkills(candidate.skills).length - 5 }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Langues -->
+        <div class="languages-section" *ngIf="candidate.languages && candidate.languages.length > 0">
+          <h4 class="section-title">
+            <span class="icon">🌍</span>
+            Langues
+          </h4>
+          <div class="languages-list">
+            <span class="language-tag" *ngFor="let lang of candidate.languages">
+              {{ lang.name }} - {{ lang.level }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="documents-section">
+          <h4 class="section-title">
+            <span class="icon">📎</span>
+            Documents joints
+          </h4>
+          <div class="documents-list">
+            <button class="document-btn" (click)="downloadCV(candidate.cv)" *ngIf="candidate.cv">
+              <span class="doc-icon">📄</span>
+              <span>Télécharger CV</span>
+            </button>
+            <button class="document-btn" (click)="downloadMotivation(candidate.motivationLetter)" *ngIf="candidate.motivationLetter">
+              <span class="doc-icon">📝</span>
+              <span>Lettre de motivation</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Liens -->
+        <div class="social-links" *ngIf="candidate.linkedin || candidate.github">
+          <a *ngIf="candidate.linkedin" [href]="candidate.linkedin" target="_blank" class="social-link linkedin">
+            <span class="icon">🔗</span> LinkedIn
+          </a>
+          <a *ngIf="candidate.github" [href]="candidate.github" target="_blank" class="social-link github">
+            <span class="icon">💻</span> GitHub
+          </a>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-info">
+          <div class="timeline-dot" [ngClass]="getStatusClass(candidate.status)"></div>
+          <span class="timeline-text">
+            Candidaté {{ getTimeAgo(candidate.submittedAt) }}
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="btn-action btn-details" (click)="viewDetails(candidate)">
+          <span>👁️</span> Voir profil complet
+        </button>
+        
+        <div class="decision-actions" *ngIf="candidate.status === 'En attente'">
+          <button class="btn-action btn-accept" (click)="openActionModal(candidate, 'Accepté')">
+            <span>✅</span> Accepter
+          </button>
+          <button class="btn-action btn-reject" (click)="openActionModal(candidate, 'Refusé')">
+            <span>❌</span> Refuser
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal de confirmation d'action -->
+<div class="modal-backdrop" *ngIf="showActionModal" (click)="closeActionModal()">
+  <div class="modal-container action-modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon" [class.accept]="actionType === 'Accepté'" [class.reject]="actionType === 'Refusé'">
+      {{ actionType === 'Accepté' ? '✅' : '❌' }}
+    </div>
+    <h3>Confirmer {{ actionType === 'Accepté' ? 'l\'acceptation' : 'le refus' }}</h3>
+    <p>
+      Êtes-vous sûr de vouloir {{ actionType === 'Accepté' ? 'accepter' : 'refuser' }} la candidature de 
+      <strong>{{ selectedCandidate?.candidateName }}</strong> ?
+    </p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="closeActionModal()">Annuler</button>
+      <button 
+        class="btn" 
+        [class.btn-success]="actionType === 'Accepté'" 
+        [class.btn-danger]="actionType === 'Refusé'"
+        (click)="confirmAction()">
+        Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal détails candidat -->
+<div class="modal-backdrop" *ngIf="showDetailsModal && candidateDetails" (click)="closeDetailsModal()">
+  <div class="modal-container details-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeDetailsModal()">✕</button>
+    
+    <div class="modal-header">
+      <div class="candidate-avatar-large">
+        {{ candidateDetails.candidateName.charAt(0).toUpperCase() }}
+      </div>
+      <h2>{{ candidateDetails.candidateName }}</h2>
+      <p>{{ candidateDetails.candidateEmail }}</p>
+    </div>
+
+    <div class="modal-body">
+      
+      <!-- Compétences complètes -->
+      <div class="detail-section" *ngIf="candidateDetails.skills && candidateDetails.skills.length > 0">
+        <h3><span class="icon">💼</span> Compétences</h3>
+        <div class="skills-list">
+          <span class="skill-tag" *ngFor="let skill of parseSkills(candidateDetails.skills)">{{ skill }}</span>
+        </div>
+      </div>
+
+      <!-- Expériences -->
+      <div class="detail-section" *ngIf="candidateDetails.experiences && candidateDetails.experiences.length > 0">
+        <h3><span class="icon">💼</span> Expériences</h3>
+        <div class="experience-item" *ngFor="let exp of candidateDetails.experiences">
+          <h4>{{ exp.position }}</h4>
+          <p class="company">{{ exp.company }}</p>
+          <p class="period">
+            {{ exp.startDate | date:'MM/yyyy' }} - {{ exp.endDate ? (exp.endDate | date:'MM/yyyy') : 'Présent' }}
+          </p>
+          <p class="description">{{ exp.description }}</p>
+        </div>
+      </div>
+
+      <!-- Éducation -->
+      <div class="detail-section" *ngIf="candidateDetails.education && candidateDetails.education.length > 0">
+        <h3><span class="icon">🎓</span> Formation</h3>
+        <div class="education-item" *ngFor="let edu of candidateDetails.education">
+          <h4>{{ edu.degree }}</h4>
+          <p class="institution">{{ edu.institution }}</p>
+          <p class="period">{{ edu.startYear }} - {{ edu.endYear }}</p>
+        </div>
+      </div>
+
+      <!-- Projets -->
+      <div class="detail-section" *ngIf="candidateDetails.projects && candidateDetails.projects.length > 0">
+        <h3><span class="icon">🚀</span> Projets</h3>
+        <div class="experience-item" *ngFor="let project of candidateDetails.projects">
+          <h4>{{ project.title }}</h4>
+          <p class="description">{{ project.description }}</p>
+          <div class="technologies" *ngIf="project.technologies && project.technologies.length > 0">
+            <span class="skill-tag" *ngFor="let tech of project.technologies">{{ tech }}</span>
+          </div>
+          <a *ngIf="project.link" [href]="project.link" target="_blank" class="project-link">
+            <span class="icon">🔗</span> Voir le projet
+          </a>
+        </div>
+      </div>
+
+      <!-- Langues -->
+      <div class="detail-section" *ngIf="candidateDetails.languages && candidateDetails.languages.length > 0">
+        <h3><span class="icon">🌍</span> Langues</h3>
+        <div class="languages-list">
+          <span class="language-tag" *ngFor="let lang of candidateDetails.languages">
+            {{ lang.name }} - {{ lang.level }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Certifications -->
+      <div class="detail-section" *ngIf="candidateDetails.certifications && candidateDetails.certifications.length > 0">
+        <h3><span class="icon">🏆</span> Certifications</h3>
+        <div class="certifications-list">
+          <span class="cert-badge" *ngFor="let cert of candidateDetails.certifications">
+            {{ cert.title }} - {{ cert.issuer }}
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -145,7 +145,25 @@ const getCountCandidatureForOffer = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
+const deleteCandidature = async (req, res) => {
+  try {
+    const { candidatureId } = req.params;
 
+    const deletedCandidature = await Candidature.findByIdAndDelete(candidatureId);
+
+    if (!deletedCandidature) {
+      return res.status(404).json({ message: "Candidature non trouvée" });
+    }
+
+    res.status(200).json({
+      message: "Candidature supprimée avec succès",
+      candidature: deletedCandidature
+    });
+  } catch (error) {
+    console.error('Erreur lors de la suppression :', error);
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
 
 
 module.exports = {
@@ -153,5 +171,6 @@ module.exports = {
     getCandidatureForOffer,
     getMyCandidature,
     updateCandidatureStatus,
-    getCountCandidatureForOffer
+    getCountCandidatureForOffer,
+    deleteCandidature
 }

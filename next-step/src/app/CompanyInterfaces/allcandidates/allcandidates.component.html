@@ -1,0 +1,351 @@
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+  <main class="main-content">
+    <div class="all-candidates-dashboard">
+      
+      <!-- Header -->
+      <div class="dashboard-header">
+        <div class="header-left">
+          <h1 class="page-title">
+            <span class="icon-emoji">👥</span>
+            All Candidates
+          </h1>
+          <p class="page-subtitle">Complete list of applicants across all job positions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-export">
+            <span class="icon-emoji">📥</span>
+            Export Data
+          </button>
+          <div class="date-filter">
+            <span class="icon-emoji">📅</span>
+            Last 30 days
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="metrics-grid">
+        <div class="metric-card primary">
+          <div class="metric-icon">
+            <span class="material-icons">assignment</span>
+          </div>
+          <div class="metric-content">
+            <h3>{{ getTotalCandidates() }}</h3>
+            <p>Total Candidates</p>
+            <div class="metric-trend up">
+              <span class="material-icons">trending_up</span>
+              +12% this month
+            </div>
+          </div>
+        </div>
+        
+        <div class="metric-card warning">
+          <div class="metric-icon">
+            <span class="material-icons">schedule</span>
+          </div>
+          <div class="metric-content">
+            <h3>{{ getPendingCount() }}</h3>
+            <p>Pending Review</p>
+            <div class="metric-trend up">
+              <span class="material-icons">trending_up</span>
+              +8 new today
+            </div>
+          </div>
+        </div>
+        
+        <div class="metric-card success">
+          <div class="metric-icon">
+            <span class="material-icons">check_circle</span>
+          </div>
+          <div class="metric-content">
+            <h3>{{ getAcceptedCount() }}</h3>
+            <p>Accepted</p>
+            <div class="metric-trend up">
+              <span class="material-icons">trending_up</span>
+              +5.2%
+            </div>
+          </div>
+        </div>
+        
+        <div class="metric-card info">
+          <div class="metric-icon">
+            <span class="material-icons">event_available</span>
+          </div>
+          <div class="metric-content">
+            <h3>{{ getInterviewCount() }}</h3>
+            <p>Interviews Scheduled</p>
+            <div class="metric-trend up">
+              <span class="material-icons">trending_up</span>
+              3 this week
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters Bar -->
+      <div class="filters-container">
+        <div class="search-wrapper">
+          <span class="material-icons">search</span>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search by name, email, position..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchChange()">
+          <button class="clear-btn" *ngIf="searchQuery" (click)="clearSearch()">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="filter-group">
+          <button 
+            class="filter-chip"
+            [class.active]="activeStatusFilter === 'all'"
+            (click)="filterByStatus('all')">
+            <span class="material-icons">grid_view</span>
+            All Status
+          </button>
+          <button 
+            class="filter-chip status-pending"
+            [class.active]="activeStatusFilter === 'pending'"
+            (click)="filterByStatus('pending')">
+            <span class="material-icons">schedule</span>
+            Pending
+          </button>
+          <button 
+            class="filter-chip status-accepted"
+            [class.active]="activeStatusFilter === 'accepted'"
+            (click)="filterByStatus('accepted')">
+            <span class="material-icons">check_circle</span>
+            Accepted
+          </button>
+          <button 
+            class="filter-chip status-interview"
+            [class.active]="activeStatusFilter === 'interview'"
+            (click)="filterByStatus('interview')">
+            <span class="material-icons">event</span>
+            Interview
+          </button>
+          <button 
+            class="filter-chip status-rejected"
+            [class.active]="activeStatusFilter === 'rejected'"
+            (click)="filterByStatus('rejected')">
+            <span class="material-icons">cancel</span>
+            Rejected
+          </button>
+        </div>
+
+        <div class="sort-dropdown">
+          <span class="material-icons">sort</span>
+          <select [(ngModel)]="sortBy" (change)="onSortChange()">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="score-desc">Score High-Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p>Loading candidates...</p>
+      </div>
+
+      <!-- Candidates Table -->
+      <div class="candidates-table-container" *ngIf="!isLoading">
+        
+        <!-- No Results -->
+        <div class="no-results" *ngIf="filteredCandidates.length === 0">
+          <span class="material-icons">inbox</span>
+          <h3>No candidates found</h3>
+          <p>Try adjusting your filters or search criteria</p>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper" *ngIf="filteredCandidates.length > 0">
+          <table class="candidates-table">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" (change)="toggleSelectAll($event)">
+                </th>
+                <th>Candidate</th>
+                <th>Applied For</th>
+                <th>Applied Date</th>
+                <th>Status</th>
+                <th>Match Score</th>
+                <th>Skills</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let candidate of paginatedCandidates" class="candidate-row">
+                <td>
+                  <input type="checkbox" [(ngModel)]="candidate.selected">
+                </td>
+                
+                <!-- Candidate Info -->
+                <td class="candidate-cell">
+                  <div class="candidate-info-wrapper">
+                    <div class="candidate-avatar">
+                      <span class="material-icons">person</span>
+                    </div>
+                    <div class="candidate-details">
+                      <h4 class="candidate-name">{{ candidate.name }}</h4>
+                      <p class="candidate-email">{{ candidate.email }}</p>
+                      <p class="candidate-phone">{{ candidate.phone }}</p>
+                    </div>
+                  </div>
+                </td>
+                
+                <!-- Job Position -->
+                <td class="position-cell">
+                  <div class="position-info">
+                    <h4 class="position-title">{{ candidate.appliedPosition }}</h4>
+                    <span class="position-department">{{ candidate.department }}</span>
+                  </div>
+                </td>
+                
+                <!-- Applied Date -->
+                <td class="date-cell">
+                  <div class="date-info">
+                    <span class="date-value">{{ candidate.appliedDate | date:'MMM d, yyyy' }}</span>
+                    <span class="date-time">{{ getTimeAgo(candidate.appliedDate) }}</span>
+                  </div>
+                </td>
+                
+                <!-- Status -->
+                <td class="status-cell">
+                  <div class="status-dropdown">
+                    <select 
+                      class="status-select"
+                      [ngClass]="getStatusClass(candidate.status)"
+                      [(ngModel)]="candidate.status"
+                      (change)="onStatusChange(candidate)">
+                      <option value="pending">⏳ Pending</option>
+                      <option value="reviewed">👀 Reviewed</option>
+                      <option value="interview">📅 Interview</option>
+                      <option value="accepted">✅ Accepted</option>
+                      <option value="rejected">❌ Rejected</option>
+                    </select>
+                  </div>
+                </td>
+                
+                <!-- Match Score -->
+                <td class="score-cell">
+                  <div class="score-wrapper">
+                    <div class="score-circle" [class]="getScoreClass(candidate.matchScore)">
+                      <span class="score-value">{{ candidate.matchScore }}%</span>
+                    </div>
+                    <div class="score-bar">
+                      <div class="score-fill" [style.width.%]="candidate.matchScore" [class]="getScoreClass(candidate.matchScore)"></div>
+                    </div>
+                  </div>
+                </td>
+                
+                <!-- Skills -->
+                <td class="skills-cell">
+                  <div class="skills-preview">
+                    <span class="skill-tag" *ngFor="let skill of candidate.topSkills?.slice(0, 2)">
+                      {{ skill }}
+                    </span>
+                    <span class="skill-more" *ngIf="candidate.topSkills && candidate.topSkills.length > 2">
+                      +{{ candidate.topSkills.length - 2 }}
+                    </span>
+                  </div>
+                </td>
+                
+                <!-- Actions -->
+                <td class="actions-cell">
+                  <div class="action-buttons">
+                    <button class="btn-icon" (click)="viewCandidate(candidate)" title="View Profile">
+                      <span class="material-icons">visibility</span>
+                    </button>
+                    <button class="btn-icon" (click)="downloadCV(candidate)" title="Download CV">
+                      <span class="material-icons">download</span>
+                    </button>
+                    <button class="btn-icon" (click)="sendEmail(candidate)" title="Send Email">
+                      <span class="material-icons">email</span>
+                    </button>
+                    <button class="btn-icon btn-menu" (click)="openMenu(candidate)" title="More">
+                      <span class="material-icons">more_vert</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" *ngIf="filteredCandidates.length > 0">
+          <div class="pagination-info">
+            Showing {{ getStartIndex() }} to {{ getEndIndex() }} of {{ filteredCandidates.length }} candidates
+          </div>
+          <div class="pagination-controls">
+            <button 
+              class="pagination-btn"
+              [disabled]="currentPage === 1"
+              (click)="previousPage()">
+              <span class="material-icons">chevron_left</span>
+            </button>
+            
+            <button 
+              *ngFor="let page of getPageNumbers()"
+              class="pagination-btn"
+              [class.active]="page === currentPage"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+            
+            <button 
+              class="pagination-btn"
+              [disabled]="currentPage === getTotalPages()"
+              (click)="nextPage()">
+              <span class="material-icons">chevron_right</span>
+            </button>
+          </div>
+          <div class="items-per-page">
+            <label>Items per page:</label>
+            <select [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Actions Bar (appears when items selected) -->
+      <div class="bulk-actions-bar" *ngIf="getSelectedCount() > 0">
+        <div class="bulk-info">
+          <span class="material-icons">check_circle</span>
+          {{ getSelectedCount() }} candidate(s) selected
+        </div>
+        <div class="bulk-buttons">
+          <button class="bulk-btn btn-accept">
+            <span class="material-icons">check</span>
+            Accept Selected
+          </button>
+          <button class="bulk-btn btn-reject">
+            <span class="material-icons">close</span>
+            Reject Selected
+          </button>
+          <button class="bulk-btn btn-export">
+            <span class="material-icons">download</span>
+            Export Selected
+          </button>
+          <button class="bulk-btn btn-delete">
+            <span class="material-icons">delete</span>
+            Delete Selected
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

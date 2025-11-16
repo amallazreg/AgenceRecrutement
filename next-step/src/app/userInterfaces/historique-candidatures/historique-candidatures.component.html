@@ -1,0 +1,310 @@
+<!-- historique-candidatures.component.html -->
+<app-sidebar-acceuil></app-sidebar-acceuil>
+
+<div class="candidatures-container">
+
+  <!-- Header avec animation -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">📋</span>
+        Historique des Candidatures
+      </h1>
+      <p class="page-subtitle">Suivez l'évolution de vos {{ filteredCandidatures.length }} candidatures</p>
+    </div>
+    
+    <div class="header-stats">
+      <div class="stat-card stat-pending">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getStatusCount('En attente') }}</span>
+          <span class="stat-label">En attente</span>
+        </div>
+      </div>
+      <div class="stat-card stat-accepted">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getStatusCount('Accepté') }}</span>
+          <span class="stat-label">Acceptées</span>
+        </div>
+      </div>
+      <div class="stat-card stat-rejected">
+        <div class="stat-icon">❌</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ getStatusCount('Refusé') }}</span>
+          <span class="stat-label">Refusées</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre de Recherche -->
+  <div class="search-section">
+    <div class="search-bar-wrapper">
+      <div class="search-input-group">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Rechercher par titre, entreprise..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()">
+        <button class="clear-search-btn" *ngIf="searchQuery" (click)="searchQuery = ''; onSearchChange()">
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres par Status -->
+  <div class="filters-section">
+    <div class="status-filters">
+      <button 
+        class="filter-btn"
+        [class.active]="activeFilter === 'all'"
+        (click)="filterByStatus('all')">
+        <span class="filter-emoji">📊</span>
+        Toutes
+      </button>
+      <button 
+        class="filter-btn filter-pending"
+        [class.active]="activeFilter === 'En attente'"
+        (click)="filterByStatus('En attente')">
+        <span class="filter-emoji">⏳</span>
+        En attente
+      </button>
+      <button 
+        class="filter-btn filter-accepted"
+        [class.active]="activeFilter === 'Accepté'"
+        (click)="filterByStatus('Accepté')">
+        <span class="filter-emoji">✅</span>
+        Acceptées
+      </button>
+      <button 
+        class="filter-btn filter-rejected"
+        [class.active]="activeFilter === 'Refusé'"
+        (click)="filterByStatus('Refusé')">
+        <span class="filter-emoji">❌</span>
+        Refusées
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement de vos candidatures...</p>
+  </div>
+
+  <!-- Liste des Candidatures -->
+  <div class="candidatures-list" *ngIf="!isLoading">
+    
+    <!-- Aucun résultat -->
+    <div class="no-results" *ngIf="filteredCandidatures.length === 0">
+      <div class="no-results-icon">😕</div>
+      <h3>Aucune candidature trouvée</h3>
+      <p>Commencez à postuler aux offres qui vous intéressent</p>
+      <button class="btn-primary" routerLink="/offres">
+        <span>💼</span> Voir les offres
+      </button>
+    </div>
+
+    <!-- Cards des candidatures -->
+    <div class="candidature-card" *ngFor="let candidature of filteredCandidatures">
+      
+      <!-- Status Badge en haut à droite -->
+      <div class="status-badge" [ngClass]="getStatusClass(candidature.status)">
+        <span class="status-icon">{{ getStatusIcon(candidature.status) }}</span>
+        <span class="status-text">{{ candidature.status }}</span>
+      </div>
+
+      <div class="card-content">
+        
+        <!-- Logo et Info principale -->
+        <div class="card-header">
+          <div class="company-logo">{{ getSectorEmoji(candidature.offerId.sector) }}</div>
+          <div class="offer-info">
+            <h3 class="offer-title">{{ candidature.offerId.title }}</h3>
+            <p class="company-name">
+              <span class="icon">🏢</span>
+              {{ candidature.offerId.companyId?.name || candidature.offerId.company }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Détails de l'offre -->
+        <div class="offer-details">
+          <div class="detail-item">
+            <span class="detail-icon">📍</span>
+            <span class="detail-text">{{ candidature.offerId.location }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">📝</span>
+            <span class="detail-text">{{ candidature.offerId.contractType }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">📅</span>
+            <span class="detail-text">Postulé le {{ candidature.submittedAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Documents joints -->
+        <div class="documents-section">
+          <h4 class="documents-title">
+            <span class="icon">📎</span>
+            Documents joints
+          </h4>
+          <div class="documents-list">
+            <div class="document-item" *ngIf="candidature.cv">
+              <span class="doc-icon">📄</span>
+              <span class="doc-name">CV</span>
+            </div>
+            <div class="document-item" *ngIf="candidature.motivationLetter">
+              <span class="doc-icon">📝</span>
+              <span class="doc-name">Lettre de motivation</span>
+            </div>
+            <div class="document-item" *ngFor="let doc of candidature.additionalDocuments">
+              <span class="doc-icon">📋</span>
+              <span class="doc-name">Document</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline / Date -->
+        <div class="timeline-info">
+          <div class="timeline-dot" [ngClass]="getStatusClass(candidature.status)"></div>
+          <span class="timeline-text">
+            {{ getTimeAgo(candidature.submittedAt) }}
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="btn-action btn-view" (click)="viewOfferDetails(candidature.offerId)">
+          <span>👁️</span> Voir l'offre
+        </button>
+        <button class="btn-action btn-delete" (click)="deleteCandidature(candidature._id)">
+          <span>🗑️</span> Supprimer
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="cancelDelete()">
+  <div class="modal-container delete-modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">⚠️</div>
+    <h3>Confirmer la suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer cette candidature ? Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="cancelDelete()">Annuler</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 Modal des détails de l'offre -->
+<div class="modal-backdrop" *ngIf="showOfferModal && selectedOffer" (click)="closeOfferModal()">
+  <div class="modal-container offer-details-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header de la modal -->
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <div class="offer-logo">{{ getSectorEmoji(selectedOffer.sector) }}</div>
+        <div class="offer-header-info">
+          <h2 class="modal-title">{{ selectedOffer.title }}</h2>
+          <p class="modal-company">
+            <span class="icon">🏢</span>
+            {{ selectedOffer.companyId?.name || selectedOffer.company }}
+          </p>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="closeOfferModal()">✕</button>
+    </div>
+
+    <!-- Body de la modal -->
+    <div class="modal-body">
+      
+      <!-- Informations principales -->
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-icon">📍</span>
+          <div class="info-content">
+            <span class="info-label">Localisation</span>
+            <span class="info-value">{{ selectedOffer.location }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">📝</span>
+          <div class="info-content">
+            <span class="info-label">Type de contrat</span>
+            <span class="info-value">{{ selectedOffer.contractType }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">🏷️</span>
+          <div class="info-content">
+            <span class="info-label">Secteur</span>
+            <span class="info-value">{{ selectedOffer.sector }}</span>
+          </div>
+        </div>
+        <div class="info-item" *ngIf="selectedOffer.salary">
+          <span class="info-icon">💰</span>
+          <div class="info-content">
+            <span class="info-label">Salaire</span>
+            <span class="info-value">{{ selectedOffer.salary }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="modal-section" *ngIf="selectedOffer.description">
+        <h3 class="section-title">
+          <span class="section-icon">📄</span>
+          Description du poste
+        </h3>
+        <p class="section-content">{{ selectedOffer.description }}</p>
+      </div>
+
+      <!-- Exigences -->
+      <div class="modal-section" *ngIf="selectedOffer.requirements && selectedOffer.requirements.length > 0">
+        <h3 class="section-title">
+          <span class="section-icon">✓</span>
+          Exigences
+        </h3>
+        <ul class="requirements-list">
+          <li *ngFor="let req of selectedOffer.requirements">{{ req }}</li>
+        </ul>
+      </div>
+
+      <!-- Avantages -->
+      <div class="modal-section" *ngIf="selectedOffer.benefits && selectedOffer.benefits.length > 0">
+        <h3 class="section-title">
+          <span class="section-icon">🎁</span>
+          Avantages
+        </h3>
+        <div class="benefits-grid">
+          <div class="benefit-tag" *ngFor="let benefit of selectedOffer.benefits">
+            <span class="benefit-icon">✨</span>
+            {{ benefit }}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer de la modal -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeOfferModal()">
+        Fermer
+      </button>
+    </div>
+
+  </div>
+</div>
