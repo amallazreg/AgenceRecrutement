@@ -1,8 +1,6 @@
 <!-- Container Principal -->
-  <app-sidebar-acceuil></app-sidebar-acceuil>
+<app-sidebar-acceuil></app-sidebar-acceuil>
 <div class="job-offers-container">
- 
-
 
   <!-- Header avec animation -->
   <div class="page-header">
@@ -61,7 +59,7 @@
   <div class="filters-section">
     <div class="filters-container">
       
-      <!-- Catégorie -->
+      <!-- Catégorie avec emojis dynamiques -->
       <div class="filter-group">
         <label class="filter-label">
           <span class="filter-icon">📂</span>
@@ -69,11 +67,13 @@
         </label>
         <select class="filter-select" [(ngModel)]="selectedCategory" (change)="applyFilters()">
           <option value="all">Toutes les catégories</option>
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          <option *ngFor="let cat of categories" [value]="cat">
+            {{ getSectorEmoji(cat) }} {{ cat }}
+          </option>
         </select>
       </div>
 
-      <!-- Type de contrat -->
+      <!-- Type de contrat avec emojis dynamiques -->
       <div class="filter-group">
         <label class="filter-label">
           <span class="filter-icon">📝</span>
@@ -81,7 +81,9 @@
         </label>
         <select class="filter-select" [(ngModel)]="selectedType" (change)="applyFilters()">
           <option value="all">Tous les types</option>
-          <option *ngFor="let type of contractTypes" [value]="type">{{ type }}</option>
+          <option *ngFor="let type of contractTypes" [value]="type">
+            {{ getContractTypeEmoji(type) }} {{ type }}
+          </option>
         </select>
       </div>
 
@@ -128,7 +130,7 @@
     <p>Chargement des offres...</p>
   </div>
 
-  <!-- Liste des Offres -->
+  <!-- Liste des Offres avec EMOJIS DYNAMIQUES -->
   <div class="offers-grid" [class.list-view]="viewMode === 'list'" *ngIf="!isLoading">
     
     <!-- Aucun résultat -->
@@ -139,14 +141,17 @@
       <button class="btn-primary" (click)="resetFilters()">Réinitialiser les filtres</button>
     </div>
 
-    <!-- Cards des offres -->
+    <!-- Cards des offres avec EMOJIS DYNAMIQUES -->
     <div class="offer-card" *ngFor="let offer of filteredOffers" (click)="openOfferDetails(offer)">
       
       <!-- Header de la card -->
       <div class="offer-card-header">
+        
         <div class="offer-badges">
-          <span class="badge badge-type" [class]="'badge-' + offer.contractType.toLowerCase()">
-            {{ offer.contractType }}
+
+          <!-- Badge avec emoji dynamique de type de contrat -->
+          <span class="badge" [ngClass]="getContractTypeBadgeClass(offer.contractType)">
+            {{ getContractTypeEmoji(offer.contractType) }} {{ offer.contractType }}
           </span>
           <span class="badge badge-remote" *ngIf="offer.remoteOption">🏠 Remote</span>
         </div>
@@ -155,11 +160,15 @@
       <!-- Contenu de la card -->
       <div class="offer-card-body">
         
-        <h3 class="offer-title">   <span class="info-icon">💼</span>
-{{ offer.title }}</h3>
+        <!-- Titre avec emoji dynamique du secteur -->
+        <h3 class="offer-title">
+          <span class="info-icon">{{ getSectorEmoji(offer.sector) }}</span>
+          {{ offer.title }}
+        </h3>
+        
         <p class="offer-company">
           <span class="company-icon">🏢</span>
-{{ offer.companyId.name }}
+          {{ offer.companyId.name }}
         </p>
         
         <div class="offer-info">
@@ -175,11 +184,11 @@
             <span class="info-icon">⏱️</span>
             {{ offer.workingHours }}
           </span>
+          <!-- Emoji dynamique d'expérience -->
           <span class="info-item">
-            <span class="info-icon">📈</span> <!-- symbole de progression -->
-                {{ offer.experienceLevel }}
-            </span>
-
+            <span class="info-icon">{{ getExperienceEmoji(offer.experienceLevel) }}</span>
+            {{ offer.experienceLevel }}
+          </span>
         </div>
 
         <p class="offer-description">
@@ -189,48 +198,34 @@
         <!-- Compétences -->
         <div class="offer-skills">
           <span 
-  class="skill-tag" 
-  *ngFor="let skill of (offer.requiredSkills || []).slice(0, 4)">
-  {{ skill }}
-</span>
-
-<span class="skill-more" *ngIf="offer.requiredSkills && offer.requiredSkills.length > 4">
-  +{{ offer.requiredSkills.length - 4 }}
-</span>
-
+            class="skill-tag" 
+            *ngFor="let skill of (offer.requiredSkills || []).slice(0, 4)">
+            {{ skill }}
+          </span>
+          <span class="skill-more" *ngIf="offer.requiredSkills && offer.requiredSkills.length > 4">
+            +{{ offer.requiredSkills.length - 4 }}
+          </span>
         </div>
       </div>
 
       <!-- Footer de la card -->
-     <div class="offer-card-footer">
-
-  <!-- Si expiré -->
- <div class="offer-card-footer">
-
-  <!-- Si expiré -->
-  <span *ngIf="(offer?.daysRemaining ?? 0) < 0"
- class="expired">
-    ⚠️ {{ offer?.statusInfo }}
-  </span>
-
-  <!-- Sinon : jours restants -->
-  <span *ngIf="(offer?.daysRemaining ?? 0) >= 0"
- class="posted-date">
-    📅 {{ offer?.daysRemaining }} jours restants
-  </span>
-
-</div>
-
-
-</div>
-
+      <div class="offer-card-footer">
+        <!-- Si expiré -->
+        <span *ngIf="(offer?.daysRemaining ?? 0) < 0" class="expired">
+          ⚠️ Offre expirée
+        </span>
+        <!-- Sinon : jours restants -->
+        <span *ngIf="(offer?.daysRemaining ?? 0) >= 0" class="posted-date">
+          📅 {{ offer?.daysRemaining }} jours restants
+        </span>
+      </div>
 
     </div>
   </div>
 
 </div>
 
-<!-- Modal Détails de l'Offre -->
+<!-- Modal Détails de l'Offre avec EMOJIS DYNAMIQUES -->
 <div class="modal-backdrop" *ngIf="isDetailModalOpen && selectedOffer" (click)="closeDetailModal()">
   <div class="modal-container detail-modal" (click)="$event.stopPropagation()">
     
@@ -242,27 +237,27 @@
       </svg>
     </button>
 
-    <!-- Header du Modal -->
+    <!-- Header du Modal avec emoji dynamique -->
     <div class="modal-detail-header">
-     <!--<div class="company-logo-large">{{ selectedOffer.logo }}</div> --> 
+      <!-- Logo avec emoji dynamique du secteur -->
+      <div class="company-logo-large">{{ getSectorEmoji(selectedOffer.sector) }}</div>
       <div class="header-info">
         <h2 class="detail-title">{{ selectedOffer.title }}</h2>
         <p class="detail-company">
           <span class="company-icon">🏢</span>
           {{ selectedOffer.companyId.name }}
-
         </p>
         <div class="detail-badges">
-          <span class="badge badge-type" [class]="'badge-' + selectedOffer.contractType.toLowerCase()">
-            {{ selectedOffer.contractType }}
+          <!-- Badge avec emoji dynamique de type de contrat -->
+          <span class="badge" [ngClass]="getContractTypeBadgeClass(selectedOffer.contractType)">
+            {{ getContractTypeEmoji(selectedOffer.contractType) }} {{ selectedOffer.contractType }}
           </span>
           <span class="badge badge-remote" *ngIf="selectedOffer.remoteOption">🏠 Télétravail</span>
           <span class="badge badge-location">📍 {{ selectedOffer.location }}</span>
-          <span class="info-item">
-  <span class="badge badge-location">📈 {{ selectedOffer.experienceLevel }}</span> <!-- symbole de progression -->
-  
-</span>
-
+          <!-- Badge avec emoji dynamique d'expérience -->
+          <span class="badge badge-location">
+            {{ getExperienceEmoji(selectedOffer.experienceLevel) }} {{ selectedOffer.experienceLevel }}
+          </span>
         </div>
       </div>
     </div>
@@ -282,18 +277,17 @@
             <span class="info-value">{{ selectedOffer.salaryRange || 'Non spécifié' }}</span>
           </div>
           <div class="info-box">
-            <span class="info-label">⏱️ Expérience</span>
+            <!-- Emoji dynamique d'expérience dans le modal -->
+            <span class="info-label">{{ getExperienceEmoji(selectedOffer.experienceLevel) }} Expérience</span>
             <span class="info-value">{{ selectedOffer.experienceLevel }}</span>
           </div>
           <div class="info-box">
             <span class="info-label">📅 Publié le</span>
-            <span class="info-value">{{ (selectedOffer.createdAt) }}</span>
+            <span class="info-value">{{ selectedOffer.createdAt| date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="info-box">
-            <span class="info-label">⏰ days Remaining</span>
-            <span class="info-value" >
-              {{ (selectedOffer.daysRemaining) }}
-            </span>
+            <span class="info-label">⏰ Jours restants</span>
+            <span class="info-value">{{ selectedOffer.daysRemaining }}</span>
           </div>
         </div>
       </div>
@@ -308,7 +302,7 @@
       </div>
 
       <!-- Exigences -->
-      <div class="detail-section">
+      <div class="detail-section" *ngIf="selectedOffer.requiredDiploma?.length">
         <h3 class="section-title">
           <span class="section-icon">✅</span>
           Exigences
@@ -320,7 +314,6 @@
         </ul>
       </div>
 
-      <!-- Compétences Requises -->
       <!-- Compétences Requises -->
       <div class="detail-section" *ngIf="selectedOffer.requiredSkills?.length">
         <h3 class="section-title">
@@ -370,7 +363,7 @@
       <button class="btn btn-secondary" (click)="closeDetailModal()">
         Fermer
       </button>
-      <button class="btn btn-primary" >
+      <button class="btn btn-primary" (click)="applyToOffer(selectedOffer._id!)">
         <span>📤</span> Postuler Maintenant
       </button>
     </div>
