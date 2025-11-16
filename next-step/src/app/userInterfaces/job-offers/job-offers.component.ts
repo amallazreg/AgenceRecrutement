@@ -168,12 +168,20 @@ applyFilters(): void {
     this.filteredOffers = [...this.offers];
   }
 
-  // Ouvrir les détails d'une offre
-  openOfferDetails(offer: Offer): void {
-    this.selectedOffer = offer;
-    this.isDetailModalOpen = true;
-    document.body.style.overflow = 'hidden';
-  }
+openOfferDetails(offer: Offer) {
+  // Incrémente les vues via le service
+  this.offersService.incrementViews(offer._id!).subscribe({
+    next: (updatedOffer) => {
+      offer.views = updatedOffer.views; // met à jour localement pour affichage immédiat
+    },
+    error: (err) => console.error('Erreur lors de l\'incrémentation des vues', err)
+  });
+
+  // Ouvre le modal
+  this.selectedOffer = offer;
+  this.isDetailModalOpen = true;
+}
+
 
   // Fermer le modal
   closeDetailModal(): void {
@@ -217,6 +225,9 @@ applyFilters(): void {
       year: 'numeric'
     });
   }
+
+ 
+
 
    // Méthodes pour le modal
   openApplyModal() {

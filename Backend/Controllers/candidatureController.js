@@ -128,11 +128,30 @@ const updateCandidatureStatus = async (req, res) => {
   }
 };
 
+const getCountCandidatureForOffer = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+
+    // Vérifier que l'offre existe
+    const offer = await Offer.findById(offerId);
+    if (!offer) return res.status(404).json({ message: "Offre non trouvée" });
+
+    // Compter le nombre de candidatures
+    const count = await Candidature.countDocuments({ offerId });
+
+    res.status(200).json({ offerId, candidatureCount: count });
+  } catch (error) {
+    console.error('Erreur lors du comptage des candidatures :', error);
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
+
 
 
 module.exports = {
     applyOffer,
     getCandidatureForOffer,
     getMyCandidature,
-    updateCandidatureStatus
+    updateCandidatureStatus,
+    getCountCandidatureForOffer
 }

@@ -17,4 +17,11 @@ export class CandidatureService {
     if (motivationLetter) formData.append('motivationLetter', motivationLetter);
 
     return this.http.post(`${this.apiUrl}/applyOffer/${offerId}/${candidateId}`, formData);
-  }}
+  }
+
+  getCandidatureCount(offerId: string): Observable<{ offerId: string; candidatureCount: number }> {
+  return this.http.get<{ offerId: string; candidatureCount: number }>(`${this.apiUrl}/getCountCandidatureForOffer/${offerId}`);
+}
+
+
+}
