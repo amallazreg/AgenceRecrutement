@@ -112,6 +112,16 @@ export class CompanyOffersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOffers();
+
+      // Pour chaque offre, récupérer le nombre de candidatures
+    this.offers.forEach(offer => {
+      console.log(offer._id!)
+        this.candidatureService.getCandidatureCount(offer._id!).subscribe(res => {
+          offer.applicationsCount = res.candidatureCount;
+                console.log(offer.applicationsCount)
+
+        });
+      });
   }
 
  loadOffers(): void {
@@ -122,12 +132,12 @@ export class CompanyOffersComponent implements OnInit {
       this.offers = offers || [];
 
       // Pour chaque offre, récupérer le nombre de candidatures
-      this.offers.forEach(offer => {
-        this.candidatureService.getCandidatureCount(offer._id!).subscribe({
-          next: (res) => {
-            offer.applicationsCount = res.candidatureCount;
-          },
-          error: (err) => console.error(err)
+    this.offers.forEach(offer => {
+      console.log(offer._id!)
+        this.candidatureService.getCandidatureCount(offer._id!).subscribe(res => {
+          offer.applicationsCount = res.candidatureCount;
+                console.log(offer.applicationsCount)
+
         });
       });
 

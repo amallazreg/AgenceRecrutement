@@ -107,8 +107,8 @@ export class CandidatureService {
 }
 
   // Récupérer les candidatures d'un candidat
-  getMyCandidatures(candidateId: string): Observable<Candidature[]> {
-    return this.http.get<Candidature[]>(`${this.apiUrl}/getMyCandidature/${candidateId}`);
+  getMyCandidatures(offreId: string): Observable<Candidature[]> {
+    return this.http.get<Candidature[]>(`${this.apiUrl}/getCountCandidatureForOffer/${offreId}`);
   }
 
   // Supprimer une candidature

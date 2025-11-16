@@ -132,10 +132,11 @@
                   <span class="material-icons">visibility</span>
                   <span>{{ offer.views || 0 }} vues</span>
                 </div>
-                <div class="stat-item applications">
-                  <span class="material-icons">person</span>
-                  <span>{{ offer.applicationsCount || 0 }} candidatures</span>
-                </div>
+             <div class="stat-item applications">
+  <span class="material-icons">person</span>
+  <span>{{ offer.applicationsCount  }} candidatures</span>
+</div>
+
                 <div class="status-badge" [ngClass]="getStatusClass(offer.status || 'Publié')">
                   {{ offer.status || 'Publié' }}
                 </div>
