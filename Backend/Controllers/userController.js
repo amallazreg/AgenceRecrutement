@@ -76,7 +76,7 @@ const signinController = async (req, res) => {
     // =============================
     // 1️⃣ Rechercher dans la collection User
     // =============================
-    let account = await User.findOne({ name }).select("email name password role _id").exec();
+    let account = await User.findOne({ name }).select("email name password role _id profileStatus").exec();
     let accountType = "user";
 
     // Si pas trouvé, rechercher dans Company
@@ -131,6 +131,7 @@ const signinController = async (req, res) => {
         role: "user",
         userId: account._id,
         name: account.name,
+        profileStatus: account.profileStatus,
       });
     }
   } catch (err) {
@@ -208,7 +209,7 @@ const updateProfile = async (req, res) => {
       updatedUser.skills?.length,
       updatedUser.education?.length,
       updatedUser.experiences?.length,
-      //updatedUser.cv,
+      updatedUser.cv,
     ];
 
     const isComplete = requiredFields.every(field => field && field !== '' && field !== null);

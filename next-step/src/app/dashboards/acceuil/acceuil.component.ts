@@ -10,10 +10,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './acceuil.component.css'
 })
 export class AcceuilComponent implements OnInit, AfterViewInit {
-  @ViewChild(ProfileCompletionComponent)
+   @ViewChild(ProfileCompletionComponent)
   profileModal!: ProfileCompletionComponent;
 
-  userProfileStatus: 'complete' | 'incomplete' = 'incomplete';
+  // ✅ Profil status : 'complete' ou 'incomplete'
+  profileStatus: 'complete' | 'incomplete' = 'incomplete';
   isLoggedIn: boolean = false;
 
   ngOnInit(): void {
@@ -22,7 +23,8 @@ export class AcceuilComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.isLoggedIn && this.userProfileStatus === 'incomplete') {
+    // 🔹 Si utilisateur connecté et profil incomplet, afficher le modal
+    if (this.isLoggedIn && this.profileStatus === 'incomplete') {
       setTimeout(() => {
         this.profileModal?.showModal();
       }, 300);
@@ -32,21 +34,20 @@ export class AcceuilComponent implements OnInit, AfterViewInit {
   // ✅ Vérifie si user est connecté (via token)
   checkLogin(): void {
     const token = localStorage.getItem('token');
-    this.isLoggedIn = !!token;  // true si token existe, sinon false
+    this.isLoggedIn = !!token;  // true si token existe
   }
 
-  // ✅ Vérifie le statut du profil
+  // ✅ Vérifie le statut du profil depuis le localStorage
   checkProfileStatus(): void {
     const status = localStorage.getItem('profileStatus');
-    this.userProfileStatus = status === 'complete' ? 'complete' : 'incomplete';
+    this.profileStatus = status === 'Complet' || status === 'complete' ? 'complete' : 'incomplete';
   }
 
-  // ✅ Quand le profil est complété
+  // ✅ Quand le profil est complété via le modal
   onProfileCompleted(profileData: any): void {
     console.log('✅ Profil complété :', profileData);
-
-    this.userProfileStatus = 'complete';
-    localStorage.setItem('profileStatus', 'complete');
+    this.profileStatus = 'complete';
+    localStorage.setItem('profileStatus', 'Complet');
   }
 
   onModalClosed(): void {
