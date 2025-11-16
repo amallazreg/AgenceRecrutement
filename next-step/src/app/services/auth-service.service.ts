@@ -80,6 +80,24 @@ getUserName(): string {
   return '';
 }
 
+ // Dans ton AuthServiceService
+
+// Récupérer l'ID de l'utilisateur connecté
+getUserId(): string | null {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  try {
+    const decoded = this.decodeToken(token);
+    // Selon comment tu as créé le token, l'ID peut être dans 'id' ou '_id'
+    return decoded.id || decoded._id || null;
+  } catch (error) {
+    console.error('Erreur lors du décodage du token :', error);
+    return null;
+  }
+}
+
+
 logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('role');

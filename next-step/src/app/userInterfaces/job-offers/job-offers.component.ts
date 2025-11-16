@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { SidebarAcceuilComponent } from '../../shared/sidebar-acceuil/sidebar-acceuil.component';
 import { Offer, OfferService } from '../../services/offers.service';
 import { OfferHelperServiceService, SpecificField } from '../../services/offer-helper-service.service';
+import { CandidatureService } from '../../services/candidature.service';
+import { AuthServiceService } from '../../services/auth-service.service';
 
 
 
@@ -60,7 +62,9 @@ export class JobOffersComponent implements OnInit {
   // Types de contrat
   contractTypes: string[] = ['CDI', 'CDD', 'Stage', 'Freelance', 'Alternance'];
   
-constructor(private router: Router, private offersService: OfferService,private offerHelperService : OfferHelperServiceService) {}
+constructor(private router: Router, private offersService: OfferService,private offerHelperService : OfferHelperServiceService,private candidatureService : CandidatureService,
+  private authService : AuthServiceService
+) {}
 
   ngOnInit(): void {
   this.loadJobOffers();
@@ -248,4 +252,29 @@ applyFilters(): void {
       this.motivationLetterFileName = '';
     }
   }
+
+
+
+  submitApplication() {
+  if (!this.selectedOffer) return;
+
+  const candidateId = this.authService.getUserId() as string;
+  console.log("l'id du user est ",candidateId) // remplace par l'ID connecté
+  const offerId = this.selectedOffer._id as string;
+  console.log("l'id d'offre est ", offerId);
+
+ this.candidatureService.applyOffer(offerId, candidateId, this.cvFile, this.motivationLetterFile)
+    .subscribe({
+      next: (res) => {
+        console.log('Candidature réussie', res);
+        alert(res.message);
+        this.closeApplyModal();
+      },
+      error: (err) => {
+        console.error('Erreur candidature', err);
+        alert('Erreur lors de l’envoi de la candidature');
+      }
+    });
+}
+
 }
