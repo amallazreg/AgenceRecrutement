@@ -188,6 +188,9 @@ expandSidebar(): void {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    this.router.navigate(['/login']);
-  }
+this.router.navigateByUrl('/auth/login').then(() => {
+    window.location.reload();
+  });  }
+
+  
 }

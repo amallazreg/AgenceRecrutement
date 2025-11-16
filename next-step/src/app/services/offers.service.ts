@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Company } from './company.service';
 
 export interface Offer {
   _id?: string;
-  companyId?: string;
-  sector: string;
+companyId: {
+    _id: string;
+    name: string;
+  };  sector: string;
   title: string;
   description: string;
   requiredSkills: string[];
@@ -90,6 +93,9 @@ export interface OfferResponse {
 })
 export class OfferService {
   private apiUrl = `http://localhost:3000/company`;
+    private apiUrl2 = `http://localhost:3000/admin`;
+
+  
 
   constructor(private http: HttpClient) { }
 
@@ -116,6 +122,10 @@ export class OfferService {
   getAllOffers(): Observable<Offer[]> {
     return this.http.get<Offer[]>(`${this.apiUrl}/getAllOffres`);
   }
+
+    getCompanyById(companyId: string): Observable<Company> {
+      return this.http.get<Company>(`${this.apiUrl2}/${companyId}`);
+    }
 
   // 🔵 RÉCUPÉRATION d'une offre par ID
   getOfferById(id: string): Observable<Offer> {
@@ -211,7 +221,7 @@ export class OfferService {
 
     // Ajouter les champs spécifiques selon le secteur
     switch (selectedSector) {
-      case 'Informatique':
+      case 'Technologie':
         return {
           ...baseData,
           programmingLanguages: formData.programmingLanguages || [],

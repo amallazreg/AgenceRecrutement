@@ -123,114 +123,11 @@ export class CompanyOffersComponent implements OnInit {
       error: (error) => {
         console.error('Erreur lors du chargement des offres:', error);
         this.isLoading = false;
-        this.loadDemoData();
       }
     });
   }
 
-  private loadDemoData(): void {
-    this.offers = [
-      {
-        _id: '1',
-        companyId: 'comp1',
-        sector: 'Informatique',
-        title: 'Développeur Full Stack Senior',
-        description: 'Nous recherchons un développeur Full Stack expérimenté pour rejoindre notre équipe technique et participer au développement de nos applications web.',
-        requiredSkills: ['React', 'Node.js', 'MongoDB', 'TypeScript', 'Docker', 'AWS'],
-        experienceLevel: 'Senior',
-        contractType: 'CDI',
-        location: 'Paris, France',
-        salaryRange: '45K - 60K €',
-        remoteOption: 'Hybride',
-        status: 'Publié',
-        views: 342,
-        applicationsCount: 28,
-        startOffreDate: new Date().toISOString(),
-        endOffreDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-        workingHours: '35h/semaine',
-        programmingLanguages: ['JavaScript', 'TypeScript'],
-        frameworks: ['React', 'Node.js', 'Express']
-      },
-      {
-        _id: '2',
-        companyId: 'comp1',
-        sector: 'Marketing',
-        title: 'Chef de Projet Marketing Digital',
-        description: 'Rejoignez notre équipe marketing pour piloter des campagnes digitales innovantes et développer notre présence en ligne.',
-        requiredSkills: ['SEO/SEM', 'Google Ads', 'Analytics'],
-        experienceLevel: 'Intermediate',
-        contractType: 'CDI',
-        location: 'Lyon, France',
-        salaryRange: '38K - 48K €',
-        remoteOption: 'Non',
-        status: 'Publié',
-        views: 187,
-        applicationsCount: 15,
-        startOffreDate: new Date().toISOString(),
-        endOffreDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
-        workingHours: '35h/semaine'
-      },
-      {
-        _id: '3',
-        companyId: 'comp1',
-        sector: 'Finance',
-        title: 'Analyste Financier',
-        description: 'Nous cherchons un analyste financier pour renforcer notre département finance et contribuer à nos analyses stratégiques.',
-        requiredSkills: ['Excel', 'SAP', 'Reporting'],
-        experienceLevel: 'Intermediate',
-        contractType: 'CDI',
-        location: 'Paris La Défense',
-        salaryRange: '40K - 55K €',
-        remoteOption: 'Hybride',
-        status: 'Brouillon',
-        views: 256,
-        applicationsCount: 42,
-        startOffreDate: new Date().toISOString(),
-        endOffreDate: new Date(Date.now() + 22 * 24 * 60 * 60 * 1000).toISOString(),
-        workingHours: '35h/semaine'
-      },
-      {
-        _id: '4',
-        companyId: 'comp1',
-        sector: 'Santé',
-        title: 'Infirmier(ère) en Service de Réanimation',
-        description: 'Rejoignez notre équipe médicale dans un service de réanimation moderne et participez aux soins intensifs.',
-        requiredSkills: ['Diplôme d\'État', 'Réanimation', 'Garde'],
-        experienceLevel: 'Junior',
-        contractType: 'CDI',
-        location: 'Marseille',
-        salaryRange: '30K - 38K €',
-        remoteOption: 'Non',
-        status: 'Publié',
-        views: 124,
-        applicationsCount: 9,
-        startOffreDate: new Date().toISOString(),
-        endOffreDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-        workingHours: '35h/semaine'
-      },
-      {
-        _id: '5',
-        companyId: 'comp1',
-        sector: 'Éducation',
-        title: 'Professeur de Mathématiques - Lycée',
-        description: 'Enseignez les mathématiques à des élèves de lycée dans un établissement dynamique et innovant.',
-        requiredSkills: ['Mathématiques', 'Lycée', 'CAPES'],
-        experienceLevel: 'Intermediate',
-        contractType: 'CDI',
-        location: 'Toulouse',
-        salaryRange: '28K - 35K €',
-        remoteOption: 'Non',
-        status: 'Archivé',
-        views: 98,
-        applicationsCount: 12,
-        startOffreDate: new Date().toISOString(),
-        endOffreDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-        workingHours: '35h/semaine'
-      }
-    ];
-    this.filterOffers();
-    this.updateMetricsAndTabs();
-  }
+  
 
   private updateMetricsAndTabs(): void {
     const publishedCount = this.offers.filter(o => o.status === 'Publié').length;

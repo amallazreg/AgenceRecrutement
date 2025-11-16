@@ -18,7 +18,7 @@
       <div class="stat-card">
         <div class="stat-icon">📋</div>
         <div class="stat-content">
-          <span class="stat-number">{{ jobOffers.length }}</span>
+          <span class="stat-number">{{ offers.length }}</span>
           <span class="stat-label">Offres</span>
         </div>
       </div>
@@ -144,21 +144,22 @@
       
       <!-- Header de la card -->
       <div class="offer-card-header">
-        <div class="company-logo">{{ offer.logo }}</div>
         <div class="offer-badges">
-          <span class="badge badge-type" [class]="'badge-' + offer.type.toLowerCase()">
-            {{ offer.type }}
+          <span class="badge badge-type" [class]="'badge-' + offer.contractType.toLowerCase()">
+            {{ offer.contractType }}
           </span>
-          <span class="badge badge-remote" *ngIf="offer.remote">🏠 Remote</span>
+          <span class="badge badge-remote" *ngIf="offer.remoteOption">🏠 Remote</span>
         </div>
       </div>
 
       <!-- Contenu de la card -->
       <div class="offer-card-body">
-        <h3 class="offer-title">{{ offer.title }}</h3>
+        
+        <h3 class="offer-title">   <span class="info-icon">💼</span>
+{{ offer.title }}</h3>
         <p class="offer-company">
           <span class="company-icon">🏢</span>
-          {{ offer.company }}
+{{ offer.companyId?.name }}
         </p>
         
         <div class="offer-info">
@@ -166,14 +167,19 @@
             <span class="info-icon">📍</span>
             {{ offer.location }}
           </span>
-          <span class="info-item" *ngIf="offer.salary">
+          <span class="info-item" *ngIf="offer.salaryRange">
             <span class="info-icon">💰</span>
-            {{ offer.salary }}
+            {{ offer.salaryRange }}
           </span>
           <span class="info-item">
             <span class="info-icon">⏱️</span>
-            {{ offer.experience }}
+            {{ offer.workingHours }}
           </span>
+          <span class="info-item">
+            <span class="info-icon">📈</span> <!-- symbole de progression -->
+                {{ offer.experienceLevel }}
+            </span>
+
         </div>
 
         <p class="offer-description">
@@ -182,29 +188,42 @@
 
         <!-- Compétences -->
         <div class="offer-skills">
-          <span class="skill-tag" *ngFor="let skill of offer.skills.slice(0, 4)">
-            {{ skill }}
-          </span>
-          <span class="skill-more" *ngIf="offer.skills.length > 4">
-            +{{ offer.skills.length - 4 }}
-          </span>
+          <span 
+  class="skill-tag" 
+  *ngFor="let skill of (offer.requiredSkills || []).slice(0, 4)">
+  {{ skill }}
+</span>
+
+<span class="skill-more" *ngIf="offer.requiredSkills && offer.requiredSkills.length > 4">
+  +{{ offer.requiredSkills.length - 4 }}
+</span>
+
         </div>
       </div>
 
       <!-- Footer de la card -->
-      <div class="offer-card-footer">
-        <span class="posted-date">
-          📅 {{ formatDate(offer.postedDate) }}
-        </span>
-        <span class="deadline" [class.urgent]="getDaysRemaining(offer.deadline) <= 7">
-          <span *ngIf="getDaysRemaining(offer.deadline) > 0">
-            ⏰ {{ getDaysRemaining(offer.deadline) }} jours restants
-          </span>
-          <span *ngIf="getDaysRemaining(offer.deadline) <= 0" class="expired">
-            ⚠️ Expiré
-          </span>
-        </span>
-      </div>
+     <div class="offer-card-footer">
+
+  <!-- Si expiré -->
+ <div class="offer-card-footer">
+
+  <!-- Si expiré -->
+  <span *ngIf="(offer?.daysRemaining ?? 0) < 0"
+ class="expired">
+    ⚠️ {{ offer?.statusInfo }}
+  </span>
+
+  <!-- Sinon : jours restants -->
+  <span *ngIf="(offer?.daysRemaining ?? 0) >= 0"
+ class="posted-date">
+    📅 {{ offer?.daysRemaining }} jours restants
+  </span>
+
+</div>
+
+
+</div>
+
 
     </div>
   </div>
@@ -225,19 +244,25 @@
 
     <!-- Header du Modal -->
     <div class="modal-detail-header">
-      <div class="company-logo-large">{{ selectedOffer.logo }}</div>
+     <!--<div class="company-logo-large">{{ selectedOffer.logo }}</div> --> 
       <div class="header-info">
         <h2 class="detail-title">{{ selectedOffer.title }}</h2>
         <p class="detail-company">
           <span class="company-icon">🏢</span>
-          {{ selectedOffer.company }}
+          {{ selectedOffer.companyId.name }}
+
         </p>
         <div class="detail-badges">
-          <span class="badge badge-type" [class]="'badge-' + selectedOffer.type.toLowerCase()">
-            {{ selectedOffer.type }}
+          <span class="badge badge-type" [class]="'badge-' + selectedOffer.contractType.toLowerCase()">
+            {{ selectedOffer.contractType }}
           </span>
-          <span class="badge badge-remote" *ngIf="selectedOffer.remote">🏠 Télétravail</span>
+          <span class="badge badge-remote" *ngIf="selectedOffer.remoteOption">🏠 Télétravail</span>
           <span class="badge badge-location">📍 {{ selectedOffer.location }}</span>
+          <span class="info-item">
+  <span class="badge badge-location">📈 {{ selectedOffer.experienceLevel }}</span> <!-- symbole de progression -->
+  
+</span>
+
         </div>
       </div>
     </div>
@@ -254,20 +279,20 @@
         <div class="info-grid">
           <div class="info-box">
             <span class="info-label">💰 Salaire</span>
-            <span class="info-value">{{ selectedOffer.salary || 'Non spécifié' }}</span>
+            <span class="info-value">{{ selectedOffer.salaryRange || 'Non spécifié' }}</span>
           </div>
           <div class="info-box">
             <span class="info-label">⏱️ Expérience</span>
-            <span class="info-value">{{ selectedOffer.experience }}</span>
+            <span class="info-value">{{ selectedOffer.experienceLevel }}</span>
           </div>
           <div class="info-box">
             <span class="info-label">📅 Publié le</span>
-            <span class="info-value">{{ formatDate(selectedOffer.postedDate) }}</span>
+            <span class="info-value">{{ (selectedOffer.createdAt) }}</span>
           </div>
           <div class="info-box">
-            <span class="info-label">⏰ Date limite</span>
-            <span class="info-value" [class.urgent]="getDaysRemaining(selectedOffer.deadline) <= 7">
-              {{ formatDate(selectedOffer.deadline) }}
+            <span class="info-label">⏰ days Remaining</span>
+            <span class="info-value" >
+              {{ (selectedOffer.daysRemaining) }}
             </span>
           </div>
         </div>
@@ -289,24 +314,54 @@
           Exigences
         </h3>
         <ul class="requirements-list">
-          <li *ngFor="let req of selectedOffer.requirements">
+          <li *ngFor="let req of selectedOffer.requiredDiploma">
             <span class="bullet">▸</span> {{ req }}
           </li>
         </ul>
       </div>
 
       <!-- Compétences Requises -->
-      <div class="detail-section">
+      <!-- Compétences Requises -->
+      <div class="detail-section" *ngIf="selectedOffer.requiredSkills?.length">
         <h3 class="section-title">
           <span class="section-icon">🎯</span>
           Compétences Requises
         </h3>
         <div class="skills-grid">
-          <span class="skill-badge" *ngFor="let skill of selectedOffer.skills">
+          <span class="skill-badge" *ngFor="let skill of selectedOffer.requiredSkills">
             {{ skill }}
           </span>
         </div>
       </div>
+
+      <!-- Champs spécifiques au secteur -->
+      <ng-container *ngIf="getSpecificFields(selectedOffer) as specificFields">
+        <div class="detail-section" *ngFor="let field of specificFields">
+          <h3 class="section-title">
+            <span class="section-icon">{{ field.icon }}</span>
+            {{ field.label }}
+          </h3>
+          
+          <!-- Type: text -->
+          <p class="detail-description" *ngIf="field.type === 'text'">
+            {{ field.value }}
+          </p>
+          
+          <!-- Type: tags -->
+          <div class="skills-grid" *ngIf="field.type === 'tags' && isArray(field.value)">
+            <span class="skill-badge" *ngFor="let item of asArray(field.value)">
+              {{ item }}
+            </span>
+          </div>
+          
+          <!-- Type: list -->
+          <ul class="requirements-list" *ngIf="field.type === 'list' && isArray(field.value)">
+            <li *ngFor="let item of asArray(field.value)">
+              <span class="bullet">▸</span> {{ item }}
+            </li>
+          </ul>
+        </div>
+      </ng-container>
 
     </div>
 
@@ -315,7 +370,7 @@
       <button class="btn btn-secondary" (click)="closeDetailModal()">
         Fermer
       </button>
-      <button class="btn btn-primary" (click)="applyToOffer(selectedOffer._id)">
+      <button class="btn btn-primary" >
         <span>📤</span> Postuler Maintenant
       </button>
     </div>
