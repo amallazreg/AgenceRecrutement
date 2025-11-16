@@ -51,7 +51,6 @@ export class ProfileCompletionComponent implements OnInit {
     { title: 'Education', icon: '🎓' },
     { title: 'Experience', icon: '💻' },
     { title: 'Languages & Links', icon: '🌐' },
-    { title: 'Documents', icon: '📄' } // Nouvelle étape
   ];
 
   // Fichiers uploadés

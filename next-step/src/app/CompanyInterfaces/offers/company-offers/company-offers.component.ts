@@ -5,6 +5,7 @@ import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
 import { OffersformComponent } from '../offersform/offersform.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Offer, OfferService } from '../../../services/offers.service';
+import { CandidatureService } from '../../../services/candidature.service';
 
 interface Metric {
   value: number | string;
@@ -103,29 +104,42 @@ export class CompanyOffersComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private offerService: OfferService
+    private offerService: OfferService,
+    private candidatureService : CandidatureService
   ) {}
 
   ngOnInit(): void {
     this.loadOffers();
   }
 
-  loadOffers(): void {
-    this.isLoading = true;
-    
-    this.offerService.getOffersByCompany().subscribe({
-      next: (offers) => {
-        this.offers = offers || [];
-        this.filterOffers();
-        this.updateMetricsAndTabs();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des offres:', error);
-        this.isLoading = false;
-      }
-    });
-  }
+ loadOffers(): void {
+  this.isLoading = true;
+  
+  this.offerService.getOffersByCompany().subscribe({
+    next: (offers) => {
+      this.offers = offers || [];
+
+      // Pour chaque offre, récupérer le nombre de candidatures
+      this.offers.forEach(offer => {
+        this.candidatureService.getCandidatureCount(offer._id!).subscribe({
+          next: (res) => {
+            offer.applicationsCount = res.candidatureCount;
+          },
+          error: (err) => console.error(err)
+        });
+      });
+
+      this.filterOffers();
+      this.updateMetricsAndTabs();
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Erreur lors du chargement des offres:', error);
+      this.isLoading = false;
+    }
+  });
+}
+
 
   
 

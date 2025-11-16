@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { SidebarAcceuilComponent } from '../../shared/sidebar-acceuil/sidebar-acceuil.component';
 import { Offer, OfferService } from '../../services/offers.service';
 import { OfferHelperServiceService, SpecificField } from '../../services/offer-helper-service.service';
+import { CandidatureService } from '../../services/candidature.service';
+import { AuthServiceService } from '../../services/auth-service.service';
 
 
 
@@ -34,6 +36,17 @@ export class JobOffersComponent implements OnInit {
   isLoading: boolean = true;
   viewMode: 'grid' | 'list' = 'grid';
 
+  // Variables pour le modal de candidature
+  isApplyModalOpen: boolean = false;
+
+  // Variables pour les fichiers
+  cvFile: File | null = null;
+  cvFileName: string = '';
+  motivationLetterFile: File | null = null;
+  motivationLetterFileName: string = '';
+
+  
+  
   // Catégories disponibles
   categories: string[] = [
     'Technologie',
@@ -48,6 +61,7 @@ export class JobOffersComponent implements OnInit {
   // Types de contrat
   contractTypes: string[] = ['CDI', 'CDD', 'Stage', 'Freelance', 'Alternance'];
   
+
   // ============================================
   // SYSTÈME D'ICÔNES EMOJI PAR SECTEUR
   // ============================================
@@ -118,11 +132,10 @@ export class JobOffersComponent implements OnInit {
     'precision_manufacturing': '🏭'
   };
 
-  constructor(
-    private router: Router, 
-    private offersService: OfferService,
-    private offerHelperService: OfferHelperServiceService
-  ) {}
+
+constructor(private router: Router, private offersService: OfferService,private offerHelperService : OfferHelperServiceService,private candidatureService : CandidatureService,
+  private authService : AuthServiceService
+) {}
 
   ngOnInit(): void {
     this.loadJobOffers();
@@ -319,11 +332,21 @@ export class JobOffersComponent implements OnInit {
   // GESTION DU MODAL
   // ============================================
   
-  openOfferDetails(offer: Offer): void {
-    this.selectedOffer = offer;
-    this.isDetailModalOpen = true;
-    document.body.style.overflow = 'hidden';
-  }
+
+
+openOfferDetails(offer: Offer) {
+  // Incrémente les vues via le service
+  this.offersService.incrementViews(offer._id!).subscribe({
+    next: (updatedOffer) => {
+      offer.views = updatedOffer.views; // met à jour localement pour affichage immédiat
+    },
+    error: (err) => console.error('Erreur lors de l\'incrémentation des vues', err)
+  });
+
+  // Ouvre le modal
+  this.selectedOffer = offer;
+  this.isDetailModalOpen = true;
+}
 
   closeDetailModal(): void {
     this.isDetailModalOpen = false;
@@ -365,4 +388,67 @@ export class JobOffersComponent implements OnInit {
       year: 'numeric'
     });
   }
+
+ 
+
+
+   // Méthodes pour le modal
+  openApplyModal() {
+    this.isApplyModalOpen = true;
+  }
+
+  closeApplyModal() {
+    this.isApplyModalOpen = false;
+    this.cvFile = null;
+    this.motivationLetterFile = null;
+  }
+
+   // Méthodes pour gérer les fichiers
+  onFileSelected(event: any, type: 'cv' | 'motivationLetter') {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    if (type === 'cv') {
+      this.cvFile = file;
+      this.cvFileName = file.name;
+    } else {
+      this.motivationLetterFile = file;
+      this.motivationLetterFileName = file.name;
+    }
+  }
+
+  removeFile(type: 'cv' | 'motivationLetter') {
+    if (type === 'cv') {
+      this.cvFile = null;
+      this.cvFileName = '';
+    } else {
+      this.motivationLetterFile = null;
+      this.motivationLetterFileName = '';
+    }
+  }
+
+
+
+  submitApplication() {
+  if (!this.selectedOffer) return;
+
+  const candidateId = this.authService.getUserId() as string;
+  console.log("l'id du user est ",candidateId) // remplace par l'ID connecté
+  const offerId = this.selectedOffer._id as string;
+  console.log("l'id d'offre est ", offerId);
+
+ this.candidatureService.applyOffer(offerId, candidateId, this.cvFile, this.motivationLetterFile)
+    .subscribe({
+      next: (res) => {
+        console.log('Candidature réussie', res);
+        alert(res.message);
+        this.closeApplyModal();
+      },
+      error: (err) => {
+        console.error('Erreur candidature', err);
+        alert('Erreur lors de l’envoi de la candidature');
+      }
+    });
+}
+
 }
