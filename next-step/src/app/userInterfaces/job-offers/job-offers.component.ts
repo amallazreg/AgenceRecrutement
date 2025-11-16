@@ -35,6 +35,15 @@ export class JobOffersComponent implements OnInit {
   isLoading: boolean = true;
   viewMode: 'grid' | 'list' = 'grid';
 
+  // Variables pour le modal de candidature
+  isApplyModalOpen: boolean = false;
+
+  // Variables pour les fichiers
+  cvFile: File | null = null;
+  cvFileName: string = '';
+  motivationLetterFile: File | null = null;
+  motivationLetterFileName: string = '';
+
   
   
   // Catégories disponibles
@@ -203,5 +212,40 @@ applyFilters(): void {
       month: 'short',
       year: 'numeric'
     });
+  }
+
+   // Méthodes pour le modal
+  openApplyModal() {
+    this.isApplyModalOpen = true;
+  }
+
+  closeApplyModal() {
+    this.isApplyModalOpen = false;
+    this.cvFile = null;
+    this.motivationLetterFile = null;
+  }
+
+   // Méthodes pour gérer les fichiers
+  onFileSelected(event: any, type: 'cv' | 'motivationLetter') {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    if (type === 'cv') {
+      this.cvFile = file;
+      this.cvFileName = file.name;
+    } else {
+      this.motivationLetterFile = file;
+      this.motivationLetterFileName = file.name;
+    }
+  }
+
+  removeFile(type: 'cv' | 'motivationLetter') {
+    if (type === 'cv') {
+      this.cvFile = null;
+      this.cvFileName = '';
+    } else {
+      this.motivationLetterFile = null;
+      this.motivationLetterFileName = '';
+    }
   }
 }

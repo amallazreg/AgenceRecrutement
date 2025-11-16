@@ -166,9 +166,7 @@ const updateProfile = async (req, res) => {
       portfolio,
     } = req.body;
 
-    // 🔹 Si l'utilisateur a uploadé des fichiers (CV, lettre de motivation)
-    const cv = req.files?.cv ? req.files.cv[0].filename : undefined;
-    const motivationLetter = req.files?.motivationLetter ? req.files.motivationLetter[0].filename : undefined;
+  
 
     // 🔹 Construire un objet de mise à jour dynamique
     const updateData = {
@@ -183,8 +181,7 @@ const updateProfile = async (req, res) => {
       linkedin,
       github,
       portfolio,
-      cv,
-      motivationLetter,
+ 
     };
 
     // Ajouter les tableaux si présents
@@ -209,7 +206,6 @@ const updateProfile = async (req, res) => {
       updatedUser.skills?.length,
       updatedUser.education?.length,
       updatedUser.experiences?.length,
-      updatedUser.cv,
     ];
 
     const isComplete = requiredFields.every(field => field && field !== '' && field !== null);
