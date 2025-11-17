@@ -7,6 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Offer, OfferService } from '../../../services/offers.service';
 import { CandidatureService } from '../../../services/candidature.service';
 import { Router } from '@angular/router';
+import { forkJoin, tap } from 'rxjs';
+
 
 interface Metric {
   value: number | string;
@@ -124,30 +126,24 @@ export class CompanyOffersComponent implements OnInit {
       });
   }
 
- loadOffers(): void {
+loadOffers(): void {
   this.isLoading = true;
-  
+
   this.offerService.getOffersByCompany().subscribe({
     next: (offers) => {
       this.offers = offers || [];
 
-      // Pour chaque offre, récupérer le nombre de candidatures
-    this.offers.forEach(offer => {
-      console.log(offer._id!)
-        this.candidatureService.getCandidatureCount(offer._id!).subscribe(res => {
-          offer.applicationsCount = res.candidatureCount;
-                console.log(offer.applicationsCount)
+      const calls = this.offers.map(offer =>
+        this.candidatureService.getCandidatureCount(offer._id!).pipe(
+          tap(res => offer.applicationsCount = res.candidatureCount)
+        )
+      );
 
-        });
+      forkJoin(calls).subscribe(() => {
+        this.filterOffers();              // 🔥 maintenant applicationsCount existe
+        this.updateMetricsAndTabs();      // 🔥 les stats vont s’afficher correctement
+        this.isLoading = false;           // 🔥 charge terminé
       });
-
-      this.filterOffers();
-      this.updateMetricsAndTabs();
-      this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('Erreur lors du chargement des offres:', error);
-      this.isLoading = false;
     }
   });
 }
