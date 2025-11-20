@@ -134,3 +134,29 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# ==============================
+# PYTHON & IA
+# ==============================
+
+# Virtual environment
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IA model files
+*.bin
+*.pt
+
+# Uploads (CV, letters, etc.)
+Backend/uploads/
+
+# Notebooks
+*.ipynb
+
+# Local configs
+*.env
