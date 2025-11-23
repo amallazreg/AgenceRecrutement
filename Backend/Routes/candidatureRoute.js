@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const {applyOffer,getCandidatureForOffer,getMyCandidature,updateCandidatureStatus,getCountCandidatureForOffer, deleteCandidature,getNotification, notificationLue} = require('../Controllers/candidatureController');
+const {applyOffer,getCandidatureForOffer,getMyCandidature,updateCandidatureStatus,getCountCandidatureForOffer,
+   deleteCandidature,getNotification, notificationLue,getAllCandidatureForCompany} = require('../Controllers/candidatureController');
 const upload = require('../middleware/upload'); // Multer pour fichiers
 
 router.post('/applyOffer/:offerId/:candidateId', upload.fields([
@@ -19,6 +20,8 @@ router.get('/getCountCandidatureForOffer/:offerId', getCountCandidatureForOffer)
 
 router.get('getNotification/:candidateId',getNotification); 
 router.put('notificationLue/:id',notificationLue);
+
+router.get('/getAllCandidatureForCompany/:companyId', getAllCandidatureForCompany);
 
 
 

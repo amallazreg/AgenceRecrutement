@@ -33,10 +33,7 @@
           <div class="metric-content">
             <h3>{{ getTotalCandidates() }}</h3>
             <p>Total Candidates</p>
-            <div class="metric-trend up">
-              <span class="material-icons">trending_up</span>
-              +12% this month
-            </div>
+            
           </div>
         </div>
         
@@ -45,12 +42,9 @@
             <span class="material-icons">schedule</span>
           </div>
           <div class="metric-content">
-            <h3>{{ getPendingCount() }}</h3>
+            <h3>{{ getRefuseCount() }}</h3>
             <p>Pending Review</p>
-            <div class="metric-trend up">
-              <span class="material-icons">trending_up</span>
-              +8 new today
-            </div>
+          
           </div>
         </div>
         
@@ -61,10 +55,7 @@
           <div class="metric-content">
             <h3>{{ getAcceptedCount() }}</h3>
             <p>Accepted</p>
-            <div class="metric-trend up">
-              <span class="material-icons">trending_up</span>
-              +5.2%
-            </div>
+          
           </div>
         </div>
         
@@ -73,12 +64,9 @@
             <span class="material-icons">event_available</span>
           </div>
           <div class="metric-content">
-            <h3>{{ getInterviewCount() }}</h3>
+            <h3>{{ getEnAttenteCount() }}</h3>
             <p>Interviews Scheduled</p>
-            <div class="metric-trend up">
-              <span class="material-icons">trending_up</span>
-              3 this week
-            </div>
+         
           </div>
         </div>
       </div>
@@ -108,15 +96,15 @@
           </button>
           <button 
             class="filter-chip status-pending"
-            [class.active]="activeStatusFilter === 'pending'"
-            (click)="filterByStatus('pending')">
+            [class.active]="activeStatusFilter === 'En attente'"
+            (click)="filterByStatus('En attente')">
             <span class="material-icons">schedule</span>
             Pending
           </button>
           <button 
             class="filter-chip status-accepted"
-            [class.active]="activeStatusFilter === 'accepted'"
-            (click)="filterByStatus('accepted')">
+            [class.active]="activeStatusFilter === 'Accepté'"
+            (click)="filterByStatus('Accepté')">
             <span class="material-icons">check_circle</span>
             Accepted
           </button>
@@ -129,8 +117,8 @@
           </button>
           <button 
             class="filter-chip status-rejected"
-            [class.active]="activeStatusFilter === 'rejected'"
-            (click)="filterByStatus('rejected')">
+            [class.active]="activeStatusFilter === 'Refusé'"
+            (click)="filterByStatus('Refusé')">
             <span class="material-icons">cancel</span>
             Rejected
           </button>
@@ -204,7 +192,7 @@
                 <!-- Job Position -->
                 <td class="position-cell">
                   <div class="position-info">
-                    <h4 class="position-title">{{ candidate.appliedPosition }}</h4>
+                    <h4 class="position-title">{{ candidate.offerTitle }}</h4>
                     <span class="position-department">{{ candidate.department }}</span>
                   </div>
                 </td>
@@ -212,8 +200,8 @@
                 <!-- Applied Date -->
                 <td class="date-cell">
                   <div class="date-info">
-                    <span class="date-value">{{ candidate.appliedDate | date:'MMM d, yyyy' }}</span>
-                    <span class="date-time">{{ getTimeAgo(candidate.appliedDate) }}</span>
+                    <span class="date-value">{{ candidate.submittedAt | date:'MMM d, yyyy' }}</span>
+                    <span class="date-time">{{ getTimeAgo(candidate.submittedAt) }}</span>
                   </div>
                 </td>
                 
@@ -225,11 +213,11 @@
                       [ngClass]="getStatusClass(candidate.status)"
                       [(ngModel)]="candidate.status"
                       (change)="onStatusChange(candidate)">
-                      <option value="pending">⏳ Pending</option>
+                      <option value="En attente">⏳ Pending</option>
                       <option value="reviewed">👀 Reviewed</option>
                       <option value="interview">📅 Interview</option>
-                      <option value="accepted">✅ Accepted</option>
-                      <option value="rejected">❌ Rejected</option>
+                      <option value="Accepté">✅ Accepted</option>
+                      <option value="Refusé">❌ Rejected</option>
                     </select>
                   </div>
                 </td>
@@ -249,11 +237,11 @@
                 <!-- Skills -->
                 <td class="skills-cell">
                   <div class="skills-preview">
-                    <span class="skill-tag" *ngFor="let skill of candidate.topSkills?.slice(0, 2)">
+                    <span class="skill-tag" *ngFor="let skill of candidate.skills?.slice(0, 2)">
                       {{ skill }}
                     </span>
-                    <span class="skill-more" *ngIf="candidate.topSkills && candidate.topSkills.length > 2">
-                      +{{ candidate.topSkills.length - 2 }}
+                    <span class="skill-more" *ngIf="candidate.skills && candidate.skills.length > 2">
+                      +{{ candidate.skills.length - 2 }}
                     </span>
                   </div>
                 </td>

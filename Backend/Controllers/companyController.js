@@ -79,8 +79,23 @@ const signinController = async (req, res) => {
     }
 };
 
+const getCurrentCompany = async (req, res) => {
+  try {
+    const company = req.company; // récupérée depuis le middleware
+    if (!company) {
+      return res.status(404).json({ message: 'Company not found' });
+    }
+    res.status(200).json(company);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
 
 module.exports = {
     signupController,
-    signinController
+    signinController,
+    getCurrentCompany
 };

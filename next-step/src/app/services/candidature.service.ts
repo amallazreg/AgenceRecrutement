@@ -133,4 +133,8 @@ markAsRead(id: string) {
   return this.http.put(`${this.apiUrl}/notificationLue/${id}`, {});
 }
 
+ getAllForCompany(companyId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/getAllCandidatureForCompany/${companyId}`);
+  }
+
 }

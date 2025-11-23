@@ -1,10 +1,13 @@
 
 const express = require('express');
 const router = express.Router();
-const { signupController, signinController} = require('../Controllers/companyController');
+const { signupController, signinController,getCurrentCompany} = require('../Controllers/companyController');
+const authMiddleware = require('../middleware/authMiddleware'); // middleware pour vérifier le token
+
 
 router.post('/signupCompany', signupController);
 router.post('/signin', signinController);
+router.get('/companyDashboard', authMiddleware, getCurrentCompany);
 
 
 

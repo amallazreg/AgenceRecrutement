@@ -34,7 +34,7 @@ export class CompanyService {
       'Content-Type': 'application/json'
     });
 
-    return this.http.get<Company>(`${this.apiUrl}/profile`, { headers });
+    return this.http.get<Company>(`${this.apiUrl}/companyDashboard`, { headers });
   }
 
   // Optionnel: Mettre à jour le profil company
@@ -53,4 +53,18 @@ export class CompanyService {
   getCompanyById(companyId: string): Observable<Company> {
     return this.http.get<Company>(`${this.apiUrl2}/${companyId}`);
   }
+
+  // Récupérer l'ID de la company connectée
+getCurrentCompanyId(): Observable<string> {
+  return new Observable(observer => {
+    this.getCurrentCompany().subscribe({
+      next: (company: Company) => {
+        observer.next(company._id); // renvoie l'ID
+        observer.complete();
+      },
+      error: (err) => observer.error(err)
+    });
+  });
+}
+
 }

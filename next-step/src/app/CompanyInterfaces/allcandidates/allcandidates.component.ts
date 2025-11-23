@@ -2,17 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
+import { CandidatureService } from '../../services/candidature.service';
+import { CompanyService } from '../../services/company.service';
 interface Candidate {
   id: string;
   name: string;
   email: string;
   phone: string;
-  appliedPosition: string;
+  offerTitle: string;
   department: string;
-  appliedDate: Date;
-  status: 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected';
+  submittedAt: Date;
+  status: 'Accepté' | 'Refusé' | 'En attente';
   matchScore: number;
-  topSkills: string[];
+  skills: string[];
   selected?: boolean;
 }
 @Component({
@@ -39,77 +41,56 @@ export class AllcandidatesComponent implements OnInit {
   // Loading
   isLoading: boolean = false;
 
-  constructor() {}
+    companyId: string = '';
+
+
+  constructor(private candidateService : CandidatureService,private companyService : CompanyService) {}
 
   ngOnInit(): void {
-    this.loadCandidates();
+
+this.companyService.getCurrentCompanyId().subscribe({
+  next: (id: string) => {
+    this.companyId = id;  // ici tu as la vraie valeur
+    console.log('Company ID:', this.companyId);
+
+     this.loadCandidates();
+  },
+  error: (err) => {
+    console.error('Erreur lors de la récupération de l’ID:', err);
+  }
+}); 
   }
 
   // ===== DATA LOADING =====
-  loadCandidates(): void {
+ loadCandidates(): void {
     this.isLoading = true;
-    
-    // Simulate API call
-    setTimeout(() => {
-      this.candidates = this.generateMockCandidates();
-      this.filteredCandidates = [...this.candidates];
-      this.updatePagination();
-      this.isLoading = false;
-    }, 1000);
-  }
+    this.candidateService.getAllForCompany(this.companyId).subscribe({
+      next: (res) => {
+        // Mapper backend → frontend
+        this.candidates = res.candidatures.map((c : any)=> ({
+          id: c._id,
+          name: c.candidateName,
+          email: c.candidateEmail,
+          phone: c.phone,
+          offerTitle: c.offerTitle,
+          department: c.department || '',
+          submittedAt: new Date(c.submittedAt),
+          status: c.status,
+          matchScore: c.matchScore ?? Math.floor(Math.random() * 40 + 60),
+          skills: c.skills ?? [],
+          selected: false
+        }));
 
-  generateMockCandidates(): Candidate[] {
-    const positions = [
-      { title: 'Senior Frontend Developer', dept: 'Engineering' },
-      { title: 'Backend Engineer', dept: 'Engineering' },
-      { title: 'Product Manager', dept: 'Product' },
-      { title: 'UX/UI Designer', dept: 'Design' },
-      { title: 'DevOps Engineer', dept: 'Infrastructure' },
-      { title: 'Data Scientist', dept: 'Data' },
-      { title: 'Marketing Manager', dept: 'Marketing' },
-      { title: 'Sales Representative', dept: 'Sales' }
-    ];
-
-    const names = [
-      'Sarah Johnson', 'Michael Chen', 'Emily Rodriguez', 'David Kim',
-      'Jessica Martinez', 'John Anderson', 'Maria Garcia', 'Robert Taylor',
-      'Amanda White', 'Christopher Lee', 'Jennifer Brown', 'Daniel Wilson',
-      'Lisa Davis', 'Matthew Moore', 'Michelle Thomas', 'James Jackson',
-      'Ashley Martin', 'Joshua Thompson', 'Laura Harris', 'Ryan Clark'
-    ];
-
-    const skills = [
-      ['React', 'TypeScript', 'Node.js', 'GraphQL'],
-      ['Python', 'Django', 'PostgreSQL', 'Docker'],
-      ['Figma', 'Adobe XD', 'Sketch', 'Prototyping'],
-      ['AWS', 'Kubernetes', 'CI/CD', 'Terraform'],
-      ['Machine Learning', 'Python', 'TensorFlow', 'SQL'],
-      ['Angular', 'Vue.js', 'JavaScript', 'CSS']
-    ];
-
-    const statuses: ('pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected')[] = 
-      ['pending', 'reviewed', 'interview', 'accepted', 'rejected'];
-
-    return Array.from({ length: 50 }, (_, i) => {
-      const position = positions[Math.floor(Math.random() * positions.length)];
-      const daysAgo = Math.floor(Math.random() * 30);
-      const appliedDate = new Date();
-      appliedDate.setDate(appliedDate.getDate() - daysAgo);
-
-      return {
-        id: `candidate-${i + 1}`,
-        name: names[i % names.length],
-        email: `${names[i % names.length].toLowerCase().replace(' ', '.')}@email.com`,
-        phone: `+1 (555) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
-        appliedPosition: position.title,
-        department: position.dept,
-        appliedDate: appliedDate,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        matchScore: Math.floor(Math.random() * 40 + 60), // 60-100
-        topSkills: skills[Math.floor(Math.random() * skills.length)],
-        selected: false
-      };
+        this.filteredCandidates = [...this.candidates];
+        this.updatePagination();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur chargement candidats:', err);
+        this.isLoading = false;
+      }
     });
+
   }
 
   // ===== METRICS =====
@@ -117,16 +98,18 @@ export class AllcandidatesComponent implements OnInit {
     return this.candidates.length;
   }
 
-  getPendingCount(): number {
-    return this.candidates.filter(c => c.status === 'pending').length;
-  }
+
 
   getAcceptedCount(): number {
-    return this.candidates.filter(c => c.status === 'accepted').length;
+    return this.candidates.filter(c => c.status === 'Accepté').length;
   }
 
-  getInterviewCount(): number {
-    return this.candidates.filter(c => c.status === 'interview').length;
+  getRefuseCount(): number {
+    return this.candidates.filter(c => c.status === 'Refusé').length;
+  }
+
+    getEnAttenteCount(): number {
+    return this.candidates.filter(c => c.status === 'En attente').length;
   }
 
   // ===== SEARCH & FILTER =====
@@ -153,7 +136,7 @@ export class AllcandidatesComponent implements OnInit {
       result = result.filter(c =>
         c.name.toLowerCase().includes(query) ||
         c.email.toLowerCase().includes(query) ||
-        c.appliedPosition.toLowerCase().includes(query) ||
+        c.offerTitle.toLowerCase().includes(query) ||
         c.department.toLowerCase().includes(query)
       );
     }
@@ -182,9 +165,9 @@ export class AllcandidatesComponent implements OnInit {
 
     switch (this.sortBy) {
       case 'date-desc':
-        return sorted.sort((a, b) => b.appliedDate.getTime() - a.appliedDate.getTime());
+        return sorted.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
       case 'date-asc':
-        return sorted.sort((a, b) => a.appliedDate.getTime() - b.appliedDate.getTime());
+        return sorted.sort((a, b) => a.submittedAt.getTime() - b.submittedAt.getTime());
       case 'name-asc':
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'name-desc':

@@ -207,6 +207,52 @@ const notificationLue =  async (req, res) => {
   }
 };
 
+const getAllCandidatureForCompany = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+
+    // Récupérer toutes les offres de la company
+    const offers = await Offer.find({ companyId });
+    if (!offers.length) return res.status(404).json({ message: "Aucune offre trouvée pour cette entreprise" });
+
+    const offerIds = offers.map(offer => offer._id);
+
+    // Récupérer toutes les candidatures liées à ces offres
+    const candidatures = await Candidature.find({ offerId: { $in: offerIds } })
+      .populate('candidateId', 'name email phone skills education experiences languages certifications linkedin github')
+      .populate('offerId', 'title description');
+
+    // Transformer en DTO
+    const candidatureDTO = candidatures.map(app => ({
+      _id: app._id,
+      candidateId: app.candidateId._id,
+      candidateName: app.candidateId.name,
+      candidateEmail: app.candidateId.email,
+      phone: app.candidateId.phone,
+      skills: app.candidateId.skills,
+      education: app.candidateId.education,
+      experiences: app.candidateId.experiences,
+      projects: app.candidateId.projects,
+      languages: app.candidateId.languages,
+      certifications: app.candidateId.certifications,
+      linkedin: app.candidateId.linkedin,
+      github: app.candidateId.github,
+      cv: app.cv,
+      motivationLetter: app.motivationLetter,
+      additionalDocuments: app.additionalDocuments,
+      status: app.status,
+      submittedAt: app.submittedAt,
+      offerTitle: app.offerId.title,
+      offerDescription: app.offerId.description
+    }));
+
+    res.status(200).json({ companyId, candidatures: candidatureDTO });
+
+  } catch (error) {
+    console.error('Erreur récupération candidatures pour l’entreprise :', error);
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
 
 
 module.exports = {
@@ -217,5 +263,6 @@ module.exports = {
     getCountCandidatureForOffer,
     deleteCandidature,
     getNotification,
-    notificationLue
+    notificationLue,
+    getAllCandidatureForCompany
 }
