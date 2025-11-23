@@ -118,7 +118,10 @@ export class CandidatesListComponent implements OnInit {
       next: (response: any) => {
         console.log('✅ Candidats chargés:', response);
         this.candidates = response.candidature || [];
-console.log(this.candidates[0]._id); // affiche l'_id du premier candidat
+        console.log(this.candidates[0]._id); // affiche l'_id du premier candidat
+        console.log('CV du premier candidat:', this.candidates[0].cv);
+console.log('Lettre de motivation du premier candidat:', this.candidates[0].motivationLetter);
+
         this.filteredCandidates = this.candidates;
         this.isLoading = false;
       },

@@ -74,6 +74,7 @@ const getCandidatureForOffer = async (req, res) => {
       certifications: app.candidateId.certifications,
       linkedin: app.candidateId.linkedin,
       github: app.candidateId.github,
+      cv:app.cv,
       motivationLetter: app.motivationLetter,
       additionalDocuments: app.additionalDocuments,
       status: app.status,
