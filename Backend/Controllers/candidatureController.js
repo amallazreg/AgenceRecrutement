@@ -1,6 +1,8 @@
 const Candidature = require('../Models/candidatureModel');
 const Offer = require('../Models/offreModel');
 const User = require('../Models/userModel');
+const Notification = require('../Models/notificationModel');
+
 
 const applyOffer = async (req, res) => {
   try {
@@ -120,6 +122,17 @@ const updateCandidatureStatus = async (req, res) => {
       return res.status(404).json({ message: "Candidature non trouvée" });
     }
 
+     // 🔔 Création d’une notification interne
+    await Notification.create({
+      userId: updatedCandidature.candidateId._id,
+      candidatureId: updatedCandidature._id,
+      status,
+      message:
+        status === "Accepté"
+          ? `🎉 Votre candidature pour l'offre "${updatedCandidature.offerId.title}" a été acceptée.`
+          : `❌ Votre candidature pour l'offre "${updatedCandidature.offerId.title}" a été refusée.`
+    });
+
     res.status(200).json({
       message: `Statut mis à jour avec succès en '${status}'`,
       candidature: updatedCandidature
@@ -166,6 +179,34 @@ const deleteCandidature = async (req, res) => {
   }
 };
 
+// Récupérer les notifications d'un utilisateur
+const getNotification =  async (req, res) => {
+  try {
+    const notifications = await Notification.find({ userId: req.params.userId })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+
+// Marquer une notification comme lue
+const notificationLue =  async (req, res) => {
+  try {
+    const notif = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { read: true },
+      { new: true }
+    );
+
+    res.status(200).json(notif);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+
+
 
 module.exports = {
     applyOffer,
@@ -173,5 +214,7 @@ module.exports = {
     getMyCandidature,
     updateCandidatureStatus,
     getCountCandidatureForOffer,
-    deleteCandidature
+    deleteCandidature,
+    getNotification,
+    notificationLue
 }

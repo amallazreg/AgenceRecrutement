@@ -124,4 +124,13 @@ getCandidatesForOffer(offerId: string): Observable<any> {
 updateCandidatureStatus(candidatureId: string, status: 'Accepté' | 'Refusé'): Observable<any> {
   return this.http.put(`${this.apiUrl}/updateCandidatureStatus/${candidatureId}`, { status });
 }
+
+getUnreadNotifications(candidateId: string) {
+  return this.http.get<any[]>(`${this.apiUrl}/getNotification/${candidateId}`);
+}
+
+markAsRead(id: string) {
+  return this.http.put(`${this.apiUrl}/notificationLue/${id}`, {});
+}
+
 }

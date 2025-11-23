@@ -94,6 +94,15 @@ interface Candidature {
   __v: number;
 }
 
+interface NotificationItem {
+  id: string;
+  message: string;
+  type: "success" | "error";
+  isRead: boolean;
+  date: string;
+}
+
+
 @Component({
   selector: 'app-historique-candidatures',
   standalone: true,
@@ -104,6 +113,9 @@ interface Candidature {
 export class HistoriqueCandidaturesComponent implements OnInit {
   candidatures: Candidature[] = [];
   filteredCandidatures: Candidature[] = [];
+
+  notifications: NotificationItem[] = [];
+
   
   searchQuery: string = '';
   activeFilter: string = 'all';
@@ -119,6 +131,11 @@ export class HistoriqueCandidaturesComponent implements OnInit {
 
   // ID du candidat connecté
   currentCandidateId: string = '';
+
+  showNotification: boolean = false;
+notificationMessage: string = "";
+notificationType: string = ""; // success | error
+notificationIcon: string = ""; // emoji
 
   constructor(
     private router: Router,
@@ -179,6 +196,9 @@ getCompanyName(offer: Offer): string {
       
         this.filteredCandidatures = data;
         this.isLoading = false;
+        
+        this.checkForNewNotifications();
+
 
       },
       error: (err) => {
@@ -313,4 +333,84 @@ getCompanyName(offer: Offer): string {
     this.showDeleteModal = false;
     this.candidatureToDelete = null;
   }
+
+  // Afficher une notification
+displayNotification(message: string, type: "success" | "error") {
+  this.notificationMessage = message;
+  this.notificationType = type;
+  this.notificationIcon = type === "success" ? "🎉" : "⚠️";
+  this.showNotification = true;
+
+  setTimeout(() => {
+    this.showNotification = false;
+  }, 5000); // disparaît après 5 sec
+}
+
+closeNotification() {
+  this.showNotification = false;
+}
+
+markNotificationAsRead(notif: NotificationItem) {
+  notif.isRead = true;
+
+  // Charger ancien stockage
+  const readNotifications = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+
+  // Ajouter la notification lue
+  if (!readNotifications.includes(notif.id)) {
+    readNotifications.push(notif.id);
+  }
+
+  // Sauvegarder
+  localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+
+  // Retirer visuellement la notification
+  this.notifications = this.notifications.filter(n => n.id !== notif.id);
+}
+
+
+checkForNewNotifications() {
+  // Charger les notifications déjà lues depuis localStorage
+  const readNotifications = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+
+  this.notifications = []; // reset
+
+  // Parcourir toutes les candidatures
+  this.candidatures.forEach(c => {
+    // ID unique pour chaque notification
+    const notifId = `${c._id}_${c.status}`;
+
+    // Si déjà lue → on ignore
+    if (readNotifications.includes(notifId)) return;
+
+    // Générer un message
+    let message = "";
+    let type: "success" | "error" = "success";
+
+    if (c.status === "Accepté") {
+      message = `Félicitations ! Votre candidature pour '${c.offerId.title}' a été ACCEPTÉE 🎉`;
+      type = "success";
+    }
+
+    if (c.status === "Refusé") {
+      message = `Votre candidature pour '${c.offerId.title}' a été REFUSÉE ❌`;
+      type = "error";
+    }
+
+    // Ajouter notification si message disponible
+    if (message !== "") {
+      this.notifications.push({
+        id: notifId,
+        message,
+        type,
+        isRead: false,
+        date: c.submittedAt
+      });
+    }
+  });
+}
+
+
+
+
 }

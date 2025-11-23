@@ -1,7 +1,19 @@
 <!-- historique-candidatures.component.html -->
 <app-sidebar-acceuil></app-sidebar-acceuil>
 
+
 <div class="candidatures-container">
+<div class="notification-container">
+  <div *ngFor="let notif of notifications" 
+       class="notification-box"
+       [ngClass]="notif.type">
+
+    <span class="close-btn" (click)="markNotificationAsRead(notif)">×</span>
+
+    <p>{{ notif.message }}</p>
+  </div>
+</div>
+
 
   <!-- Header avec animation -->
   <div class="page-header">

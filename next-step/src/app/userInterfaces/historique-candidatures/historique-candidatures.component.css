@@ -904,3 +904,36 @@
     grid-template-columns: 1fr;
   }
 }
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 340px;
+  z-index: 2000;
+}
+
+.notification-box {
+  padding: 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  color: white;
+  animation: fadeIn 0.4s ease;
+  font-size: 15px;
+  position: relative;
+}
+
+.notification-box.success {
+  background-color: #4caf50;
+}
+
+.notification-box.error {
+  background-color: #f44336;
+}
+
+.close-btn {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
