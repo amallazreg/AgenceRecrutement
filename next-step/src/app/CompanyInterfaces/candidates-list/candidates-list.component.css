@@ -942,3 +942,31 @@
     padding: 0;
   }
 }
+
+.match-score-container {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.match-score {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Couleurs selon le niveau */
+.match-score.high {
+  background-color: #2ecc71; /* Vert */
+}
+
+.match-score.medium {
+  background-color: #f1c40f; /* Jaune */
+}
+
+.match-score.low {
+  background-color: #e74c3c; /* Rouge */
+}

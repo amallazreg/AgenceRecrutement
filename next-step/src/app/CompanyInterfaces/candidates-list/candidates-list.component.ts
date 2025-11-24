@@ -62,6 +62,7 @@ interface Candidat {
   additionalDocuments: string[];
   status: 'En attente' | 'Accepté' | 'Refusé';
   submittedAt: string;
+  matchScore?: number;
 }
 
 @Component({
@@ -117,7 +118,7 @@ export class CandidatesListComponent implements OnInit {
     this.candidatureService.getCandidatesForOffer(this.offerId).subscribe({
       next: (response: any) => {
         console.log('✅ Candidats chargés:', response);
-        this.candidates = response.candidature || [];
+        this.candidates = response.candidatures || [];
         console.log(this.candidates[0]._id); // affiche l'_id du premier candidat
         console.log('CV du premier candidat:', this.candidates[0].cv);
 console.log('Lettre de motivation du premier candidat:', this.candidates[0].motivationLetter);

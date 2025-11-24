@@ -137,6 +137,17 @@
           </div>
         </div>
 
+              <!-- Match Score -->
+      <div class="match-score-container" *ngIf="candidate.matchScore !== undefined">
+        <div class="match-score" [ngClass]="{
+          'high': candidate.matchScore >= 0.75,
+          'medium': candidate.matchScore >= 0.5 && candidate.matchScore < 0.75,
+          'low': candidate.matchScore < 0.5
+        }">
+          {{ (candidate.matchScore * 100) | number:'1.0-0' }}%
+        </div>
+      </div>
+
         <!-- Compétences -->
         <div class="skills-section" *ngIf="candidate.skills && candidate.skills.length > 0">
           <h4 class="section-title">
