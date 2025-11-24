@@ -188,7 +188,16 @@ const updateProfile = async (req, res) => {
     if (education) updateData.education = JSON.parse(education);
     if (experiences) updateData.experiences = JSON.parse(experiences);
     if (projects) updateData.projects = JSON.parse(projects);
-    if (skills) updateData.skills = Array.isArray(skills) ? skills : skills?.split(',');
+    if (skills) {
+  try {
+    updateData.skills = Array.isArray(skills)
+      ? skills
+      : JSON.parse(skills);
+  } catch {
+    updateData.skills = skills.split(',');
+  }
+}
+
     if (languages) updateData.languages = JSON.parse(languages);
     if (certifications) updateData.certifications = JSON.parse(certifications);
 

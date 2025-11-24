@@ -76,9 +76,15 @@ this.companyService.getCurrentCompanyId().subscribe({
           department: c.department || '',
           submittedAt: new Date(c.submittedAt),
           status: c.status,
-          matchScore: c.matchScore ?? Math.floor(Math.random() * 40 + 60),
-          skills: c.skills ?? [],
-          selected: false
+matchScore:
+  c.matchScore !== undefined && c.matchScore !== null
+    ? Math.round(c.matchScore * 100)
+    : 0,
+              skills: Array.isArray(c.skills) ? c.skills : [],  // ✔️ FIX
+
+
+ 
+         selected: false
         }));
 
         this.filteredCandidates = [...this.candidates];

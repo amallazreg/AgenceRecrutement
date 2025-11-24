@@ -107,10 +107,7 @@
             </div>
           </div>
 
-          <div class="remember">
-            <input type="checkbox" id="accept" name="accept" [(ngModel)]="formData.acceptTerms" required>
-            <label for="accept">Remember me</label>
-          </div>
+      
 
           <button type="submit" class="btn" [disabled]="!loginForm.valid">
             Log in as {{ loginMode === 'company' ? 'Company' : 'User' }}

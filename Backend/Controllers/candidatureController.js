@@ -2,6 +2,11 @@ const Candidature = require('../Models/candidatureModel');
 const Offer = require('../Models/offreModel');
 const User = require('../Models/userModel');
 const Notification = require('../Models/notificationModel');
+const axios = require("axios");
+const fs = require("fs");
+const extractPdfText = require("../utils/pdfReader");
+const pdf = require("pdf-parse-fixed");
+const FormData = require("form-data");
 
 
 const applyOffer = async (req, res) => {
@@ -16,20 +21,68 @@ const applyOffer = async (req, res) => {
     const candidate = await User.findById(candidateId);
     if (!candidate) return res.status(404).json({ message: "Candidat non trouvé" });
 
-    // Fichiers uploadés
-    const cv = req.files?.cv ? req.files.cv[0].filename : undefined;
-    const motivationLetter = req.files?.motivationLetter ? req.files.motivationLetter[0].filename : undefined;
+    // Vérifier CV
+    if (!req.files?.cv)
+      return res.status(400).json({ message: "CV obligatoire" });
+
+    // Fichiers importés
+    const cvFile = req.files.cv[0];
+    const motivationLetter = req.files?.motivationLetter
+      ? req.files.motivationLetter[0].filename
+      : undefined;
+
     const additionalDocuments = req.files?.additionalDocuments
       ? req.files.additionalDocuments.map(file => file.filename)
       : [];
 
-    // Créer la candidature
+    // 1️⃣ LIRE le CV PDF en texte
+    const cvPath = cvFile.path;
+    const cvBuffer = fs.readFileSync(cvPath);
+    const cvData = await pdf(cvBuffer);
+    const cvText = cvData.text;
+
+    // 2️⃣ Construire objet OFFER pour Flask
+    const offerData = {
+      title: offer.title,
+      description: offer.description,
+      experienceLevel: offer.experienceLevel,
+      contractType: offer.contractType,
+      location: offer.location,
+      workingHours: offer.workingHours,
+      remoteOption: offer.remoteOption,
+      programmingLanguages: offer.programmingLanguages,
+      frameworks: offer.frameworks,
+      databaseKnowledge: offer.databaseKnowledge,
+      tools: offer.tools,
+      methodology: offer.methodology
+    };
+
+    // 3️⃣ Préparer FORM-DATA vers Flask
+    const formData = new FormData();
+    formData.append("cv", fs.createReadStream(cvPath));        // PDF
+    formData.append("offer", JSON.stringify(offerData));       // Offre JSON
+
+    // 4️⃣ Requête Flask
+    const response = await axios.post(
+      "http://127.0.0.1:5000/match",
+      formData,
+      { headers: formData.getHeaders() }
+    );
+
+    console.log("FLASK RESPONSE:", response.data); // DEBUG
+
+    const matchScore = response.data?.similarite || 0;
+    console.log("MATCH SCORE:", matchScore);       // DEBUG
+
+    // 5️⃣ Sauvegarde candidature
     const candidature = new Candidature({
       candidateId,
       offerId,
-      cv,
+      cv: cvFile.filename,
       motivationLetter,
-      additionalDocuments
+      additionalDocuments,
+      matchScore,
+      status: "En attente",
     });
 
     await candidature.save();
@@ -38,11 +91,14 @@ const applyOffer = async (req, res) => {
       message: "Candidature envoyée avec succès",
       candidature
     });
+
   } catch (error) {
     console.error("Erreur lors de la candidature :", error);
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
+
+
 
 
 
@@ -54,13 +110,16 @@ const getCandidatureForOffer = async (req, res) => {
     const offer = await Offer.findById(offerId);
     if (!offer) return res.status(404).json({ message: "Offre non trouvée" });
 
-    // Récupérer les candidatures
-    const candidature = await Candidature.find({ offerId })
-      .populate('candidateId', 'name email phone skills education experiences languages certifications linkedin github'); 
-      // <-- ici on choisit uniquement les champs que la company peut voir
+    // Récupérer les candidatures TRIEES par matchScore DESC
+    const candidatures = await Candidature.find({ offerId })
+      .sort({ matchScore: -1 })   // 🔥 TRI DU MEILLEUR AU MOINS BON
+      .populate(
+        "candidateId",
+        "name email phone skills education experiences languages certifications linkedin github"
+      );
 
-    // Transformer en DTO pour sécuriser la réponse
-    const candidatureDTO = candidature.map(app => ({
+    // Mapper et inclure matchScore
+    const candidatureDTO = candidatures.map(app => ({
       _id: app._id,
       candidateId: app.candidateId._id,
       candidateName: app.candidateId.name,
@@ -74,14 +133,17 @@ const getCandidatureForOffer = async (req, res) => {
       certifications: app.candidateId.certifications,
       linkedin: app.candidateId.linkedin,
       github: app.candidateId.github,
-      cv:app.cv,
+      cv: app.cv,
       motivationLetter: app.motivationLetter,
       additionalDocuments: app.additionalDocuments,
+
+      matchScore: app.matchScore,   // ✅ IMPORTANT
+
       status: app.status,
       submittedAt: app.submittedAt
     }));
 
-    res.status(200).json({ offerId, candidature: candidatureDTO });
+    res.status(200).json({ offerId, candidatures: candidatureDTO });
 
   } catch (error) {
     console.error('Erreur récupération candidatures :', error);
@@ -217,12 +279,12 @@ const getAllCandidatureForCompany = async (req, res) => {
 
     const offerIds = offers.map(offer => offer._id);
 
-    // Récupérer toutes les candidatures liées à ces offres
+    // 🔥 Récupérer candidatures triées par matchScore DESC
     const candidatures = await Candidature.find({ offerId: { $in: offerIds } })
+      .sort({ matchScore: -1 })   // <-- TRI DU MEILLEUR AU MOINS BON
       .populate('candidateId', 'name email phone skills education experiences languages certifications linkedin github')
       .populate('offerId', 'title description');
 
-    // Transformer en DTO
     const candidatureDTO = candidatures.map(app => ({
       _id: app._id,
       candidateId: app.candidateId._id,
@@ -240,6 +302,9 @@ const getAllCandidatureForCompany = async (req, res) => {
       cv: app.cv,
       motivationLetter: app.motivationLetter,
       additionalDocuments: app.additionalDocuments,
+
+      matchScore: app.matchScore,  // <-- INCLUS DANS LE DTO
+
       status: app.status,
       submittedAt: app.submittedAt,
       offerTitle: app.offerId.title,
@@ -253,7 +318,6 @@ const getAllCandidatureForCompany = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
-
 
 module.exports = {
     applyOffer,
