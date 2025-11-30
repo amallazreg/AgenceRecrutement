@@ -9,6 +9,8 @@ const pdf = require("pdf-parse-fixed");
 const FormData = require("form-data");
 
 
+
+
 const applyOffer = async (req, res) => {
   try {
     const { offerId, candidateId } = req.params;

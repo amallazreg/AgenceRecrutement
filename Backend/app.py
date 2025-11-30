@@ -84,5 +84,29 @@ def match_cv_offer():
         "offer_text": offer_text  # optionnel mais utile pour debug
     })
 
+
+@app.post("/recommend")
+def recommend_offer():
+    data = request.get_json()
+
+    if "profile" not in data or "offer" not in data:
+        return jsonify({"error": "Champs 'profile' et 'offer' obligatoires"}), 400
+
+    profile_text = data["profile"]
+    offer_obj = data["offer"]
+
+    # Transformer l’offre en texte
+    offer_text = offer_to_text(offer_obj)
+
+    # Similarité SBERT
+    score = calculer_similarite(profile_text, offer_text)
+
+    return jsonify({
+        "similarite": score,
+        "profile_length": len(profile_text),
+        "offer_text": offer_text
+    })
+
+
 if __name__ == "__main__":
     app.run(debug=True)
