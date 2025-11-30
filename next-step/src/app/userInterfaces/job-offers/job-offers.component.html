@@ -20,6 +20,14 @@
           <span class="stat-label">Offres</span>
         </div>
       </div>
+      <!-- 🔥 NOUVEAU : Stat pour offres recommandées -->
+      <div class="stat-card stat-recommended" *ngIf="recommendedOffers.length > 0">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-content">
+          <span class="stat-number">{{ recommendedOffers.length }}</span>
+          <span class="stat-label">Recommandées</span>
+        </div>
+      </div>
       <div class="stat-card">
         <div class="stat-icon">🏢</div>
         <div class="stat-content">
@@ -37,7 +45,7 @@
     </div>
   </div>
 
-  <!-- Barre de Recherche Créative -->
+  <!-- Barre de Recherche -->
   <div class="search-section">
     <div class="search-bar-wrapper">
       <div class="search-input-group">
@@ -55,11 +63,11 @@
     </div>
   </div>
 
-  <!-- Filtres Avancés -->
+  <!-- 🔥 AMÉLIORÉ : Filtres Avancés avec Score et Recommandations -->
   <div class="filters-section">
     <div class="filters-container">
       
-      <!-- Catégorie avec emojis dynamiques -->
+      <!-- Catégorie -->
       <div class="filter-group">
         <label class="filter-label">
           <span class="filter-icon">📂</span>
@@ -73,7 +81,7 @@
         </select>
       </div>
 
-      <!-- Type de contrat avec emojis dynamiques -->
+      <!-- Type de contrat -->
       <div class="filter-group">
         <label class="filter-label">
           <span class="filter-icon">📝</span>
@@ -99,6 +107,21 @@
         </select>
       </div>
 
+      <!-- 🔥 NOUVEAU : Filtre par score minimum -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">⭐</span>
+          Score minimum
+        </label>
+        <select class="filter-select" [(ngModel)]="minScore" (change)="applyFilters()">
+          <option [value]="0">Tous les scores</option>
+          <option [value]="80">🔥 Excellent (80%+)</option>
+          <option [value]="60">⭐ Très bon (60%+)</option>
+          <option [value]="40">✨ Bon (40%+)</option>
+          <option [value]="20">💫 Moyen (20%+)</option>
+        </select>
+      </div>
+
       <!-- Remote Only -->
       <div class="filter-group checkbox-group">
         <label class="checkbox-filter">
@@ -113,8 +136,28 @@
     </div>
 
     <div class="filters-actions">
+      <!-- 🔥 NOUVEAU : Toggle recommandations uniquement -->
+      <button 
+        class="btn-recommended" 
+        [class.active]="showOnlyRecommended"
+        *ngIf="recommendedOffers.length > 0"
+        (click)="toggleRecommendedOnly()">
+        <span>🔥</span> 
+        <span *ngIf="!showOnlyRecommended">Voir recommandées</span>
+        <span *ngIf="showOnlyRecommended">Voir toutes</span>
+      </button>
+
       <button class="btn-reset-filters" (click)="resetFilters()">
         <span>🔄</span> Réinitialiser
+      </button>
+      
+      <!-- 🔥 NOUVEAU : Bouton de tri par score -->
+      <button 
+        class="btn-sort-score" 
+        [class.active]="sortMode === 'score'"
+        *ngIf="recommendedOffers.length > 0"
+        (click)="toggleSortByScore()">
+        <span>⭐</span> Trier par score
       </button>
       
       <button class="btn-toggle-view" (click)="toggleViewMode()">
@@ -130,7 +173,7 @@
     <p>Chargement des offres...</p>
   </div>
 
-  <!-- Liste des Offres avec EMOJIS DYNAMIQUES -->
+  <!-- 🔥 AMÉLIORÉ : Liste des Offres avec SCORES -->
   <div class="offers-grid" [class.list-view]="viewMode === 'list'" *ngIf="!isLoading">
     
     <!-- Aucun résultat -->
@@ -141,15 +184,21 @@
       <button class="btn-primary" (click)="resetFilters()">Réinitialiser les filtres</button>
     </div>
 
-    <!-- Cards des offres avec EMOJIS DYNAMIQUES -->
+    <!-- 🔥 Cards des offres avec SCORE DE MATCHING -->
     <div class="offer-card" *ngFor="let offer of filteredOffers" (click)="openOfferDetails(offer)">
       
+      <!-- 🔥 NOUVEAU : Badge de Score (si offre recommandée) -->
+      <div class="match-score-badge" 
+           *ngIf="isOfferRecommended(offer._id!)"
+           [style.background]="getMatchColor(getOfferScore(offer._id!))">
+        <span class="score-emoji">{{ getMatchEmoji(getOfferScore(offer._id!)) }}</span>
+        <span class="score-value">{{ getOfferScorePercentage(offer._id!) }}%</span>
+        <span class="score-label">{{ getMatchLabel(getOfferScore(offer._id!)) }}</span>
+      </div>
+
       <!-- Header de la card -->
       <div class="offer-card-header">
-
         <div class="offer-badges">
-
-          <!-- Badge avec emoji dynamique de type de contrat -->
           <span class="badge" [ngClass]="getContractTypeBadgeClass(offer.contractType)">
             {{ getContractTypeEmoji(offer.contractType) }} {{ offer.contractType }}
           </span>
@@ -159,8 +208,6 @@
 
       <!-- Contenu de la card -->
       <div class="offer-card-body">
-        
-        <!-- Titre avec emoji dynamique du secteur -->
         <h3 class="offer-title">
           <span class="info-icon">{{ getSectorEmoji(offer.sector) }}</span>
           {{ offer.title }}
@@ -184,7 +231,6 @@
             <span class="info-icon">⏱️</span>
             {{ offer.workingHours }}
           </span>
-          <!-- Emoji dynamique d'expérience -->
           <span class="info-item">
             <span class="info-icon">{{ getExperienceEmoji(offer.experienceLevel) }}</span>
             {{ offer.experienceLevel }}
@@ -210,11 +256,9 @@
 
       <!-- Footer de la card -->
       <div class="offer-card-footer">
-        <!-- Si expiré -->
         <span *ngIf="(offer?.daysRemaining ?? 0) < 0" class="expired">
           ⚠️ Offre expirée
         </span>
-        <!-- Sinon : jours restants -->
         <span *ngIf="(offer?.daysRemaining ?? 0) >= 0" class="posted-date">
           📅 {{ offer?.daysRemaining }} jours restants
         </span>
@@ -225,11 +269,10 @@
 
 </div>
 
-<!-- Modal Détails de l'Offre avec EMOJIS DYNAMIQUES -->
+<!-- 🔥 AMÉLIORÉ : Modal Détails avec Score -->
 <div class="modal-backdrop" *ngIf="isDetailModalOpen && selectedOffer" (click)="closeDetailModal()">
   <div class="modal-container detail-modal" (click)="$event.stopPropagation()">
     
-    <!-- Close Button -->
     <button class="modal-close-btn" (click)="closeDetailModal()">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -237,9 +280,27 @@
       </svg>
     </button>
 
-    <!-- Header du Modal avec emoji dynamique -->
+    <!-- 🔥 NOUVEAU : Badge de Score dans le modal (si offre recommandée) -->
+    <div class="modal-match-badge" 
+         *ngIf="isOfferRecommended(selectedOffer._id!)"
+         [style.background]="getMatchColor(getOfferScore(selectedOffer._id!))">
+      <div class="match-content">
+        <span class="match-emoji-large">{{ getMatchEmoji(getOfferScore(selectedOffer._id!)) }}</span>
+        <div class="match-info">
+          <span class="match-score-large">{{ getOfferScorePercentage(selectedOffer._id!) }}%</span>
+          <span class="match-label-text">{{ getMatchLabel(getOfferScore(selectedOffer._id!)) }}</span>
+        </div>
+      </div>
+      
+      <div class="match-explanation">
+        <p class="match-text">
+          💡 Cette offre correspond à votre profil basé sur vos compétences et votre spécialité
+        </p>
+      </div>
+    </div>
+
+    <!-- Header du Modal -->
     <div class="modal-detail-header">
-      <!-- Logo avec emoji dynamique du secteur -->
       <div class="company-logo-large">{{ getSectorEmoji(selectedOffer.sector) }}</div>
       <div class="header-info">
         <h2 class="detail-title">{{ selectedOffer.title }}</h2>
@@ -248,13 +309,11 @@
           {{ selectedOffer.companyId.name }}
         </p>
         <div class="detail-badges">
-          <!-- Badge avec emoji dynamique de type de contrat -->
           <span class="badge" [ngClass]="getContractTypeBadgeClass(selectedOffer.contractType)">
             {{ getContractTypeEmoji(selectedOffer.contractType) }} {{ selectedOffer.contractType }}
           </span>
           <span class="badge badge-remote" *ngIf="selectedOffer.remoteOption">🏠 Télétravail</span>
           <span class="badge badge-location">📍 {{ selectedOffer.location }}</span>
-          <!-- Badge avec emoji dynamique d'expérience -->
           <span class="badge badge-location">
             {{ getExperienceEmoji(selectedOffer.experienceLevel) }} {{ selectedOffer.experienceLevel }}
           </span>
@@ -262,10 +321,9 @@
       </div>
     </div>
 
-    <!-- Contenu du Modal -->
+    <!-- Contenu du Modal (reste identique) -->
     <div class="modal-detail-content">
       
-      <!-- Informations Clés -->
       <div class="detail-section">
         <h3 class="section-title">
           <span class="section-icon">ℹ️</span>
@@ -277,13 +335,12 @@
             <span class="info-value">{{ selectedOffer.salaryRange || 'Non spécifié' }}</span>
           </div>
           <div class="info-box">
-            <!-- Emoji dynamique d'expérience dans le modal -->
             <span class="info-label">{{ getExperienceEmoji(selectedOffer.experienceLevel) }} Expérience</span>
             <span class="info-value">{{ selectedOffer.experienceLevel }}</span>
           </div>
           <div class="info-box">
             <span class="info-label">📅 Publié le</span>
-            <span class="info-value">{{ selectedOffer.createdAt| date:'dd/MM/yyyy HH:mm' }}</span>
+            <span class="info-value">{{ selectedOffer.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="info-box">
             <span class="info-label">⏰ Jours restants</span>
@@ -292,7 +349,6 @@
         </div>
       </div>
 
-      <!-- Description -->
       <div class="detail-section">
         <h3 class="section-title">
           <span class="section-icon">📋</span>
@@ -301,7 +357,6 @@
         <p class="detail-description">{{ selectedOffer.description }}</p>
       </div>
 
-      <!-- Exigences -->
       <div class="detail-section" *ngIf="selectedOffer.requiredDiploma?.length">
         <h3 class="section-title">
           <span class="section-icon">✅</span>
@@ -314,7 +369,6 @@
         </ul>
       </div>
 
-      <!-- Compétences Requises -->
       <div class="detail-section" *ngIf="selectedOffer.requiredSkills?.length">
         <h3 class="section-title">
           <span class="section-icon">🎯</span>
@@ -327,7 +381,6 @@
         </div>
       </div>
 
-      <!-- Champs spécifiques au secteur -->
       <ng-container *ngIf="getSpecificFields(selectedOffer) as specificFields">
         <div class="detail-section" *ngFor="let field of specificFields">
           <h3 class="section-title">
@@ -335,19 +388,16 @@
             {{ field.label }}
           </h3>
           
-          <!-- Type: text -->
           <p class="detail-description" *ngIf="field.type === 'text'">
             {{ field.value }}
           </p>
           
-          <!-- Type: tags -->
           <div class="skills-grid" *ngIf="field.type === 'tags' && isArray(field.value)">
             <span class="skill-badge" *ngFor="let item of asArray(field.value)">
               {{ item }}
             </span>
           </div>
           
-          <!-- Type: list -->
           <ul class="requirements-list" *ngIf="field.type === 'list' && isArray(field.value)">
             <li *ngFor="let item of asArray(field.value)">
               <span class="bullet">▸</span> {{ item }}
@@ -363,8 +413,7 @@
       <button class="btn btn-secondary" (click)="closeDetailModal()">
         Fermer
       </button>
-      <!--<button class="btn btn-primary" (click)="applyToOffer(selectedOffer._id!)">-->
-      <button class="btn btn-primary" (click)="openApplyModal()" >
+      <button class="btn btn-primary" (click)="openApplyModal()">
         <span>📤</span> Postuler Maintenant
       </button>
     </div>
@@ -372,20 +421,15 @@
   </div>
 </div>
 
-
-<!-- Modal de Candidature -->
+<!-- Modal de Candidature (inchangé) -->
 <div class="modal-backdrop" *ngIf="isApplyModalOpen" (click)="closeApplyModal()">
   <div class="modal-container apply-modal" (click)="$event.stopPropagation()">
-    <button class="modal-close-btn" (click)="closeApplyModal()">
-      ✖
-    </button>
+    <button class="modal-close-btn" (click)="closeApplyModal()">✖</button>
 
-    <!-- Ici, tu peux copier ta div form-step -->
     <div class="form-step">
       <h3>📄 Upload Your Documents</h3>
       <p class="step-description">Upload your CV and motivation letter</p>
 
-      <!-- CV Upload -->
       <div class="upload-section">
         <div class="upload-header">
           <h4>Curriculum Vitae (CV)</h4>
@@ -421,7 +465,6 @@
         </div>
       </div>
 
-      <!-- Motivation Letter Upload -->
       <div class="upload-section">
         <div class="upload-header">
           <h4>Motivation Letter</h4>

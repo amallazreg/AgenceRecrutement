@@ -7,8 +7,7 @@ import { Offer, OfferService } from '../../services/offers.service';
 import { OfferHelperServiceService, SpecificField } from '../../services/offer-helper-service.service';
 import { CandidatureService } from '../../services/candidature.service';
 import { AuthServiceService } from '../../services/auth-service.service';
-
-
+import { MatchScoreService, OfferWithScore } from '../../services/match-score.service';
 
 @Component({
   selector: 'app-job-offers',
@@ -19,10 +18,17 @@ import { AuthServiceService } from '../../services/auth-service.service';
 })
 export class JobOffersComponent implements OnInit {
   // Données
-  offers: Offer[] = [];
+  offers: Offer[] = []; // 🔥 Toutes les offres normales
   filteredOffers: Offer[] = [];
   selectedOffer: Offer | null = null;
   companyNames: { [key: string]: string } = {};
+  
+  // 🔥 Données de recommandation (de l'API)
+  recommendedOffers: OfferWithScore[] = []; // Offres recommandées de l'API
+  offersWithScores: Map<string, number> = new Map(); // offerId -> matchingScore
+  
+  // 🔥 Mode d'affichage
+  showOnlyRecommended: boolean = false; // false = toutes les offres, true = recommandées uniquement
 
   // Recherche et filtres
   searchQuery: string = '';
@@ -35,250 +41,311 @@ export class JobOffersComponent implements OnInit {
   isDetailModalOpen: boolean = false;
   isLoading: boolean = true;
   viewMode: 'grid' | 'list' = 'grid';
+  
+  // 🔥 Mode de tri
+  sortMode: 'score' | 'date' | 'none' = 'none';
 
   // Variables pour le modal de candidature
   isApplyModalOpen: boolean = false;
-
-  // Variables pour les fichiers
   cvFile: File | null = null;
   cvFileName: string = '';
   motivationLetterFile: File | null = null;
   motivationLetterFileName: string = '';
 
-  
-  
-  // Catégories disponibles
+  // Catégories et types
   categories: string[] = [
-    'Technologie',
-    'Marketing',
-    'Finance',
-    'Santé',
-    'Éducation',
-    'Commerce',
-    'Industrie'
+    'Technologie', 'Marketing', 'Finance', 'Santé',
+    'Éducation', 'Commerce', 'Industrie'
   ];
-  
-  // Types de contrat
   contractTypes: string[] = ['CDI', 'CDD', 'Stage', 'Freelance', 'Alternance'];
-  
 
-  // ============================================
-  // SYSTÈME D'ICÔNES EMOJI PAR SECTEUR
-  // ============================================
+  // Emojis mappings
   private sectorEmojis: { [key: string]: string } = {
-    'Technologie': '💻',
-    'Marketing': '📢',
-    'Finance': '💰',
-    'Santé': '🏥',
-    'Éducation': '📚',
-    'Commerce': '🛍️',
-    'Industrie': '🏭',
-    
-    // Variations possibles
-    'Informatique': '🖥️',
-    'Digital Marketing': '📱',
-    'Banque': '🏦',
-    'Médecine': '⚕️',
-    'Formation': '🎓',
-    'E-commerce': '🛒',
-    'Production': '⚙️',
-    
-    // Par défaut
-    'Autre': '💼'
+    'Technologie': '💻', 'Marketing': '📢', 'Finance': '💰',
+    'Santé': '🏥', 'Éducation': '📚', 'Commerce': '🛍️',
+    'Industrie': '🏭', 'Informatique': '🖥️', 'Autre': '💼'
   };
 
-  // ============================================
-  // ICÔNES PAR TYPE DE CONTRAT
-  // ============================================
   private contractTypeEmojis: { [key: string]: string } = {
-    'CDI': '📝',
-    'CDD': '📄',
-    'Stage': '🎓',
-    'Freelance': '💼',
-    'Alternance': '🔄',
-    'Intérim': '⏱️',
-    'Temps Partiel': '⏰',
-    'Temps Plein': '⌚'
+    'CDI': '📝', 'CDD': '📄', 'Stage': '🎓',
+    'Freelance': '💼', 'Alternance': '🔄'
   };
 
-  // ============================================
-  // ICÔNES PAR NIVEAU D'EXPÉRIENCE
-  // ============================================
   private experienceEmojis: { [key: string]: string } = {
-    'Débutant': '🌱',
-    'Junior': '🌿',
-    'Intermédiaire': '🌳',
-    'Senior': '🏆',
-    'Expert': '⭐',
-    'Manager': '👔',
-    'Directeur': '💎',
-    '0-1 ans': '🌱',
-    '1-3 ans': '🌿',
-    '3-5 ans': '🌳',
-    '5+ ans': '🏆',
-    '10+ ans': '⭐'
+    'Débutant': '🌱', 'Junior': '🌿', 'Intermédiaire': '🌳',
+    'Senior': '🏆', 'Expert': '⭐'
   };
+minScore: any;
 
-  // ============================================
-  // MAPPING BACKEND -> EMOJIS
-  // ============================================
-  private backendIconToEmoji: { [key: string]: string } = {
-    'computer': '💻',
-    'campaign': '📢',
-    'account_balance': '💰',
-    'local_hospital': '🏥',
-    'school': '📚',
-    'store': '🛍️',
-    'precision_manufacturing': '🏭'
-  };
+  constructor(
+    private router: Router,
+    private offersService: OfferService,
+    private offerHelperService: OfferHelperServiceService,
+    private candidatureService: CandidatureService,
+    private authService: AuthServiceService,
+    private recommendationService: MatchScoreService
+  ) {}
+
+ngOnInit(): void {
+  const candidateId = this.authService.getUserId() as string;
+
+  if (candidateId) {
+    this.loadRecommendationsOnly(candidateId);
+  } else {
+    this.filteredOffers = [];
+    this.isLoading = false;
+  }
+}
 
 
-constructor(private router: Router, private offersService: OfferService,private offerHelperService : OfferHelperServiceService,private candidatureService : CandidatureService,
-  private authService : AuthServiceService
-) {}
+  // 🔥 Charger TOUTES les offres + les recommandations en parallèle
+ 
 
-  ngOnInit(): void {
-    this.loadJobOffers();
+  // 🔥 Charger les recommandations (pour avoir les scores)
+loadRecommendationsOnly(candidateId: string): void {
+  this.isLoading = true;
+
+  this.recommendationService.getRecommendedOffers(candidateId).subscribe({
+    next: (response) => {
+      this.recommendedOffers = response.recommendations || [];
+
+      // Remplace TOUTES les offres par les recommandations
+      this.offers = [...this.recommendedOffers];
+
+      // Remplit le Map des scores
+      this.offersWithScores.clear();
+      this.recommendedOffers.forEach(offer => {
+        this.offersWithScores.set(offer._id!, offer.matchingScore);
+      });
+
+      // Appliquer filtres
+      this.applyFilters();
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('Erreur lors du chargement des recommandations:', err);
+      this.isLoading = false;
+    }
+  });
+}
+
+  // 🔥 MÉTHODE PRINCIPALE : Toggle entre toutes les offres et recommandées
+  toggleRecommendedOnly(): void {
+    this.showOnlyRecommended = !this.showOnlyRecommended;
+    
+    if (this.showOnlyRecommended) {
+      // Mode "Recommandées uniquement"
+      console.log('🔥 Affichage des offres recommandées (score >= 40%)');
+      this.sortMode = 'score'; // Activer le tri par score automatiquement
+    } else {
+      // Mode "Toutes les offres"
+      console.log('📋 Affichage de toutes les offres');
+      this.sortMode = 'none'; // Désactiver le tri
+    }
+    
+    this.applyFilters();
   }
 
-  // ============================================
-  // MÉTHODES POUR OBTENIR LES ICÔNES EMOJI
-  // ============================================
-  
-  /**
-   * Obtenir l'emoji d'un secteur
-   * Compatible avec les données du backend
-   */
+  // 🔥 Obtenir le score d'une offre (0-1)
+  getOfferScore(offerId: string): number {
+    return this.offersWithScores.get(offerId) || 0;
+  }
+
+  // 🔥 Obtenir le score en pourcentage (0-100)
+  getOfferScorePercentage(offerId: string): number {
+    const score = this.getOfferScore(offerId);
+    return this.recommendationService.scoreToPercentage(score);
+  }
+
+  // 🔥 Vérifier si une offre est recommandée
+  isOfferRecommended(offerId: string): boolean {
+    return this.offersWithScores.has(offerId);
+  }
+
+  // 🔥 Vérifier si une offre a un score >= 40%
+  hasGoodMatch(offerId: string): boolean {
+    const percentage = this.getOfferScorePercentage(offerId);
+    return percentage >= 40; // Bon match ou mieux
+  }
+
+  // 🔥 Tri par score
+  sortByScore(): void {
+    if (this.sortMode === 'score') {
+      this.filteredOffers.sort((a, b) => {
+        const scoreA = this.getOfferScore(a._id!);
+        const scoreB = this.getOfferScore(b._id!);
+        return scoreB - scoreA; // Décroissant
+      });
+    }
+  }
+
+  // 🔥 AMÉLIORATION : Filtres intelligents
+  applyFilters(): void {
+    // 🎯 LOGIQUE PRINCIPALE
+    if (this.showOnlyRecommended) {
+      // ============================================
+      // MODE "RECOMMANDÉES UNIQUEMENT" (score >= 40%)
+      // ============================================
+      this.filteredOffers = this.recommendedOffers
+        .filter(offer => {
+          // Filtre 1 : Offres publiées uniquement
+          if (offer.status !== 'Publié') return false;
+
+          // Filtre 2 : Score >= 40% (Bon match minimum)
+          const scorePercentage = this.getOfferScorePercentage(offer._id!);
+          if (scorePercentage < 40) return false;
+
+          // Filtre 3 : Recherche
+          const matchesSearch = 
+            offer.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+            offer.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+           (offer.requiredSkills || []).some((skill: string) =>
+    skill.toLowerCase().includes(this.searchQuery.toLowerCase())
+);
+
+          
+          // Filtre 4 : Catégorie
+          const matchesCategory = this.selectedCategory === 'all' || offer.sector === this.selectedCategory;
+          
+          // Filtre 5 : Type de contrat
+          const matchesType = this.selectedType === 'all' || offer.contractType === this.selectedType;
+          
+          // Filtre 6 : Localisation
+          const matchesLocation = this.selectedLocation === 'all' || offer.location === this.selectedLocation;
+          
+          // Filtre 7 : Remote
+          const matchesRemote = !this.showRemoteOnly || offer.remoteOption;
+          
+          return matchesSearch && matchesCategory && matchesType && 
+                 matchesLocation && matchesRemote;
+        });
+
+      // Tri automatique par score décroissant
+      this.sortByScore();
+      
+    } else {
+      // ============================================
+      // MODE "TOUTES LES OFFRES"
+      // ============================================
+      this.filteredOffers = this.offers.filter(offer => {
+        if (offer.status !== 'Publié') return false;
+
+        const matchesSearch = 
+          offer.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          offer.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          (offer.requiredSkills || []).some(skill => 
+            skill.toLowerCase().includes(this.searchQuery.toLowerCase())
+          );
+        
+        const matchesCategory = this.selectedCategory === 'all' || offer.sector === this.selectedCategory;
+        const matchesType = this.selectedType === 'all' || offer.contractType === this.selectedType;
+        const matchesLocation = this.selectedLocation === 'all' || offer.location === this.selectedLocation;
+        const matchesRemote = !this.showRemoteOnly || offer.remoteOption;
+        
+        return matchesSearch && matchesCategory && matchesType && 
+               matchesLocation && matchesRemote;
+      });
+
+      // Tri optionnel par score si activé manuellement
+      if (this.sortMode === 'score') {
+        this.sortByScore();
+      }
+    }
+
+    console.log(`📊 Offres affichées: ${this.filteredOffers.length}`);
+  }
+
+  // 🔥 Compter les offres recommandées (score >= 40%)
+  getRecommendedCount(): number {
+    return this.recommendedOffers.filter(offer => {
+      const scorePercentage = this.getOfferScorePercentage(offer._id!);
+      return scorePercentage >= 40 && offer.status === 'Publié';
+    }).length;
+  }
+
+  // Méthodes existantes...
   getSectorEmoji(sector: string): string {
-    // Recherche directe par nom de secteur
-    if (this.sectorEmojis[sector]) {
-      return this.sectorEmojis[sector];
-    }
-    
-    // Recherche case-insensitive
-    const sectorLower = sector.toLowerCase();
-    const foundKey = Object.keys(this.sectorEmojis).find(
-      key => key.toLowerCase() === sectorLower
-    );
-    
-    if (foundKey) {
-      return this.sectorEmojis[foundKey];
-    }
-    
-    // Par défaut
-    return this.sectorEmojis['Autre'];
+    return this.sectorEmojis[sector] || this.sectorEmojis['Autre'];
   }
 
-  /**
-   * Convertir une icône Material du backend en emoji
-   */
-  convertBackendIconToEmoji(materialIcon: string): string {
-    return this.backendIconToEmoji[materialIcon] || '💼';
-  }
-
-  /**
-   * Obtenir l'emoji d'un type de contrat
-   */
   getContractTypeEmoji(contractType: string): string {
     return this.contractTypeEmojis[contractType] || '📋';
   }
 
-  /**
-   * Obtenir l'emoji d'un niveau d'expérience
-   */
   getExperienceEmoji(experience: string): string {
-    // Recherche exacte
     if (this.experienceEmojis[experience]) {
       return this.experienceEmojis[experience];
     }
-    
-    // Recherche par mots-clés
     const expLower = experience.toLowerCase();
-    if (expLower.includes('débutant') || expLower.includes('0-1')) {
-      return '🌱';
-    } else if (expLower.includes('1-3') || expLower.includes('junior')) {
-      return '🌿';
-    } else if (expLower.includes('3-5') || expLower.includes('intermédiaire')) {
-      return '🌳';
-    } else if (expLower.includes('5+') || expLower.includes('senior')) {
-      return '🏆';
-    } else if (expLower.includes('10+') || expLower.includes('expert')) {
-      return '⭐';
-    }
-    
+    if (expLower.includes('débutant')) return '🌱';
+    if (expLower.includes('junior')) return '🌿';
+    if (expLower.includes('intermédiaire')) return '🌳';
+    if (expLower.includes('senior')) return '🏆';
     return '📈';
   }
 
-  /**
-   * Obtenir la classe CSS de couleur pour un badge de secteur
-   */
-  getSectorBadgeClass(sector: string): string {
-    const classes: { [key: string]: string } = {
-      'Technologie': 'badge-tech',
-      'Marketing': 'badge-marketing',
-      'Finance': 'badge-finance',
-      'Santé': 'badge-health',
-      'Éducation': 'badge-education',
-      'Commerce': 'badge-commerce',
-      'Industrie': 'badge-industry'
-    };
-    
-    return classes[sector] || 'badge-default';
-  }
-
-  /**
-   * Obtenir la classe CSS pour un type de contrat
-   */
   getContractTypeBadgeClass(contractType: string): string {
-    const type = contractType.toLowerCase();
-    return `badge-${type}`;
+    return `badge-${contractType.toLowerCase()}`;
   }
 
-  // ============================================
-  // CHARGEMENT DES OFFRES
-  // ============================================
-  
-  loadJobOffers(): void {
-    this.isLoading = true;
+  // Méthodes de matching
+  getMatchColor(score: number): string {
+    return this.recommendationService.getMatchColor(score);
+  }
 
-    this.offersService.getAllOffers().subscribe({
-      next: (offers) => {
-        this.offers = offers || [];
+  getMatchLabel(score: number): string {
+    return this.recommendationService.getMatchLabel(score);
+  }
 
-        // Récupérer le nom de chaque company
-        this.offers.forEach(offer => {
-          offer.daysRemaining = offer.daysRemaining ?? 0;
-          if (offer.companyId) {
-            this.offersService.getCompanyById(offer.companyId._id).subscribe(company => {
-              this.companyNames[offer.companyId.name!] = company.name;
-            });
-          }
-        });
+  getMatchEmoji(score: number): string {
+    return this.recommendationService.getMatchEmoji(score);
+  }
 
-        this.applyFilters();
-        this.isLoading = false;
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.selectedCategory = 'all';
+    this.selectedType = 'all';
+    this.selectedLocation = 'all';
+    this.showRemoteOnly = false;
+    this.showOnlyRecommended = false; // Retour à toutes les offres
+    this.sortMode = 'none';
+    this.applyFilters();
+  }
+
+  // 🔥 Toggle tri par score manuel
+  toggleSortByScore(): void {
+    this.sortMode = this.sortMode === 'score' ? 'none' : 'score';
+    this.applyFilters();
+  }
+
+  openOfferDetails(offer: Offer) {
+    this.offersService.incrementViews(offer._id!).subscribe({
+      next: (updatedOffer) => {
+        offer.views = updatedOffer.views;
       },
-      error: (error) => {
-        console.error('Erreur lors du chargement des offres:', error);
-        this.isLoading = false;
-      }
+      error: (err) => console.error('Erreur incrémentation vues', err)
     });
+
+    this.selectedOffer = offer;
+    this.isDetailModalOpen = true;
   }
 
-  calculateDaysRemaining(endDate: string): number {
-    const end = new Date(endDate);
-    const today = new Date();
-    const diffTime = end.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  closeDetailModal(): void {
+    this.isDetailModalOpen = false;
+    this.selectedOffer = null;
   }
 
-  getStatusInfo(offer: Offer): string {
-    const days = this.calculateDaysRemaining(offer.endOffreDate);
-    if (days < 0) return 'Offre expirée';
-    if (days === 0) return 'Dernier jour';
-    if (days <= 3) return `Plus que ${days} jours`;
-    return `${days} jours restants`;
-  } 
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
+  }
+
+  getUniqueLocations(): string[] {
+    return [...new Set(this.offers.map(offer => offer.location))];
+  }
 
   getSpecificFields(offer: Offer): SpecificField[] {
     return this.offerHelperService.getSpecificFields(offer);
@@ -292,107 +359,7 @@ constructor(private router: Router, private offersService: OfferService,private 
     return Array.isArray(value) ? value : [value];
   }
 
-  // ============================================
-  // FILTRAGE ET RECHERCHE
-  // ============================================
-  
-  applyFilters(): void {
-    this.filteredOffers = this.offers.filter(offer => {
-      // Filtre uniquement les offres publiées
-      if (offer.status !== 'Publié') return false;
-
-      const matchesSearch = 
-        offer.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        offer.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        (offer.requiredSkills || []).some(skill => skill.toLowerCase().includes(this.searchQuery.toLowerCase()));
-      
-      const matchesCategory = this.selectedCategory === 'all' || offer.sector === this.selectedCategory;
-      const matchesType = this.selectedType === 'all' || offer.contractType === this.selectedType;
-      const matchesLocation = this.selectedLocation === 'all' || offer.location === this.selectedLocation;
-      const matchesRemote = !this.showRemoteOnly || offer.remoteOption;
-      
-      return matchesSearch && matchesCategory && matchesType && matchesLocation && matchesRemote;
-    });
-  }
-
-  onSearchChange(): void {
-    this.applyFilters();
-  }
-
-  resetFilters(): void {
-    this.searchQuery = '';
-    this.selectedCategory = 'all';
-    this.selectedType = 'all';
-    this.selectedLocation = 'all';
-    this.showRemoteOnly = false;
-    this.applyFilters();
-  }
-
-  // ============================================
-  // GESTION DU MODAL
-  // ============================================
-  
-
-
-openOfferDetails(offer: Offer) {
-  // Incrémente les vues via le service
-  this.offersService.incrementViews(offer._id!).subscribe({
-    next: (updatedOffer) => {
-      offer.views = updatedOffer.views; // met à jour localement pour affichage immédiat
-    },
-    error: (err) => console.error('Erreur lors de l\'incrémentation des vues', err)
-  });
-
-  // Ouvre le modal
-  this.selectedOffer = offer;
-  this.isDetailModalOpen = true;
-}
-
-  closeDetailModal(): void {
-    this.isDetailModalOpen = false;
-    this.selectedOffer = null;
-    document.body.style.overflow = 'auto';
-  }
-
-  applyToOffer(offerId: string): void {
-    console.log('Postuler à l\'offre:', offerId);
-    // TODO: Implémenter la logique de candidature
-    alert('Candidature envoyée avec succès ! 🎉');
-    this.closeDetailModal();
-  }
-
-  // ============================================
-  // UTILITAIRES
-  // ============================================
-  
-  toggleViewMode(): void {
-    this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
-  }
-
-  getDaysRemaining(deadline: Date): number {
-    const today = new Date();
-    const deadlineDate = new Date(deadline);
-    const diffTime = deadlineDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  }
-
-  getUniqueLocations(): string[] {
-    return [...new Set(this.offers.map(offer => offer.location))];
-  }
-
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-  }
-
- 
-
-
-   // Méthodes pour le modal
+  // Méthodes du modal de candidature
   openApplyModal() {
     this.isApplyModalOpen = true;
   }
@@ -403,7 +370,6 @@ openOfferDetails(offer: Offer) {
     this.motivationLetterFile = null;
   }
 
-   // Méthodes pour gérer les fichiers
   onFileSelected(event: any, type: 'cv' | 'motivationLetter') {
     const file: File = event.target.files[0];
     if (!file) return;
@@ -427,28 +393,23 @@ openOfferDetails(offer: Offer) {
     }
   }
 
-
-
   submitApplication() {
-  if (!this.selectedOffer) return;
+    if (!this.selectedOffer) return;
 
-  const candidateId = this.authService.getUserId() as string;
-  console.log("l'id du user est ",candidateId) // remplace par l'ID connecté
-  const offerId = this.selectedOffer._id as string;
-  console.log("l'id d'offre est ", offerId);
+    const candidateId = this.authService.getUserId() as string;
+    const offerId = this.selectedOffer._id as string;
 
- this.candidatureService.applyOffer(offerId, candidateId, this.cvFile, this.motivationLetterFile)
-    .subscribe({
-      next: (res) => {
-        console.log('Candidature réussie', res);
-        alert(res.message);
-        this.closeApplyModal();
-      },
-      error: (err) => {
-        console.error('Erreur candidature', err);
-        alert('Erreur lors de l’envoi de la candidature');
-      }
-    });
-}
-
+    this.candidatureService.applyOffer(offerId, candidateId, this.cvFile, this.motivationLetterFile)
+      .subscribe({
+        next: (res) => {
+          alert(res.message);
+          this.closeApplyModal();
+          this.closeDetailModal();
+        },
+        error: (err) => {
+          console.error('Erreur candidature', err);
+          alert('Erreur lors de l\'envoi de la candidature');
+        }
+      });
+  }
 }
