@@ -24,7 +24,7 @@
       <div class="stat-card stat-recommended" *ngIf="recommendedOffers.length > 0">
         <div class="stat-icon">🔥</div>
         <div class="stat-content">
-          <span class="stat-number">{{ recommendedOffers.length }}</span>
+          <span class="stat-number">{{ recommendedOffers.length /4 }}</span>
           <span class="stat-label">Recommandées</span>
         </div>
       </div>
@@ -35,13 +35,7 @@
           <span class="stat-label">Villes</span>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon">🌟</div>
-        <div class="stat-content">
-          <span class="stat-number">{{ categories.length }}</span>
-          <span class="stat-label">Catégories</span>
-        </div>
-      </div>
+      
     </div>
   </div>
 
@@ -67,19 +61,7 @@
   <div class="filters-section">
     <div class="filters-container">
       
-      <!-- Catégorie -->
-      <div class="filter-group">
-        <label class="filter-label">
-          <span class="filter-icon">📂</span>
-          Catégorie
-        </label>
-        <select class="filter-select" [(ngModel)]="selectedCategory" (change)="applyFilters()">
-          <option value="all">Toutes les catégories</option>
-          <option *ngFor="let cat of categories" [value]="cat">
-            {{ getSectorEmoji(cat) }} {{ cat }}
-          </option>
-        </select>
-      </div>
+   
 
       <!-- Type de contrat -->
       <div class="filter-group">

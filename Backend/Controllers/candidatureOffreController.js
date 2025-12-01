@@ -76,20 +76,22 @@ const recommendOffers = async (req, res) => {
     if (!candidate)
       return res.status(404).json({ message: "Candidat non trouvé" });
 
-    // ✅ AJOUT : Filtrer les offres selon la spécialité
     const candidateSpecialty = candidate.specialty?.toLowerCase() || "";
 
+    // ✅ Ajouter populate pour companyId
     let offers = [];
-
     if (candidateSpecialty === "technologie") {
-      offers = await Offre.find({ sector: /technologie/i });
+      offers = await Offre.find({ sector: /technologie/i }).populate('companyId', 'name');
     } else {
-      offers = await Offre.find(); // pas de filtre
+      offers = await Offre.find().populate('companyId', 'name');
     }
 
-    // Embedding du candidat
     const candidateText = buildCandidateText(candidate);
     const candidateVec = await embedText(candidateText);
+
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const today = new Date();
+    const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     const results = [];
 
@@ -102,13 +104,33 @@ const recommendOffers = async (req, res) => {
         ${offer.description}
         ${sectorFields}
       `;
-
       const offerVec = await embedText(offerText);
       const score = cosineSimilarity(candidateVec, offerVec);
 
+      // Calcul daysRemaining
+      let daysRemaining = null;
+      let statusInfo = "Date de fin non définie";
+      if (offer.endOffreDate) {
+        const endDate = new Date(offer.endOffreDate);
+        const diffMs = endDate.getTime() - todayZero.getTime();
+        daysRemaining = Math.floor(diffMs / MS_PER_DAY) + 1;
+        if (daysRemaining > 0) statusInfo = `Expire dans ${daysRemaining} jour(s)`;
+        else if (daysRemaining === 0) statusInfo = "Expire aujourd'hui";
+        else statusInfo = `Expirée depuis ${Math.abs(daysRemaining)} jour(s)`;
+
+        // Archive si expirée
+        if (daysRemaining <= 0 && offer.status !== 'Archivé') {
+          offer.status = 'Archivé';
+          try { await offer.save(); } catch (err) { console.error(err); }
+        }
+      }
+
       results.push({
         ...offer._doc,
-        matchingScore: Math.round(score * 100) // %
+        matchingScore: Math.round(score * 100),
+        companyName: offer.companyId?.name || "Entreprise inconnue",
+        daysRemaining,
+        statusInfo
       });
     }
 

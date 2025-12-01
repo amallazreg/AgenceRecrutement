@@ -41,7 +41,7 @@ export class MatchScoreService {
     if (percentage >= 80) return '#10b981'; // Vert - Excellent
     if (percentage >= 60) return '#3b82f6'; // Bleu - Très bon
     if (percentage >= 40) return '#f59e0b'; // Orange - Bon
-    if (percentage >= 20) return '#f97316'; // Orange foncé - Moyen
+    if (percentage >= 30) return '#f97316'; // Orange foncé - Moyen
     return '#6b7280'; // Gris - Faible
   }
 
@@ -54,7 +54,7 @@ export class MatchScoreService {
     if (percentage >= 80) return 'Excellent match';
     if (percentage >= 60) return 'Très bon match';
     if (percentage >= 40) return 'Bon match';
-    if (percentage >= 20) return 'Match moyen';
+    if (percentage >= 30) return 'Match moyen';
     return 'Match faible';
   }
 
@@ -67,7 +67,7 @@ export class MatchScoreService {
     if (percentage >= 80) return '🔥';
     if (percentage >= 60) return '⭐';
     if (percentage >= 40) return '✨';
-    if (percentage >= 20) return '💫';
+    if (percentage >= 30) return '💫';
     return '📌';
   }
 
