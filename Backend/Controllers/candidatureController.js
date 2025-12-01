@@ -275,38 +275,42 @@ const getAllCandidatureForCompany = async (req, res) => {
   try {
     const { companyId } = req.params;
 
-    // Récupérer toutes les offres de la company
+    // Récupérer toutes les offres de l'entreprise
     const offers = await Offer.find({ companyId });
-    if (!offers.length) return res.status(404).json({ message: "Aucune offre trouvée pour cette entreprise" });
+    if (!offers.length) {
+      return res.status(404).json({ message: "Aucune offre trouvée pour cette entreprise" });
+    }
 
     const offerIds = offers.map(offer => offer._id);
 
-    // 🔥 Récupérer candidatures triées par matchScore DESC
+    // Récupérer candidatures triées par matchScore DESC et peupler les références
     const candidatures = await Candidature.find({ offerId: { $in: offerIds } })
-      .sort({ matchScore: -1 })   // <-- TRI DU MEILLEUR AU MOINS BON
-      .populate('candidateId', 'name email phone skills education experiences languages certifications linkedin github')
+      .sort({ matchScore: -1 })
+      .populate('candidateId', 'name email phone skills education experiences projects languages certifications linkedin github')
       .populate('offerId', 'title description');
 
-    const candidatureDTO = candidatures.map(app => ({
+    // Filtrer les candidatures dont le candidat ou l'offre est null
+    const validCandidatures = candidatures.filter(app => app.candidateId && app.offerId);
+
+    // Mapper les candidatures vers un DTO sécurisé
+    const candidatureDTO = validCandidatures.map(app => ({
       _id: app._id,
       candidateId: app.candidateId._id,
       candidateName: app.candidateId.name,
       candidateEmail: app.candidateId.email,
       phone: app.candidateId.phone,
-      skills: app.candidateId.skills,
-      education: app.candidateId.education,
-      experiences: app.candidateId.experiences,
-      projects: app.candidateId.projects,
-      languages: app.candidateId.languages,
-      certifications: app.candidateId.certifications,
-      linkedin: app.candidateId.linkedin,
-      github: app.candidateId.github,
+      skills: app.candidateId.skills || [],
+      education: app.candidateId.education || [],
+      experiences: app.candidateId.experiences || [],
+      projects: app.candidateId.projects || [],
+      languages: app.candidateId.languages || [],
+      certifications: app.candidateId.certifications || [],
+      linkedin: app.candidateId.linkedin || '',
+      github: app.candidateId.github || '',
       cv: app.cv,
       motivationLetter: app.motivationLetter,
       additionalDocuments: app.additionalDocuments,
-
-      matchScore: app.matchScore,  // <-- INCLUS DANS LE DTO
-
+      matchScore: app.matchScore,
       status: app.status,
       submittedAt: app.submittedAt,
       offerTitle: app.offerId.title,
@@ -320,6 +324,7 @@ const getAllCandidatureForCompany = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
+
 
 module.exports = {
     applyOffer,

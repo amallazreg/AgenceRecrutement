@@ -1,69 +1,126 @@
-const axios = require("axios");
 const User = require("../Models/userModel");
 const Offre = require("../Models/offreModel");
-const { calculateSimilarity } = require("../utils/similarity");
+const { embedText } = require("../utils/ai");
+const { buildCandidateText } = require("../utils/candidateText");
 
-
-// 🔵 Construire le texte profil candidat
-function buildCandidateProfile(c) {
-  return `
-    Skills: ${c.skills?.join(", ")};
-    Experiences: ${c.experiences?.join(", ")};
-    Education: ${c.education};
-    Projects: ${c.projects?.join(", ")};
-    Languages: ${c.languages?.join(", ")};
-    Certifications: ${c.certifications?.join(", ")};
-  `;
+// Similarité cosinus
+function cosineSimilarity(vecA, vecB) {
+  const dot = vecA.reduce((sum, v, i) => sum + v * vecB[i], 0);
+  const magA = Math.sqrt(vecA.reduce((sum, v) => sum + v * v, 0));
+  const magB = Math.sqrt(vecB.reduce((sum, v) => sum + v * v, 0));
+  return dot / (magA * magB);
 }
+
+function extractSectorFields(offer) {
+  return {
+    technologie: [
+      ...offer.programmingLanguages,
+      ...offer.frameworks,
+      ...offer.databaseKnowledge,
+      ...offer.tools,
+      offer.projectType,
+      ...(offer.methodology || [])
+    ].join(" "),
+
+    marketing: [
+      ...offer.marketingChannels,
+      ...offer.campaignTools,
+      ...offer.targetAudience,
+      ...offer.kpiFocus
+    ].join(" "),
+
+    finance: [
+      ...offer.financialTools,
+      ...offer.areaOfExpertise,
+      ...offer.certifications,
+      ...offer.reportingFrequency
+    ].join(" "),
+
+    health: [
+      ...offer.requiredDiploma,
+      ...offer.medicalSpecialty,
+      ...offer.workSchedule,
+      ...offer.licenseNumber
+    ].join(" "),
+
+    education: [
+      ...offer.teachingLevel,
+      ...offer.subjectTaught,
+      ...offer.requiredDegree,
+      offer.classSize
+    ].join(" "),
+
+    commerce: [
+      ...offer.salesType,
+      ...offer.productType,
+      ...offer.salesTarget,
+      ...offer.customerManagementTools,
+      offer.mobilityRequired ? "mobility required" : ""
+    ].join(" "),
+
+    industry: [
+      ...offer.machineOperation,
+      ...offer.safetyCertifications,
+      offer.shiftType,
+      offer.productionEnvironment,
+      offer.qualityControl
+    ].join(" "),
+  };
+}
+
 const recommendOffers = async (req, res) => {
   try {
     const candidateId = req.params.candidateId;
 
-    // 1) Récupérer candidat
     const candidate = await User.findById(candidateId);
-    if (!candidate) {
+    if (!candidate)
       return res.status(404).json({ message: "Candidat non trouvé" });
+
+    // ✅ AJOUT : Filtrer les offres selon la spécialité
+    const candidateSpecialty = candidate.specialty?.toLowerCase() || "";
+
+    let offers = [];
+
+    if (candidateSpecialty === "technologie") {
+      offers = await Offre.find({ sector: /technologie/i });
+    } else {
+      offers = await Offre.find(); // pas de filtre
     }
 
-    const candidateSpecialty = candidate.specialty || "";
-    const candidateSkills = (candidate.skills || []).join(" ");
+    // Embedding du candidat
+    const candidateText = buildCandidateText(candidate);
+    const candidateVec = await embedText(candidateText);
 
-    // 2) Récupérer toutes les offres
-    const offers = await Offre.find();
+    const results = [];
 
-    // 3) Filtrer uniquement les offres avec secteur ≈ spécialité
-    const filteredOffers = offers.filter((offer) => {
-      const similaritySector = calculateSimilarity(candidateSpecialty, offer.sector);
-      return similaritySector >= 0.3; // seuil
-    });
+    for (const offer of offers) {
+      const sectorKey = offer.sector.toLowerCase();
+      const sectorFields = extractSectorFields(offer)[sectorKey] || "";
 
-    // 4) Calculer matchingScore basé sur skills vs title+description
-    const scoredOffers = filteredOffers
-      .map((offer) => {
-        const combinedOfferText = `${offer.title} ${offer.description}`;
+      const offerText = `
+        ${offer.title}
+        ${offer.description}
+        ${sectorFields}
+      `;
 
-        const score = calculateSimilarity(candidateSkills, combinedOfferText);
+      const offerVec = await embedText(offerText);
+      const score = cosineSimilarity(candidateVec, offerVec);
 
-        return {
-          ...offer._doc,
-          matchingScore: score,
-        };
-      })
-      .sort((a, b) => b.matchingScore - a.matchingScore);
+      results.push({
+        ...offer._doc,
+        matchingScore: Math.round(score * 100) // %
+      });
+    }
 
     res.json({
-      candidate: {
-        specialty: candidateSpecialty,
-        skills: candidateSkills,
-      },
-      recommendations: scoredOffers,
+      candidate: candidateId,
+      recommendations: results.sort((a, b) => b.matchingScore - a.matchingScore)
     });
+
   } catch (error) {
-    console.error("Erreur recommandation :", error);
-    res.status(500).json({ error: "Error calculating recommendations" });
+    console.error("AI Matching Error:", error);
+    res.status(500).json({ error: "Erreur matching AI" });
   }
 };
 
-module.exports = {
-  recommendOffers
-};
+module.exports = { recommendOffers };

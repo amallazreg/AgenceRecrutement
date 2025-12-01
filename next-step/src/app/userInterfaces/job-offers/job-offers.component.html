@@ -108,19 +108,7 @@
       </div>
 
       <!-- 🔥 NOUVEAU : Filtre par score minimum -->
-      <div class="filter-group">
-        <label class="filter-label">
-          <span class="filter-icon">⭐</span>
-          Score minimum
-        </label>
-        <select class="filter-select" [(ngModel)]="minScore" (change)="applyFilters()">
-          <option [value]="0">Tous les scores</option>
-          <option [value]="80">🔥 Excellent (80%+)</option>
-          <option [value]="60">⭐ Très bon (60%+)</option>
-          <option [value]="40">✨ Bon (40%+)</option>
-          <option [value]="20">💫 Moyen (20%+)</option>
-        </select>
-      </div>
+   
 
       <!-- Remote Only -->
       <div class="filter-group checkbox-group">

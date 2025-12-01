@@ -36,7 +36,7 @@ export class MatchScoreService {
    */
   getMatchColor(score: number): string {
     // Score est entre 0 et 1, on le convertit en pourcentage
-    const percentage = score * 100;
+    const percentage = score ;
     
     if (percentage >= 80) return '#10b981'; // Vert - Excellent
     if (percentage >= 60) return '#3b82f6'; // Bleu - Très bon
@@ -49,7 +49,7 @@ export class MatchScoreService {
    * Obtenir le label du match selon le score
    */
   getMatchLabel(score: number): string {
-    const percentage = score * 100;
+    const percentage = score ;
     
     if (percentage >= 80) return 'Excellent match';
     if (percentage >= 60) return 'Très bon match';
@@ -62,7 +62,7 @@ export class MatchScoreService {
    * Obtenir l'icône emoji selon le score
    */
   getMatchEmoji(score: number): string {
-    const percentage = score * 100;
+    const percentage = score ;
     
     if (percentage >= 80) return '🔥';
     if (percentage >= 60) return '⭐';
@@ -75,6 +75,6 @@ export class MatchScoreService {
    * Convertir le score (0-1) en pourcentage
    */
   scoreToPercentage(score: number): number {
-    return Math.round(score * 100);
+    return Math.round(score);
   }
 }

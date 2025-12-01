@@ -22,7 +22,7 @@ const offerSchema = new mongoose.Schema({
   remoteOption: { type: String, enum: ['Oui','Non','Hybride'], default: 'Non' ,required: true},
   createdAt: { type: Date, default: Date.now } ,
 
-  // Champs spécifiques - Informatique 
+  // Champs spécifiques - Technologie 
   programmingLanguages: [{ type: String }],
   frameworks: [{ type: String }],
   databaseKnowledge: [{ type: String }],
