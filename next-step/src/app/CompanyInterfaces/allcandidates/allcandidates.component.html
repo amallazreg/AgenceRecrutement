@@ -314,24 +314,39 @@
           <span class="material-icons">check_circle</span>
           {{ getSelectedCount() }} candidate(s) selected
         </div>
-        <div class="bulk-buttons">
-          <button class="bulk-btn btn-accept">
-            <span class="material-icons">check</span>
-            Accept Selected
-          </button>
-          <button class="bulk-btn btn-reject">
-            <span class="material-icons">close</span>
-            Reject Selected
-          </button>
-          <button class="bulk-btn btn-export">
-            <span class="material-icons">download</span>
-            Export Selected
-          </button>
-          <button class="bulk-btn btn-delete">
-            <span class="material-icons">delete</span>
-            Delete Selected
-          </button>
-        </div>
+<div class="bulk-buttons">
+  <button class="bulk-btn btn-accept" (click)="acceptSelected()">
+    <span class="material-icons">check</span>
+    Accept Selected
+  </button>
+
+  <button class="bulk-btn btn-reject" (click)="rejectSelected()">
+    <span class="material-icons">close</span>
+    Reject Selected
+  </button>
+
+  <button class="bulk-btn btn-export" (click)="exportSelected()">
+    <span class="material-icons">download</span>
+    Export Selected
+  </button>
+
+  <button class="bulk-btn btn-delete" (click)="deleteSelected()">
+    <span class="material-icons">delete</span>
+    Delete Selected
+  </button>
+</div>
+
+<!-- Exemple liste -->
+<div *ngFor="let item of filteredItems">
+  <input type="checkbox"
+         [(ngModel)]="item.selected" />
+
+  {{ item.title }}
+  <span [class]="getStatusClass(item.status)">
+    {{ item.status }}
+  </span>
+</div>
+
       </div>
 
     </div>

@@ -28,6 +28,7 @@ export class AllcandidatesComponent implements OnInit {
   candidates: Candidate[] = [];
   filteredCandidates: Candidate[] = [];
   paginatedCandidates: Candidate[] = [];
+  filteredItems: any[] = []; // Après filtre
 
   // Filters
   searchQuery: string = '';
@@ -60,6 +61,65 @@ this.companyService.getCurrentCompanyId().subscribe({
   }
 }); 
   }
+// ===== BULK ACTION HELPERS =====
+getSelectedCandidates(): Candidate[] {
+  return this.candidates.filter(c => c.selected);
+}
+acceptSelected(): void {
+  const selected = this.getSelectedCandidates();
+  selected.forEach(candidate => {
+    candidate.status = 'Accepté';
+
+    // Optionnel : envoyer au backend
+     this.candidateService.updateCandidatureStatus(candidate.id, 'Accepté').subscribe();
+  });
+
+  this.applyFilters();
+}
+rejectSelected(): void {
+  const selected = this.getSelectedCandidates();
+  selected.forEach(candidate => {
+    candidate.status = 'Refusé';
+
+    // Optionnel : backend
+     this.candidateService.updateCandidatureStatus(candidate.id, 'Refusé').subscribe();
+  });
+
+  this.applyFilters();
+}
+deleteSelected(): void {
+  const selectedIds = this.getSelectedCandidates().map(c => c.id);
+
+  // Retirer du tableau local
+  this.candidates = this.candidates.filter(c => !selectedIds.includes(c.id));
+
+  // Rafraîchir les filtres et la pagination
+  this.applyFilters();
+
+  // Optionnel : backend delete
+  
+  selectedIds.forEach(id => {
+    this.candidateService.deleteCandidature(id).subscribe();
+  });
+  
+}
+exportSelected(): void {
+  const selected = this.getSelectedCandidates();
+
+  if (selected.length === 0) {
+    alert("Aucun candidat sélectionné !");
+    return;
+  }
+
+  const data = JSON.stringify(selected, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "selected_candidates.json";
+  link.click();
+}
 
   // ===== DATA LOADING =====
  loadCandidates(): void {
