@@ -41,21 +41,16 @@ La plateforme intègre un système de recommandation basé sur l'intelligence ar
 
 Pour les candidats :
 
-Recommandation automatique des offres d'emploi les plus adaptées à leur profil.
-
-Calcul d'un score de correspondance entre les compétences du candidat et les exigences des offres.
-
-Classement des offres selon leur niveau de compatibilité avec le profil du candidat.
+- Recommandation automatique des offres d'emploi les plus adaptées à leur profil.
+- Calcul d'un score de correspondance entre les compétences du candidat et les exigences des offres.
+- Classement des offres selon leur niveau de compatibilité avec le profil du candidat.
 
 Pour les recruteurs :
 
-Analyse des profils des candidats par rapport aux exigences de chaque offre d'emploi.
-
-Calcul d'un score de compatibilité pour chaque candidat.
-
-Classement automatique des candidats selon leur score de correspondance.
-
-Identification rapide des profils les plus pertinents pour faciliter la présélection des candidats.
+- Analyse des profils des candidats par rapport aux exigences de chaque offre d'emploi.
+- Calcul d'un score de compatibilité pour chaque candidat.
+- Classement automatique des candidats selon leur score de correspondance.
+- Identification rapide des profils les plus pertinents pour faciliter la présélection des candidats.
 
 ## 🛠️ Technologies utilisées
 
