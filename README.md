@@ -35,17 +35,17 @@ Elle propose un espace dédié à chaque type d'utilisateur afin de simplifier l
 - Gestion des accès selon le rôle de l'utilisateur.
 - Communication centralisée entre candidats et recruteurs, selon les fonctionnalités implémentées.
 
-🤖 Intelligence artificielle et recommandations intelligentes
+### 🤖 Intelligence artificielle et recommandations intelligentes
 
 La plateforme intègre un système de recommandation basé sur l'intelligence artificielle afin d'optimiser le processus de recrutement et de faciliter la mise en relation entre les candidats et les recruteurs.
 
-Pour les candidats :
+### Pour les candidats :
 
 - Recommandation automatique des offres d'emploi les plus adaptées à leur profil.
 - Calcul d'un score de correspondance entre les compétences du candidat et les exigences des offres.
 - Classement des offres selon leur niveau de compatibilité avec le profil du candidat.
 
-Pour les recruteurs :
+### Pour les recruteurs :
 
 - Analyse des profils des candidats par rapport aux exigences de chaque offre d'emploi.
 - Calcul d'un score de compatibilité pour chaque candidat.
