@@ -108,16 +108,5 @@ La plateforme doit prévoir une authentification sécurisée, une gestion des r�
 
 - Notifications concernant les nouvelles offres et les candidatures.
 - Système de messagerie entre candidats et recruteurs.
-- Téléchargement et gestion des CV.
-- Recommandations d'offres adaptées aux profils.
-- Tableau de bord avec statistiques de recrutement.
 
-## 👩‍💻 Auteur
 
-**Amal Lazreg**
-
-Ingénieure en Téléinformatique
-
-## 📄 Licence
-
-À définir selon les conditions de distribution du projet.
